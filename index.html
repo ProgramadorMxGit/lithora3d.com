@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HELIX 3D ofrece impresión 3D profesional: prototipos, piezas personalizadas y producción bajo demanda con rapidez, precisión y materiales premium.">
+  <title>HELIX 3D — Impresión 3D profesional</title>
+
+  <!-- Google Fonts: Inter (300–700) with display=swap for non-blocking font load -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+
+  <!-- Tailwind CSS via CDN — pinned to v3.4.0 to prevent version drift -->
+  <script src="https://cdn.tailwindcss.com/3.4.0"></script>
+
+  <!-- Design tokens + component styles (must load AFTER Tailwind) -->
+  <link rel="stylesheet" href="assets/styles.css">
+
+  <!-- Preload hero background for LCP (used as CSS background of .hero) -->
+  <link rel="preload" as="image" href="assets/fondo_web.png" fetchpriority="high">
+</head>
+<body class="antialiased text-[#020617] bg-[#F8FAFC]">
+
+  <!-- Site header — one glass surface that morphs from a floating pill (top of page)
+       to a docked full-width bar on scroll. Structure:
+       .site-header  → fixed, full-width, click-through positioning layer
+       .header-shell → the morphing glass surface (width/inset/radius/blur/tint)
+       .header-inner → constant max-width content row (prevents content shift) -->
+  <header class="site-header" id="site-header">
+    <div class="header-shell">
+      <div class="header-inner">
+
+        <!-- Left: hexagon logo mark + wordmark -->
+        <a href="#" class="flex items-center gap-2 shrink-0">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none" stroke="#0369A1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+            <path d="M14 2.5 L23.5 8 L23.5 20 L14 25.5 L4.5 20 L4.5 8 Z"/>
+            <path d="M14 14 L14 2.5 M14 14 L23.5 20 M14 14 L4.5 20"/>
+          </svg>
+          <span class="font-bold text-base text-[#0F172A] whitespace-nowrap tracking-tight">HELIX 3D</span>
+        </a>
+
+        <!-- Center: desktop navigation (hidden on mobile) -->
+        <nav role="navigation" aria-label="Navegación principal" class="hidden lg:flex items-center gap-1">
+          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
+            Servicios
+            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+          </a>
+          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
+            Materiales
+            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+          </a>
+          <a href="#" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Casos de éxito</a>
+          <a href="#" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Sobre nosotros</a>
+          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
+            Recursos
+            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+          </a>
+        </nav>
+
+        <!-- Right: desktop CTA + mobile hamburger -->
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="#cotizar" class="cta-sheen header-cta hidden lg:inline-flex items-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2 rounded-full">Contáctanos →</a>
+          <button id="menu-btn" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu" class="lg:hidden p-2 rounded-lg text-[#334155]">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile menu — glass panel below the bar; matches the shell inset + radius -->
+    <div id="mobile-menu" class="lg:hidden">
+      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Servicios</a>
+      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Materiales</a>
+      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Casos de éxito</a>
+      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Sobre nosotros</a>
+      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Recursos</a>
+      <a href="#cotizar" class="cta-sheen header-cta mt-2 inline-flex items-center justify-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2.5 rounded-full w-full">Contáctanos →</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero section — full-bleed background composition (fondo_web.png is the section background, not an <img>)
+         Hero starts at top:0 so the background image shows BEHIND the floating header. -->
+    <section id="hero" class="hero">
+      <!-- Background image layer (styled in styles.css; role=img keeps the product description for AT) -->
+      <div class="hero__background" role="img" aria-label="Impresora 3D industrial HELIX 3D de alta precisión"></div>
+      <!-- Left-to-right legibility overlay -->
+      <div class="hero__overlay" aria-hidden="true"></div>
+
+      <div class="hero__container">
+        <div class="hero__content">
+          <span class="hero-badge inline-flex items-center gap-2 self-start rounded-full bg-[#EFF6FF] text-[#0369A1] px-3 py-1 font-semibold uppercase tracking-widest">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#0369A1]" aria-hidden="true"></span>
+            Impresión 3D profesional
+          </span>
+
+          <h1 class="hero__title">
+            <span class="block">Impresión 3D de</span>
+            <span class="block hero__title-accent">Nueva Generación</span>
+          </h1>
+
+          <p class="hero-copy">
+            Transformamos ideas en realidad con prototipos, piezas personalizadas y producción bajo demanda. Rapidez, precisión y materiales premium para impulsar tus proyectos.
+          </p>
+
+          <div class="hero-cta flex flex-wrap gap-4 items-center">
+            <a href="#cotizar" class="btn-primary cta-sheen inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 2 V12 M12 12 L21 7 M12 12 L3 7"/></svg>
+              Cotizar ahora →
+            </a>
+            <a href="#features" class="btn-secondary inline-flex items-center gap-2 bg-white border border-[#D1D5DB] text-[#0F172A] font-semibold px-6 py-3 rounded-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 7 L12 12 L2 7 Z"/><path d="M2 12 L12 17 L22 12 M2 17 L12 22 L22 17"/></svg>
+              Ver servicios →
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quotation CTA target — populated in a later task -->
+    <section id="cotizar"></section>
+
+    <!-- Features / services grid -->
+    <section id="features" class="bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 pt-[72px] pb-20">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">Nuestras ventajas</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
+          Por qué elegir HELIX 3D
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <!-- Card 1: Rapidez -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="rapidez">
+            <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15.5 14"/></svg>
+            </div>
+            <span class="block text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-1">RAPIDEZ</span>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Entrega ágil</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Tiempos optimizados sin comprometer calidad.</p>
+          </article>
+
+          <!-- Card 2: Precisión -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="precision">
+            <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.5"/></svg>
+            </div>
+            <span class="block text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-1">PRECISIÓN</span>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Alta exactitud</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Impresiones con detalles finos y tolerancias estrictas.</p>
+          </article>
+
+          <!-- Card 3: Materiales premium -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="materiales">
+            <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/><path d="M9 12 L11 14 L15 10"/></svg>
+            </div>
+            <span class="block text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-1">MATERIALES PREMIUM</span>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Máxima calidad</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Amplia variedad de materiales para cada necesidad.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site footer — brand, quick links, legal copyright -->
+  <footer class="bg-[#0F172A] text-white">
+    <div class="max-w-[1280px] mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+
+      <!-- Brand -->
+      <div class="flex flex-col items-center md:items-start gap-2">
+        <a href="#" class="flex items-center gap-2">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+            <path d="M14 2.5 L23.5 8 L23.5 20 L14 25.5 L4.5 20 L4.5 8 Z"/>
+            <path d="M14 14 L14 2.5 M14 14 L23.5 20 M14 14 L4.5 20"/>
+          </svg>
+          <span class="font-bold text-lg">HELIX 3D</span>
+        </a>
+        <p class="text-sm text-[#94A3B8]">Impresión 3D profesional</p>
+      </div>
+
+      <!-- Quick links -->
+      <nav aria-label="Enlaces de pie de página" class="flex flex-wrap items-center justify-center gap-6">
+        <a href="#" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Servicios</a>
+        <a href="#cotizar" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Contacto</a>
+        <a href="#" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Privacidad</a>
+      </nav>
+
+    </div>
+
+    <!-- Legal bar -->
+    <div class="border-t border-white/10">
+      <div class="max-w-[1280px] mx-auto px-6 py-4">
+        <p class="text-xs text-[#94A3B8] text-center">© 2025 HELIX 3D. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Animation engine: GSAP + ScrollTrigger (must load BEFORE animations.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="assets/animations.js" defer></script>
+</body>
+</html>

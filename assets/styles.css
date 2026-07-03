@@ -1,0 +1,506 @@
+/* ============================================================
+   HELIX 3D — Design Tokens & Base Styles
+   Task 2.1: :root design + motion tokens (Req 5.1, 5.2, 9.20)
+   ============================================================ */
+
+:root {
+  /* --- Color tokens --- */
+  --color-primary: #0F172A;      /* nav, headings, dark CTA */
+  --color-accent: #0369A1;       /* blue buttons, h1 highlight, card icons */
+  --color-bg: #F8FAFC;           /* page background */
+  --color-border: #E2E8F0;       /* card borders, dividers */
+  --color-text: #020617;         /* primary text */
+  --color-text-muted: #334155;   /* secondary / body text */
+  --color-badge-bg: #EFF6FF;     /* hero badge background */
+
+  /* --- Spacing scale --- */
+  --space-sm: 0.5rem;   /* 8px */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 1.5rem;   /* 24px */
+  --space-xl: 2rem;     /* 32px */
+  --space-2xl: 3rem;    /* 48px */
+  --space-3xl: 5rem;    /* 80px */
+
+  /* --- Typography --- */
+  --font-family: 'Inter', system-ui, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.6;
+  --font-size-badge: 0.75rem;
+
+  /* --- Motion durations --- */
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 160ms;
+  --motion-duration-base: 280ms;
+  --motion-duration-reveal: 650ms;
+  --motion-duration-hero: 900ms;
+
+  /* --- Motion easing --- */
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-emphasized: cubic-bezier(0.16, 1, 0.30, 1);
+  --motion-ease-exit: cubic-bezier(0.40, 0, 1, 1);
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  /* Hero section covers the full viewport from top:0.
+     The fixed floating header overlays it — no body background shows through. */
+  padding-top: 0;
+}
+
+img { max-width: 100%; height: auto; }
+
+/* ============================================================
+   HELIX 3D — Component Styles & Motion Rules
+   Task 2.2: header scroll state, nav underline, focus ring,
+   CTA sheen, reduced-motion reset (Req 5.3, 5.4, 7.6, 9.8, 9.9)
+   ============================================================ */
+
+/* ============================================================
+   HELIX 3D — Premium Glass Header (floating ⇄ docked)
+   ONE surface (.header-shell) morphs between two states via CSS
+   transitions + an .is-scrolled class toggled in animations.js:
+     • Top of page  → floating frosted-glass bar (inset, rounded)
+     • Scrolled >48  → docked full-width bar (flush, square, opaque-ish)
+   No drop shadow. Real translucency so the hero reads through the glass.
+   ============================================================ */
+
+:root {
+  --header-max: 1200px;                            /* shared content + pill width */
+  --header-ease: cubic-bezier(0.16, 1, 0.3, 1);    /* premium, no overshoot */
+}
+
+/* Fixed, full-width positioning layer. Transparent + click-through:
+   only the glass surface and the mobile menu capture pointer events. */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  pointer-events: none;
+  padding-top: 12px;                               /* floating top gap */
+  transition: padding-top 560ms var(--header-ease);
+}
+.site-header.is-scrolled {
+  padding-top: 0;                                  /* dock flush to the top */
+}
+
+/* The morphing glass surface — controls width, inset, radius, blur, tint. */
+.header-shell {
+  pointer-events: auto;
+  position: relative;
+  isolation: isolate;
+  width: calc(100% - 32px);                        /* floating side gap */
+  max-width: var(--header-max);
+  margin-inline: auto;
+  height: 64px;
+  border-radius: 26px;
+  display: flex;
+  align-items: center;
+
+  /* Real frosted glass: translucent gradient (kept < 0.45 white so hero
+     colours, blues and greys read through), blur + saturate + contrast. */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.16) 45%,
+    rgba(255, 255, 255, 0.30) 100%
+  );
+  backdrop-filter: blur(22px) saturate(175%) contrast(104%);
+  -webkit-backdrop-filter: blur(22px) saturate(175%) contrast(104%);
+  border: 1px solid rgba(148, 163, 184, 0.35);   /* soft slate-gray edge */
+  /* Inner speculars only — deliberately NO downward drop shadow. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.80),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18);
+
+  transition:
+    width           560ms var(--header-ease),
+    max-width       560ms var(--header-ease),
+    height          560ms var(--header-ease),
+    border-radius   480ms var(--header-ease),
+    background      320ms ease,
+    border-color    320ms ease,
+    box-shadow      320ms ease,
+    -webkit-backdrop-filter 420ms ease,
+    backdrop-filter 420ms ease;
+  will-change: width, border-radius;
+}
+
+/* Static light streak across the glass — refraction, not a moving shimmer.
+   Sits above the tint, below content; never animated; ignores pointer. */
+.header-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(255, 255, 255, 0.12) 25%,
+    rgba(255, 255, 255, 0)    46%,
+    rgba(255, 255, 255, 0.18) 72%,
+    rgba(255, 255, 255, 0)    100%
+  );
+  opacity: 0.70;
+  transition: opacity 320ms ease;
+}
+/* Ultra-light corner sheen (pure CSS radial gradients — no images/noise). */
+.header-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(120% 140% at 0% 0%,   rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(120% 160% at 100% 0%, rgba(3, 105, 161, 0.05),  rgba(255, 255, 255, 0) 50%);
+  opacity: 0.9;
+  transition: opacity 320ms ease;
+}
+
+/* Content row: constant max-width so logo/nav/CTA never redistribute when
+   the glass expands. Sits above the specular layers. */
+.header-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--header-max);   /* == shell floating max-width → zero content shift */
+  margin-inline: auto;
+  padding-inline: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ---- DOCKED STATE: same surface expands to a flush, square top bar ---- */
+.site-header.is-scrolled .header-shell {
+  width: 100%;
+  max-width: 3000px;                               /* effectively full-bleed, still interpolatable */
+  height: 64px;                                    /* unchanged height → no vertical jump */
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.84);           /* slightly more opaque, docked */
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  border-color: transparent;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35); /* gray hairline, no drop shadow */
+  box-shadow: none;
+}
+.site-header.is-scrolled .header-shell::before,
+.site-header.is-scrolled .header-shell::after {
+  opacity: 0;                                      /* drop the pill speculars once docked */
+}
+
+/* ---- Mobile dropdown menu — glass panel below the bar ---- */
+#mobile-menu {
+  pointer-events: auto;
+  width: calc(100% - 32px);
+  max-width: var(--header-max);
+  margin: 10px auto 0;
+  padding: 16px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition:
+    width         560ms var(--header-ease),
+    margin        560ms var(--header-ease),
+    border-radius 480ms var(--header-ease);
+}
+.site-header.is-scrolled #mobile-menu {
+  width: 100%;
+  max-width: none;
+  margin-top: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* CTA — solid navy anchor point against the translucent glass. Not glass. */
+.header-cta {
+  border-radius: 9999px !important;
+  transition:
+    background var(--motion-duration-fast) var(--motion-ease-standard),
+    transform var(--motion-duration-fast) var(--motion-ease-standard);
+}
+.header-cta:hover {
+  background: #1e293b !important;
+  transform: translateY(-1px);
+}
+
+/* Nav links inside the header: subtle hover wash; underline preserved below. */
+.site-header .nav-link { border-radius: 8px; }
+.site-header .nav-link:hover {
+  background: rgba(3, 105, 161, 0.07);
+  color: var(--color-accent);
+}
+.site-header .nav-link::after { bottom: 1px; }
+
+/* ---- Preload guard: no morph on load when reloaded already-scrolled ---- */
+.site-header.header-preload,
+.site-header.header-preload .header-shell,
+.site-header.header-preload .header-shell::before,
+.site-header.header-preload .header-shell::after,
+.site-header.header-preload #mobile-menu {
+  transition: none !important;
+}
+
+/* ---- Fallback: no backdrop-filter support → readable near-solid glass ---- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header-shell { background: rgba(255, 255, 255, 0.90); }
+  .site-header.is-scrolled .header-shell { background: rgba(255, 255, 255, 0.95); }
+  #mobile-menu { background: rgba(255, 255, 255, 0.95); }
+}
+
+/* ---- Reduced motion: switch states instantly, keep all functionality ---- */
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .header-shell,
+  .header-shell::before,
+  .header-shell::after,
+  #mobile-menu {
+    transition: none !important;
+  }
+}
+
+/* ---- Tablet: trim the side gap, ease the blur load ---- */
+@media (max-width: 1023px) {
+  .header-shell {
+    width: calc(100% - 24px);
+    backdrop-filter: blur(18px) saturate(165%);
+    -webkit-backdrop-filter: blur(18px) saturate(165%);
+  }
+  .header-inner { padding-inline: 22px; }
+  #mobile-menu { width: calc(100% - 24px); }
+}
+
+/* ---- Mobile: tighter inset, smaller radius, slightly shorter bar ---- */
+@media (max-width: 767px) {
+  .site-header { padding-top: 8px; }
+  .header-shell {
+    width: calc(100% - 16px);
+    height: 60px;
+    border-radius: 20px;
+  }
+  .site-header.is-scrolled .header-shell { height: 60px; }
+  .header-inner { padding-inline: 16px; }
+  #mobile-menu { width: calc(100% - 16px); }
+}
+
+/* --- Nav link animated underline (expands from left, no layout shift) --- */
+.nav-link {
+  position: relative;
+  transition: color var(--motion-duration-base) var(--motion-ease-standard);
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 0;
+  background: var(--color-accent);
+  transition: width var(--motion-duration-base) var(--motion-ease-standard);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  width: 100%;
+}
+.nav-link:hover {
+  color: var(--color-accent);
+}
+
+/* --- Global focus-visible ring (Req 7.6) --- */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* --- CTA sheen: single-pass sweep on hover only, motion-safe branch --- */
+@media (prefers-reduced-motion: no-preference) {
+  .cta-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-sheen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transform: skewX(-20deg);
+    transition: left var(--motion-duration-reveal) var(--motion-ease-standard);
+  }
+  .cta-sheen:hover::before {
+    left: 125%;
+  }
+}
+
+/* --- Global reduced-motion reduction (Req 9.8, 9.9) --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   HELIX 3D — Hero (full-bleed background composition)
+   fondo_web.png is the section background, not an <img>.
+   ============================================================ */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  /* Hero starts at top:0 so the background image shows BEHIND the floating header.
+     Content inside .hero__container gets its own padding-top to clear the pill. */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* Bottom fade — melts the hero image into the white next section (no hard line) */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: clamp(36px, 4vw, 64px);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.72) 78%,
+    #ffffff 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+.hero__background {
+  position: absolute;
+  top: -24px; left: 0; right: 0; bottom: -24px;
+  z-index: 0;
+  background-image: url("fondo_web.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center right;
+  will-change: transform;
+}
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(248,250,252,1)    0%,
+    rgba(248,250,252,0.98) 27%,
+    rgba(248,250,252,0.86) 43%,
+    rgba(248,250,252,0.34) 57%,
+    rgba(248,250,252,0)    72%
+  );
+}
+.hero__container {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  /* 20px header top + 64px pill height + 28px breathing room = 112px */
+  padding: 112px 24px 72px;
+}
+.hero__content {
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.hero__title {
+  max-width: 620px;
+  font-size: clamp(3.25rem, 4.5vw, 4.65rem);
+  line-height: 0.98;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--color-primary);
+  margin: 0;
+  text-wrap: balance;
+}
+.hero__title .block { display: block; }
+.hero__title-accent { color: var(--color-accent); }
+.hero-badge { font-size: 0.8rem; border: 1px solid rgba(3,105,161,0.15); }
+.hero-copy {
+  max-width: 560px;
+  font-size: 1.1875rem;   /* ~19px */
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+.btn-primary, .btn-secondary { min-height: 48px; border-radius: 12px; font-weight: 600; }
+
+/* Feature cards refinement: tighter padding, softer shadow, larger radius */
+.feature-card {
+  padding: 1.875rem;             /* 30px */
+  border-radius: 16px;
+  border: 1px solid rgba(148,163,184,0.26);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.02), 0 8px 24px rgba(15,23,42,0.035);
+}
+
+/* Seamless hero → features transition: pull the pure-white section up 1px to
+   absorb any sub-pixel seam. The hero's ::after already fades the image to #fff. */
+#features {
+  position: relative;
+  margin-top: -1px;
+}
+.section-eyebrow { letter-spacing: 0.16em; }
+
+/* Hero responsive: tablet */
+@media (max-width: 1023px) {
+  .hero { min-height: 100svh; }
+  .hero__background { background-position: 72% center; }
+  .hero__overlay {
+    background: linear-gradient(90deg,
+      rgba(248,250,252,1) 0%, rgba(248,250,252,0.97) 42%,
+      rgba(248,250,252,0.7) 62%, rgba(248,250,252,0.15) 84%, rgba(248,250,252,0) 100%);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .hero__container { padding: 108px 24px 72px; }
+  .hero__content { max-width: 520px; }
+}
+
+/* Hero responsive: mobile — vertical gradient */
+@media (max-width: 767px) {
+  .hero { min-height: 100svh; }
+  .hero__background { background-position: 72% center; }
+  .hero__overlay {
+    background: linear-gradient(180deg,
+      rgba(248,250,252,0.97) 0%, rgba(248,250,252,0.9) 40%,
+      rgba(248,250,252,0.55) 70%, rgba(248,250,252,0.32) 100%);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .hero__container { padding: 90px 20px 64px; }
+  .hero__content { max-width: 100%; gap: 20px; }
+  .hero-copy { font-size: 1.0625rem; }
+  .hero-cta { width: 100%; }
+  .hero-cta a { flex: 1 1 auto; justify-content: center; }
+}
