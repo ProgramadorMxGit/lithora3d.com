@@ -504,3 +504,57 @@ img { max-width: 100%; height: auto; }
   .hero-cta { width: 100%; }
   .hero-cta a { flex: 1 1 auto; justify-content: center; }
 }
+
+/* ============================================================
+   HELIX 3D — New Sections Styles
+   ============================================================ */
+
+/* Smooth scroll — respects reduced motion preference */
+@media (prefers-reduced-motion: no-preference) { :root { scroll-behavior: smooth; } }
+
+/* Prevent sticky header from covering anchored section titles */
+section[id] { scroll-margin-top: 100px; }
+#hero        { scroll-margin-top: 0; }
+
+/* Shared vertical padding for new sections */
+.section-pad {
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+@media (max-width: 1023px) { .section-pad { padding-top: 80px; padding-bottom: 80px; } }
+@media (max-width: 767px)  { .section-pad { padding-top: 60px; padding-bottom: 60px; } }
+
+/* Active nav link state (set by IntersectionObserver) */
+.nav-link.nav-active { color: var(--color-accent); }
+.nav-link.nav-active::after { width: 100%; }
+
+/* Dropdown animation */
+.dropdown-menu {
+  animation: ddFadeIn 180ms var(--motion-ease-standard) both;
+}
+@keyframes ddFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dropdown-item {
+  border-radius: 8px;
+  transition: background var(--motion-duration-fast) ease, color var(--motion-duration-fast) ease;
+}
+.dropdown-item:hover { background: #F1F5F9; color: var(--color-accent); }
+
+/* Chevron rotation */
+.chevron {
+  transition: transform var(--motion-duration-base) var(--motion-ease-standard);
+}
+.dropdown-btn[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+/* FAQ chevron */
+.faq-chevron {
+  transition: transform var(--motion-duration-base) var(--motion-ease-standard);
+}
+.faq-btn[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
+
+/* Cotizar dark form fields */
+#cotizar input::placeholder,
+#cotizar textarea::placeholder { color: #64748B; }
+#cotizar select option { background: #1E293B; color: white; }

@@ -3,36 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HELIX 3D ofrece impresión 3D profesional: prototipos, piezas personalizadas y producción bajo demanda con rapidez, precisión y materiales premium.">
+  <meta name="description" content="HELIX 3D: impresión 3D profesional. Prototipos, piezas personalizadas y producción bajo demanda.">
   <title>HELIX 3D — Impresión 3D profesional</title>
-
-  <!-- Google Fonts: Inter (300–700) with display=swap for non-blocking font load -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
-
-  <!-- Tailwind CSS via CDN — pinned to v3.4.0 to prevent version drift -->
   <script src="https://cdn.tailwindcss.com/3.4.0"></script>
-
-  <!-- Design tokens + component styles (must load AFTER Tailwind) -->
   <link rel="stylesheet" href="assets/styles.css">
-
-  <!-- Preload hero background for LCP (used as CSS background of .hero) -->
   <link rel="preload" as="image" href="assets/fondo_web.png" fetchpriority="high">
 </head>
 <body class="antialiased text-[#020617] bg-[#F8FAFC]">
 
-  <!-- Site header — one glass surface that morphs from a floating pill (top of page)
-       to a docked full-width bar on scroll. Structure:
-       .site-header  → fixed, full-width, click-through positioning layer
-       .header-shell → the morphing glass surface (width/inset/radius/blur/tint)
-       .header-inner → constant max-width content row (prevents content shift) -->
+  <!-- HEADER -->
   <header class="site-header" id="site-header">
     <div class="header-shell">
       <div class="header-inner">
 
-        <!-- Left: hexagon logo mark + wordmark -->
-        <a href="#" class="flex items-center gap-2 shrink-0">
+        <!-- Logo -->
+        <a href="#hero" class="flex items-center gap-2 shrink-0">
           <svg width="26" height="26" viewBox="0 0 28 28" fill="none" stroke="#0369A1" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
             <path d="M14 2.5 L23.5 8 L23.5 20 L14 25.5 L4.5 20 L4.5 8 Z"/>
             <path d="M14 14 L14 2.5 M14 14 L23.5 20 M14 14 L4.5 20"/>
@@ -40,27 +28,62 @@
           <span class="font-bold text-base text-[#0F172A] whitespace-nowrap tracking-tight">HELIX 3D</span>
         </a>
 
-        <!-- Center: desktop navigation (hidden on mobile) -->
+        <!-- Desktop nav -->
         <nav role="navigation" aria-label="Navegación principal" class="hidden lg:flex items-center gap-1">
-          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
-            Servicios
-            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
-          </a>
-          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
-            Materiales
-            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
-          </a>
-          <a href="#" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Casos de éxito</a>
-          <a href="#" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Sobre nosotros</a>
-          <a href="#" class="nav-link flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg">
-            Recursos
-            <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
-          </a>
+
+          <!-- Servicios dropdown -->
+          <div class="relative">
+            <button class="nav-link dropdown-btn flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="dd-servicios">
+              Servicios
+              <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </button>
+            <ul id="dd-servicios" class="dropdown-menu absolute top-full left-0 mt-2 w-60 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-2 hidden z-50" role="menu">
+              <li role="none"><a href="#prototipado" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Prototipado rápido</a></li>
+              <li role="none"><a href="#piezas-personalizadas" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Piezas personalizadas</a></li>
+              <li role="none"><a href="#produccion" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Producción bajo demanda</a></li>
+              <li role="none"><a href="#diseno-3d" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Diseño para impresión 3D</a></li>
+            </ul>
+          </div>
+
+          <!-- Materiales dropdown -->
+          <div class="relative">
+            <button class="nav-link dropdown-btn flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="dd-materiales">
+              Materiales
+              <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </button>
+            <ul id="dd-materiales" class="dropdown-menu absolute top-full left-0 mt-2 w-52 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-2 hidden z-50" role="menu">
+              <li role="none"><a href="#materiales" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Ver todos</a></li>
+              <li role="none"><a href="#materiales-rigidos" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Rígidos</a></li>
+              <li role="none"><a href="#materiales-flexibles" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Flexibles</a></li>
+              <li role="none"><a href="#materiales-tecnicos" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Técnicos</a></li>
+            </ul>
+          </div>
+
+          <a href="#casos-exito" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Casos de éxito</a>
+          <a href="#nosotros" class="nav-link text-sm text-[#334155] px-3 py-1.5 rounded-lg">Sobre nosotros</a>
+
+          <!-- Recursos dropdown -->
+          <div class="relative">
+            <button class="nav-link dropdown-btn flex items-center gap-1 text-sm text-[#334155] px-3 py-1.5 rounded-lg"
+                    aria-haspopup="true" aria-expanded="false" aria-controls="dd-recursos">
+              Recursos
+              <svg class="chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </button>
+            <ul id="dd-recursos" class="dropdown-menu absolute top-full left-0 mt-2 w-56 bg-white border border-[#E2E8F0] rounded-xl shadow-lg py-2 hidden z-50" role="menu">
+              <li role="none"><a href="#proceso" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Cómo trabajamos</a></li>
+              <li role="none"><a href="#aplicaciones" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Aplicaciones</a></li>
+              <li role="none"><a href="#faq" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Preguntas frecuentes</a></li>
+              <li role="none"><a href="#cotizar" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Solicitar cotización</a></li>
+            </ul>
+          </div>
+
         </nav>
 
-        <!-- Right: desktop CTA + mobile hamburger -->
+        <!-- CTA + hamburger -->
         <div class="flex items-center gap-2 shrink-0">
-          <a href="#cotizar" class="cta-sheen header-cta hidden lg:inline-flex items-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2 rounded-full">Contáctanos →</a>
+          <a href="#cotizar" class="cta-sheen header-cta hidden lg:inline-flex items-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2 rounded-full">Cotizar →</a>
           <button id="menu-btn" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="mobile-menu" class="lg:hidden p-2 rounded-lg text-[#334155]">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16"/></svg>
           </button>
@@ -69,24 +92,26 @@
       </div>
     </div>
 
-    <!-- Mobile menu — glass panel below the bar; matches the shell inset + radius -->
+    <!-- Mobile menu -->
     <div id="mobile-menu" class="lg:hidden">
-      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Servicios</a>
-      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Materiales</a>
-      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Casos de éxito</a>
-      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Sobre nosotros</a>
-      <a href="#" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg">Recursos</a>
-      <a href="#cotizar" class="cta-sheen header-cta mt-2 inline-flex items-center justify-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2.5 rounded-full w-full">Contáctanos →</a>
+      <a href="#servicios"    class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Servicios</a>
+      <a href="#materiales"   class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Materiales</a>
+      <a href="#proceso"      class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Cómo trabajamos</a>
+      <a href="#casos-exito"  class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Casos de éxito</a>
+      <a href="#nosotros"     class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Sobre nosotros</a>
+      <a href="#recursos"     class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Recursos</a>
+      <a href="#faq"          class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">FAQ</a>
+      <a href="#cotizar" class="cta-sheen header-cta mt-2 inline-flex items-center justify-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2.5 rounded-full w-full">Cotizar →</a>
     </div>
   </header>
 
   <main>
-    <!-- Hero section — full-bleed background composition (fondo_web.png is the section background, not an <img>)
-         Hero starts at top:0 so the background image shows BEHIND the floating header. -->
+
+    <!-- ============================================================
+         HERO
+    ============================================================ -->
     <section id="hero" class="hero">
-      <!-- Background image layer (styled in styles.css; role=img keeps the product description for AT) -->
       <div class="hero__background" role="img" aria-label="Impresora 3D industrial HELIX 3D de alta precisión"></div>
-      <!-- Left-to-right legibility overlay -->
       <div class="hero__overlay" aria-hidden="true"></div>
 
       <div class="hero__container">
@@ -110,7 +135,7 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 2 V12 M12 12 L21 7 M12 12 L3 7"/></svg>
               Cotizar ahora →
             </a>
-            <a href="#features" class="btn-secondary inline-flex items-center gap-2 bg-white border border-[#D1D5DB] text-[#0F172A] font-semibold px-6 py-3 rounded-lg">
+            <a href="#servicios" class="btn-secondary inline-flex items-center gap-2 bg-white border border-[#D1D5DB] text-[#0F172A] font-semibold px-6 py-3 rounded-lg">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 7 L12 12 L2 7 Z"/><path d="M2 12 L12 17 L22 12 M2 17 L12 22 L22 17"/></svg>
               Ver servicios →
             </a>
@@ -119,19 +144,15 @@
       </div>
     </section>
 
-    <!-- Quotation CTA target — populated in a later task -->
-    <section id="cotizar"></section>
-
-    <!-- Features / services grid -->
+    <!-- ============================================================
+         FEATURES
+    ============================================================ -->
     <section id="features" class="bg-white">
       <div class="max-w-[1280px] mx-auto px-6 pt-[72px] pb-20">
         <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">Nuestras ventajas</p>
-        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
-          Por qué elegir HELIX 3D
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">Por qué elegir HELIX 3D</h2>
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          <!-- Card 1: Rapidez -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="rapidez">
             <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15.5 14"/></svg>
@@ -141,7 +162,6 @@
             <p class="text-sm text-[#334155] leading-relaxed">Tiempos optimizados sin comprometer calidad.</p>
           </article>
 
-          <!-- Card 2: Precisión -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="precision">
             <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.5"/></svg>
@@ -151,7 +171,6 @@
             <p class="text-sm text-[#334155] leading-relaxed">Impresiones con detalles finos y tolerancias estrictas.</p>
           </article>
 
-          <!-- Card 3: Materiales premium -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-md cursor-pointer" data-category="materiales">
             <div class="feature-icon w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/><path d="M9 12 L11 14 L15 10"/></svg>
@@ -164,15 +183,726 @@
         </div>
       </div>
     </section>
+
+    <!-- ============================================================
+         SERVICIOS
+    ============================================================ -->
+    <section id="servicios" class="section-pad bg-white">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">NUESTROS SERVICIOS</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
+          Fabricación 3D para cada etapa de tu proyecto
+        </h2>
+
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- 01 Prototipado rápido -->
+          <article id="prototipado" class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 2 V12 M12 12 L21 7 M12 12 L3 7"/></svg>
+              </div>
+              <span class="text-[#CBD5E1] font-bold text-3xl">01</span>
+            </div>
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Prototipado rápido</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Convierte tu idea en una pieza física en el menor tiempo posible. Ideal para validar forma, ajuste y función antes de escalar a producción.</p>
+            <a href="#cotizar" class="text-[#0369A1] text-sm font-semibold hover:underline">Conocer más →</a>
+          </article>
+
+          <!-- 02 Piezas personalizadas -->
+          <article id="piezas-personalizadas" class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><path d="M17 13 V21 M13 17 H21"/></svg>
+              </div>
+              <span class="text-[#CBD5E1] font-bold text-3xl">02</span>
+            </div>
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Piezas personalizadas</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Diseñadas y fabricadas a medida según tus especificaciones. Desde refacciones únicas hasta componentes funcionales de geometría compleja.</p>
+            <a href="#cotizar" class="text-[#0369A1] text-sm font-semibold hover:underline">Conocer más →</a>
+          </article>
+
+          <!-- 03 Producción bajo demanda -->
+          <article id="produccion" class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 H20 V14 H4 Z"/><path d="M8 14 V20 M16 14 V20 M4 20 H20"/><path d="M9 9 H15"/></svg>
+              </div>
+              <span class="text-[#CBD5E1] font-bold text-3xl">03</span>
+            </div>
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Producción bajo demanda</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Series cortas sin necesidad de moldes ni inversión inicial en herramentales. Escalamos contigo según tus volúmenes y plazos.</p>
+            <a href="#cotizar" class="text-[#0369A1] text-sm font-semibold hover:underline">Conocer más →</a>
+          </article>
+
+          <!-- 04 Diseño para impresión 3D -->
+          <article id="diseno-3d" class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 7 L12 12 L2 7 Z"/><path d="M2 12 L12 17 L22 12"/><path d="M2 17 L12 22 L22 17"/></svg>
+              </div>
+              <span class="text-[#CBD5E1] font-bold text-3xl">04</span>
+            </div>
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Diseño para impresión 3D</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Optimizamos o generamos el modelo 3D de tu pieza para que sea fabricable, resistente y económica. Desde boceto hasta archivo listo para imprimir.</p>
+            <a href="#cotizar" class="text-[#0369A1] text-sm font-semibold hover:underline">Conocer más →</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PROCESO
+    ============================================================ -->
+    <section id="proceso" class="section-pad" style="background:#F1F5F9">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">CÓMO TRABAJAMOS</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-14">
+          De tu idea a una pieza lista para usar
+        </h2>
+
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+
+          <!-- Connector line (hidden on mobile) -->
+          <div class="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-[#CBD5E1]" aria-hidden="true"></div>
+
+          <!-- Step 01 -->
+          <div class="flex flex-col items-center text-center relative">
+            <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white border-2 border-[#0369A1] text-[#0369A1] mb-4 relative z-10">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <span class="text-[#0369A1] font-bold text-xs uppercase tracking-widest mb-1">01</span>
+            <h3 class="font-semibold text-[#0F172A] mb-1">Consulta</h3>
+            <p class="text-sm text-[#334155]">Cuéntanos qué necesitas. Analizamos tu proyecto y resolvemos tus dudas.</p>
+          </div>
+
+          <!-- Step 02 -->
+          <div class="flex flex-col items-center text-center relative">
+            <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white border-2 border-[#0369A1] text-[#0369A1] mb-4 relative z-10">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13 L11 15 L15 11"/></svg>
+            </div>
+            <span class="text-[#0369A1] font-bold text-xs uppercase tracking-widest mb-1">02</span>
+            <h3 class="font-semibold text-[#0F172A] mb-1">Cotización</h3>
+            <p class="text-sm text-[#334155]">Te enviamos una propuesta clara con material, tiempo y costo.</p>
+          </div>
+
+          <!-- Step 03 -->
+          <div class="flex flex-col items-center text-center relative">
+            <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white border-2 border-[#0369A1] text-[#0369A1] mb-4 relative z-10">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span class="text-[#0369A1] font-bold text-xs uppercase tracking-widest mb-1">03</span>
+            <h3 class="font-semibold text-[#0F172A] mb-1">Producción</h3>
+            <p class="text-sm text-[#334155]">Fabricamos tu pieza con el material y configuración óptimos.</p>
+          </div>
+
+          <!-- Step 04 -->
+          <div class="flex flex-col items-center text-center relative">
+            <div class="w-20 h-20 flex items-center justify-center rounded-2xl bg-white border-2 border-[#0369A1] text-[#0369A1] mb-4 relative z-10">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <span class="text-[#0369A1] font-bold text-xs uppercase tracking-widest mb-1">04</span>
+            <h3 class="font-semibold text-[#0F172A] mb-1">Entrega</h3>
+            <p class="text-sm text-[#334155]">Recibes tu pieza lista para usar, con acabado revisado.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         MATERIALES
+    ============================================================ -->
+    <section id="materiales" class="section-pad bg-white">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">MATERIALES</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-4">
+          El material correcto para cada aplicación
+        </h2>
+        <p data-animate="fade-up" data-delay="120" class="text-center text-sm text-[#64748B] mb-12">(disponibilidad según proyecto)</p>
+
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+          <!-- Rígidos -->
+          <div id="materiales-rigidos" class="rounded-xl border border-[#E2E8F0] p-6 bg-[#F8FAFC]">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/></svg>
+              </div>
+              <h3 class="font-semibold text-[#0F172A]">Rígidos</h3>
+            </div>
+            <ul class="space-y-3">
+              <li>
+                <span class="font-medium text-sm text-[#0F172A]">PLA</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Versátil, fácil de imprimir. Ideal para prototipos visuales, modelos y piezas de baja carga mecánica.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">Prototipado</span>
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">Modelos</span>
+                </div>
+              </li>
+              <li class="pt-3 border-t border-[#E2E8F0]">
+                <span class="font-medium text-sm text-[#0F172A]">PETG</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Resistencia química y mecánica mejorada. Buen equilibrio entre rigidez y flexibilidad.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">Funcional</span>
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">Resistente</span>
+                </div>
+              </li>
+              <li class="pt-3 border-t border-[#E2E8F0]">
+                <span class="font-medium text-sm text-[#0F172A]">ASA</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Resistencia UV y a la intemperie. Piezas para exterior o ambientes exigentes.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">Exterior</span>
+                  <span class="tag text-xs bg-[#EFF6FF] text-[#0369A1] px-2 py-0.5 rounded-full">UV</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Flexibles -->
+          <div id="materiales-flexibles" class="rounded-xl border border-[#E2E8F0] p-6 bg-[#F8FAFC]">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F0FDF4] text-[#16A34A]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 C6 2 2 7 2 12 S6 22 12 22 S22 17 22 12 S18 2 12 2"/><path d="M8 12 C8 9 10 7 12 7 S16 9 16 12"/></svg>
+              </div>
+              <h3 class="font-semibold text-[#0F172A]">Flexibles</h3>
+            </div>
+            <ul class="space-y-3">
+              <li>
+                <span class="font-medium text-sm text-[#0F172A]">TPU</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Elastómero termoplástico flexible y resistente al desgaste. Ideal para piezas que requieren absorción de impacto o ajuste a superficies irregulares.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#F0FDF4] text-[#16A34A] px-2 py-0.5 rounded-full">Flexible</span>
+                  <span class="tag text-xs bg-[#F0FDF4] text-[#16A34A] px-2 py-0.5 rounded-full">Impacto</span>
+                  <span class="tag text-xs bg-[#F0FDF4] text-[#16A34A] px-2 py-0.5 rounded-full">Desgaste</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Técnicos -->
+          <div id="materiales-tecnicos" class="rounded-xl border border-[#E2E8F0] p-6 bg-[#F8FAFC]">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#FFF7ED] text-[#C2410C]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/></svg>
+              </div>
+              <h3 class="font-semibold text-[#0F172A]">Técnicos</h3>
+            </div>
+            <ul class="space-y-3">
+              <li>
+                <span class="font-medium text-sm text-[#0F172A]">Nylon</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Alta resistencia mecánica y a la fatiga. Para piezas funcionales que soportan cargas repetidas.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#FFF7ED] text-[#C2410C] px-2 py-0.5 rounded-full">Alta resistencia</span>
+                  <span class="tag text-xs bg-[#FFF7ED] text-[#C2410C] px-2 py-0.5 rounded-full">Fatiga</span>
+                </div>
+              </li>
+              <li class="pt-3 border-t border-[#E2E8F0]">
+                <span class="font-medium text-sm text-[#0F172A]">Compuestos</span>
+                <p class="text-xs text-[#64748B] mt-0.5">Filamentos con fibra de carbono, fibra de vidrio u otros refuerzos. Rigidez y ligereza para aplicaciones de alto rendimiento.</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="tag text-xs bg-[#FFF7ED] text-[#C2410C] px-2 py-0.5 rounded-full">Fibra carbono</span>
+                  <span class="tag text-xs bg-[#FFF7ED] text-[#C2410C] px-2 py-0.5 rounded-full">Ligero</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="text-center">
+          <a href="#cotizar" class="inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg cta-sheen">
+            Recomiéndame un material →
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         APLICACIONES
+    ============================================================ -->
+    <section id="aplicaciones" class="section-pad" style="background:#F1F5F9">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">APLICACIONES</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
+          Soluciones para ideas, productos y necesidades reales
+        </h2>
+
+        <div data-animate="stagger" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 7 V17 M7.5 9.5 L16.5 14.5 M16.5 9.5 L7.5 14.5"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Prototipos funcionales</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1 V3 M12 21 V23 M4.22 4.22 L5.64 5.64 M18.36 18.36 L19.78 19.78 M1 12 H3 M21 12 H23 M4.22 19.78 L5.64 18.36 M18.36 5.64 L19.78 4.22"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Refacciones difíciles</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21 H16 M12 17 V21"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Organizadores</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7 H15 M9 11 H15 M9 15 H12"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Carcasas</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15 S4 9 9 9 S16 4 16 4 L20 8 S15 11 15 16 S9 20 9 20"/><path d="M9 15 L9.01 15"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Piezas de escritorio</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 7 L12 12 L2 7 Z"/><path d="M2 12 L12 17 L22 12"/><path d="M2 17 L12 22 L22 17"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Modelos de presentación</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94L5.47 21A2.12 2.12 0 0 1 2.53 18 L10.06 10.53a6 6 0 0 1 7.94-7.94z"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Herramientas</span>
+          </div>
+
+          <div class="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col items-center text-center gap-3">
+            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <span class="text-sm font-medium text-[#0F172A]">Regalos personalizados</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CASOS DE ÉXITO
+    ============================================================ -->
+    <section id="casos-exito" class="section-pad bg-white">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">PROYECTOS</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
+          Ejemplos de aplicación
+        </h2>
+
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          <!-- Ejemplo 1 -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+            </div>
+            <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 2 V12 M12 12 L21 7 M12 12 L3 7"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Prototipo de producto</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-6 grow">
+              Un equipo de desarrollo necesitaba validar la forma y el ajuste de un dispositivo antes de invertir en moldes de inyección. Se fabricó un prototipo en PLA para pruebas físicas en días, no semanas.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">Prototipado rápido</span>
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">Validar forma</span>
+            </div>
+            <a href="#cotizar" class="inline-flex items-center gap-1 text-[#0369A1] text-sm font-semibold hover:underline">Tengo un proyecto similar →</a>
+          </article>
+
+          <!-- Ejemplo 2 -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+            </div>
+            <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94L5.47 21A2.12 2.12 0 0 1 2.53 18 L10.06 10.53a6 6 0 0 1 7.94-7.94z"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Refacción personalizada</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-6 grow">
+              Una pieza descontinuada de maquinaria industrial fue recreada a partir de medidas tomadas en campo. La pieza a medida en PETG restauró la operación sin paros prolongados.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">Pieza a medida</span>
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">PETG</span>
+            </div>
+            <a href="#cotizar" class="inline-flex items-center gap-1 text-[#0369A1] text-sm font-semibold hover:underline">Tengo un proyecto similar →</a>
+          </article>
+
+          <!-- Ejemplo 3 -->
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+            </div>
+            <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 H20 V14 H4 Z"/><path d="M8 14 V20 M16 14 V20 M4 20 H20"/></svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">Serie corta de componentes</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-6 grow">
+              Una empresa necesitaba 50 unidades de un accesorio para lanzamiento de producto. La producción sin moldes permitió tenerlos listos en el plazo requerido sin inversión inicial elevada.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">Producción sin moldes</span>
+              <span class="text-xs bg-[#EFF6FF] text-[#0369A1] px-2.5 py-1 rounded-full">Serie corta</span>
+            </div>
+            <a href="#cotizar" class="inline-flex items-center gap-1 text-[#0369A1] text-sm font-semibold hover:underline">Tengo un proyecto similar →</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         NOSOTROS
+    ============================================================ -->
+    <section id="nosotros" class="section-pad" style="background:#F1F5F9">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">SOBRE HELIX 3D</p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+          <!-- Left column -->
+          <div>
+            <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] mb-6">
+              Tecnología y precisión al servicio de tus ideas
+            </h2>
+            <p data-animate="fade-up" data-delay="120" class="text-[#334155] leading-relaxed mb-4">
+              HELIX 3D es un servicio de fabricación aditiva orientado a proyectos que requieren rapidez, adaptabilidad y atención al detalle. Trabajamos con individuos, diseñadores y empresas que necesitan pasar de la idea a la pieza física sin los tiempos ni los costos de la manufactura tradicional.
+            </p>
+            <p data-animate="fade-up" data-delay="160" class="text-[#334155] leading-relaxed">
+              Nuestro enfoque combina equipos de alta precisión, selección informada de materiales y comunicación directa con cada cliente. Cada proyecto es diferente y lo tratamos como tal.
+            </p>
+          </div>
+
+          <!-- Right column: principios -->
+          <div data-animate="stagger" class="flex flex-col gap-5">
+
+            <div class="bg-white rounded-xl border border-[#E2E8F0] p-6 flex gap-4 items-start">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.5"/></svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-[#0F172A] mb-1">Atención al detalle</h3>
+                <p class="text-sm text-[#334155]">Revisamos orientación, tolerancias y acabado en cada pieza. Si algo puede mejorarse antes de imprimir, te lo decimos.</p>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-[#E2E8F0] p-6 flex gap-4 items-start">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-[#0F172A] mb-1">Comunicación clara</h3>
+                <p class="text-sm text-[#334155]">Sin tecnicismos innecesarios. Te explicamos las opciones, los tiempos y los costos de forma directa para que puedas decidir con información real.</p>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-[#E2E8F0] p-6 flex gap-4 items-start">
+              <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V11 C20 16 16.5 19.5 12 21 C7.5 19.5 4 16 4 11 V6 Z"/><path d="M9 12 L11 14 L15 10"/></svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-[#0F172A] mb-1">Soluciones adaptadas</h3>
+                <p class="text-sm text-[#334155]">Cada proyecto tiene sus propios requisitos. Ajustamos material, configuración y acabado según lo que tu pieza realmente necesita.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         RECURSOS + FAQ
+    ============================================================ -->
+    <section id="recursos" class="section-pad bg-white">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">RECURSOS</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
+          Información útil para tu proyecto
+        </h2>
+
+        <!-- Resource accordion cards -->
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
+
+          <!-- Card 1 -->
+          <details class="group rounded-xl border border-[#E2E8F0] overflow-hidden">
+            <summary class="flex items-center justify-between p-5 cursor-pointer list-none font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors">
+              <span>Cómo preparar tu proyecto</span>
+              <svg class="w-5 h-5 text-[#0369A1] transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </summary>
+            <div class="p-5 text-sm text-[#334155] leading-relaxed space-y-2 bg-white">
+              <p>Para obtener la cotización más precisa y rápida, ten listo lo siguiente:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Archivo 3D en formato STL, OBJ o STEP (preferible STEP para piezas funcionales).</li>
+                <li>Medidas reales de la pieza si no tienes modelo 3D.</li>
+                <li>Indicación del uso final: decorativo, funcional o estructural.</li>
+                <li>Material o color preferido, si tienes alguno en mente.</li>
+                <li>Cantidad de piezas necesarias.</li>
+              </ul>
+            </div>
+          </details>
+
+          <!-- Card 2 -->
+          <details class="group rounded-xl border border-[#E2E8F0] overflow-hidden">
+            <summary class="flex items-center justify-between p-5 cursor-pointer list-none font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors">
+              <span>Cómo elegir un material</span>
+              <svg class="w-5 h-5 text-[#0369A1] transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </summary>
+            <div class="p-5 text-sm text-[#334155] leading-relaxed space-y-2 bg-white">
+              <p>La elección depende del uso final de la pieza:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li><strong>PLA</strong> — prototipos visuales y piezas de interiores sin carga mecánica alta.</li>
+                <li><strong>PETG</strong> — piezas funcionales que requieren algo más de resistencia y durabilidad.</li>
+                <li><strong>ASA</strong> — piezas para exteriores expuestas a UV o humedad.</li>
+                <li><strong>TPU</strong> — piezas que necesitan flexibilidad o absorción de golpes.</li>
+                <li><strong>Nylon / Compuestos</strong> — aplicaciones de alta carga mecánica o rendimiento.</li>
+              </ul>
+              <p>Si no estás seguro, cuéntanos el uso y te recomendamos.</p>
+            </div>
+          </details>
+
+          <!-- Card 3 -->
+          <details class="group rounded-xl border border-[#E2E8F0] overflow-hidden">
+            <summary class="flex items-center justify-between p-5 cursor-pointer list-none font-semibold text-[#0F172A] bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors">
+              <span>Qué información necesitamos para cotizar</span>
+              <svg class="w-5 h-5 text-[#0369A1] transition-transform group-open:rotate-180" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+            </summary>
+            <div class="p-5 text-sm text-[#334155] leading-relaxed space-y-2 bg-white">
+              <p>Con esta información podemos darte una cotización precisa:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Descripción o archivo de la pieza.</li>
+                <li>Dimensiones aproximadas (largo × ancho × alto).</li>
+                <li>Cantidad de piezas.</li>
+                <li>Uso final (decorativo, funcional, estructural).</li>
+                <li>Material o color preferido (o dejamos que lo recomendemos).</li>
+                <li>Fecha de entrega deseada.</li>
+              </ul>
+            </div>
+          </details>
+
+        </div>
+
+        <!-- ---- FAQ ---- -->
+        <div id="faq">
+          <h3 data-animate="fade-up" class="text-2xl font-bold text-[#0F172A] text-center mb-8">Preguntas frecuentes</h3>
+
+          <div data-animate="stagger" class="max-w-3xl mx-auto divide-y divide-[#E2E8F0] border border-[#E2E8F0] rounded-xl overflow-hidden">
+
+            <!-- Q1 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-1">
+                ¿Necesito tener un modelo 3D?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-1" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                No es obligatorio. Si tienes medidas, bocetos o una pieza física de referencia, podemos orientarte en cómo obtener el archivo. En algunos casos también ofrecemos apoyo de diseño.
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-2">
+                ¿Qué información necesitan para cotizar?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-2" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Con el archivo o descripción de la pieza, sus dimensiones aproximadas, la cantidad y el uso final podemos darte una cotización inicial. Cuanta más información tengas, más precisa será la propuesta.
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-3">
+                ¿Pueden fabricar una sola pieza?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-3" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Sí. La impresión 3D no requiere mínimos de producción, por lo que fabricar una sola unidad es perfectamente viable y uno de los principales beneficios del servicio.
+              </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-4">
+                ¿Cómo se selecciona el material?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-4" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Consideramos el uso final, el entorno donde operará la pieza (temperatura, humedad, luz UV, carga mecánica) y el presupuesto disponible. Si tienes preferencia, la tomamos en cuenta; de lo contrario, recomendamos la opción más adecuada.
+              </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-5">
+                ¿Pueden realizar piezas personalizadas?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-5" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Sí, es parte central de lo que hacemos. Desde refacciones únicas hasta accesorios con geometrías complejas o grabados personalizados. Si tienes el diseño o las medidas, lo fabricamos.
+              </div>
+            </div>
+
+            <!-- Q6 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-6">
+                ¿Qué formatos de archivo pueden revisarse?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-6" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Trabajamos principalmente con STL, OBJ y STEP. STEP es preferible para piezas funcionales porque conserva la geometría exacta. Si tienes otro formato, consúltanos y buscamos la mejor forma de procesarlo.
+              </div>
+            </div>
+
+            <!-- Q7 -->
+            <div class="faq-item">
+              <button class="faq-btn w-full flex items-center justify-between px-6 py-4 text-left text-sm font-semibold text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      aria-expanded="false" aria-controls="faq-7">
+                ¿El acabado final puede variar según el material?
+                <svg class="faq-chevron w-5 h-5 text-[#0369A1] shrink-0 transition-transform" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6 L8 10 L12 6"/></svg>
+              </button>
+              <div id="faq-7" class="faq-panel hidden px-6 pb-5 text-sm text-[#334155] leading-relaxed">
+                Sí. Cada material tiene sus propias características de textura y brillo. PLA y PETG tienen acabados más lisos; el Nylon tiende a un acabado más mate. Si el acabado visual es importante para tu proyecto, menciónalo al cotizar.
+              </div>
+            </div>
+
+          </div><!-- /faq accordion -->
+        </div><!-- /faq -->
+      </div>
+    </section>
+
+    <!-- ============================================================
+         COTIZAR
+    ============================================================ -->
+    <section id="cotizar" class="section-pad bg-[#0F172A] text-white">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#7DD3FC] text-xs font-semibold uppercase tracking-widest mb-3">COMENCEMOS</p>
+        <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-white text-center mb-12">
+          Cuéntanos qué necesitas fabricar
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+          <!-- Left: info + checklist -->
+          <div data-animate="fade-up" data-delay="100">
+            <h3 class="text-xl font-semibold text-white mb-3">Del concepto a la pieza física</h3>
+            <p class="text-[#94A3B8] leading-relaxed mb-6">
+              Compártenos los detalles de tu proyecto y te enviaremos una propuesta clara con material, tiempo de producción y costo. Sin compromiso.
+            </p>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Qué pieza necesitas fabricar
+              </li>
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Medidas aproximadas
+              </li>
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Cantidad de piezas
+              </li>
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Uso final de la pieza
+              </li>
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Material o color preferido (opcional)
+              </li>
+              <li class="flex items-start gap-3 text-sm text-[#CBD5E1]">
+                <svg class="w-5 h-5 text-[#0369A1] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12 L10 17 L19 8"/></svg>
+                Archivo 3D si lo tienes disponible
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right: form -->
+          <div data-animate="fade-up" data-delay="160">
+            <!-- FORM_ENDPOINT: configure endpoint before going live -->
+            <form id="cotizar-form" class="space-y-4" novalidate>
+
+              <div>
+                <label for="f-nombre" class="block text-sm font-medium text-[#CBD5E1] mb-1">Nombre</label>
+                <input type="text" id="f-nombre" name="nombre" required autocomplete="name"
+                       placeholder="Tu nombre"
+                       class="w-full rounded-lg bg-[#1E293B] border border-[#334155] text-white placeholder-[#64748B] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0369A1] focus:border-transparent transition">
+                <p class="field-error hidden text-xs text-red-400 mt-1" aria-live="polite">Este campo es obligatorio.</p>
+              </div>
+
+              <div>
+                <label for="f-email" class="block text-sm font-medium text-[#CBD5E1] mb-1">Correo electrónico</label>
+                <input type="email" id="f-email" name="email" required autocomplete="email"
+                       placeholder="tu@correo.com"
+                       class="w-full rounded-lg bg-[#1E293B] border border-[#334155] text-white placeholder-[#64748B] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0369A1] focus:border-transparent transition">
+                <p class="field-error hidden text-xs text-red-400 mt-1" aria-live="polite">Ingresa un correo válido.</p>
+              </div>
+
+              <div>
+                <label for="f-tipo" class="block text-sm font-medium text-[#CBD5E1] mb-1">Tipo de proyecto</label>
+                <select id="f-tipo" name="tipo" required
+                        class="w-full rounded-lg bg-[#1E293B] border border-[#334155] text-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0369A1] focus:border-transparent transition appearance-none">
+                  <option value="" disabled selected>Selecciona una opción</option>
+                  <option value="prototipo">Prototipo</option>
+                  <option value="pieza">Pieza personalizada</option>
+                  <option value="produccion">Producción bajo demanda</option>
+                  <option value="diseno">Diseño para impresión 3D</option>
+                </select>
+                <p class="field-error hidden text-xs text-red-400 mt-1" aria-live="polite">Selecciona un tipo de proyecto.</p>
+              </div>
+
+              <div>
+                <label for="f-descripcion" class="block text-sm font-medium text-[#CBD5E1] mb-1">Descripción del proyecto</label>
+                <textarea id="f-descripcion" name="descripcion" required rows="4"
+                          placeholder="Cuéntanos qué necesitas: qué pieza, para qué sirve, medidas aproximadas, cantidad..."
+                          class="w-full rounded-lg bg-[#1E293B] border border-[#334155] text-white placeholder-[#64748B] px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0369A1] focus:border-transparent transition resize-none"></textarea>
+                <p class="field-error hidden text-xs text-red-400 mt-1" aria-live="polite">Por favor describe tu proyecto.</p>
+              </div>
+
+              <button type="submit"
+                      class="w-full cta-sheen bg-[#0369A1] hover:bg-[#0284C7] text-white font-semibold px-6 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 L11 13 M22 2 L15 22 L11 13 L2 9 Z"/></svg>
+                Enviar solicitud
+              </button>
+
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Site footer — brand, quick links, legal copyright -->
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
   <footer class="bg-[#0F172A] text-white">
     <div class="max-w-[1280px] mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
 
       <!-- Brand -->
       <div class="flex flex-col items-center md:items-start gap-2">
-        <a href="#" class="flex items-center gap-2">
+        <a href="#hero" class="flex items-center gap-2">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
             <path d="M14 2.5 L23.5 8 L23.5 20 L14 25.5 L4.5 20 L4.5 8 Z"/>
             <path d="M14 14 L14 2.5 M14 14 L23.5 20 M14 14 L4.5 20"/>
@@ -184,9 +914,13 @@
 
       <!-- Quick links -->
       <nav aria-label="Enlaces de pie de página" class="flex flex-wrap items-center justify-center gap-6">
-        <a href="#" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Servicios</a>
-        <a href="#cotizar" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Contacto</a>
-        <a href="#" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Privacidad</a>
+        <a href="#servicios"   class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Servicios</a>
+        <a href="#materiales"  class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Materiales</a>
+        <a href="#casos-exito" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Casos de éxito</a>
+        <a href="#nosotros"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Nosotros</a>
+        <a href="#recursos"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Recursos</a>
+        <a href="#cotizar"     class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Contacto</a>
+        <!-- Privacidad: pendiente de página real -->
       </nav>
 
     </div>
@@ -199,9 +933,110 @@
     </div>
   </footer>
 
-  <!-- Animation engine: GSAP + ScrollTrigger (must load BEFORE animations.js) -->
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="assets/animations.js" defer></script>
+
+  <!-- Dropdown + FAQ + form validation (inline, no extra file needed) -->
+  <script>
+    // ── Dropdown menus ──────────────────────────────────────────
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      const menuId = btn.getAttribute('aria-controls');
+      const menu   = document.getElementById(menuId);
+      if (!menu) return;
+
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        // close all
+        document.querySelectorAll('.dropdown-btn').forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+          const m = document.getElementById(b.getAttribute('aria-controls'));
+          if (m) m.classList.add('hidden');
+        });
+        if (!open) {
+          btn.setAttribute('aria-expanded', 'true');
+          menu.classList.remove('hidden');
+        }
+      });
+
+      // close when a link inside is clicked
+      menu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          btn.setAttribute('aria-expanded', 'false');
+          menu.classList.add('hidden');
+        });
+      });
+    });
+
+    // close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.dropdown-btn').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        const m = document.getElementById(b.getAttribute('aria-controls'));
+        if (m) m.classList.add('hidden');
+      });
+    });
+
+    // ── FAQ accordion ───────────────────────────────────────────
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panelId = btn.getAttribute('aria-controls');
+        const panel   = document.getElementById(panelId);
+        if (!panel) return;
+        const isOpen  = btn.getAttribute('aria-expanded') === 'true';
+
+        // close all
+        document.querySelectorAll('.faq-btn').forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+          b.querySelector('.faq-chevron').style.transform = '';
+          const p = document.getElementById(b.getAttribute('aria-controls'));
+          if (p) p.classList.add('hidden');
+        });
+
+        if (!isOpen) {
+          btn.setAttribute('aria-expanded', 'true');
+          btn.querySelector('.faq-chevron').style.transform = 'rotate(180deg)';
+          panel.classList.remove('hidden');
+        }
+      });
+    });
+
+    // ── Contact form client-side validation ─────────────────────
+    const form = document.getElementById('cotizar-form');
+    if (form) {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        let valid = true;
+
+        form.querySelectorAll('[required]').forEach(field => {
+          const err = field.nextElementSibling;
+          if (!field.value.trim() || (field.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value))) {
+            if (err && err.classList.contains('field-error')) err.classList.remove('hidden');
+            field.classList.add('border-red-500');
+            valid = false;
+          } else {
+            if (err && err.classList.contains('field-error')) err.classList.add('hidden');
+            field.classList.remove('border-red-500');
+          }
+        });
+
+        // TODO: wire to real endpoint before going live
+      });
+
+      // clear errors on input
+      form.querySelectorAll('[required]').forEach(field => {
+        field.addEventListener('input', () => {
+          const err = field.nextElementSibling;
+          if (err && err.classList.contains('field-error')) err.classList.add('hidden');
+          field.classList.remove('border-red-500');
+        });
+      });
+    }
+  </script>
+
 </body>
 </html>

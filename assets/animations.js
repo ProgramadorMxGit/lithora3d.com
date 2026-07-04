@@ -25,6 +25,7 @@
         initButtonInteractions();
         initImageParallax();
         initMobileMenuAnimation();
+        initActiveNavLinks();
       })
       // Mobile / tablet, motion allowed — simplified subset (no parallax, no pointer reaction)
       .add('(prefers-reduced-motion: no-preference) and (max-width: 1023px)', () => {
@@ -33,6 +34,7 @@
         initScrollReveals({ mobile: true });
         initFeatureCardAnimations({ mobile: true });
         initMobileMenuAnimation();
+        initActiveNavLinks();
       })
       // Reduced motion — no entrance animation, but the header still docks
       // (instantly, since CSS transitions are disabled under reduced motion)
@@ -303,6 +305,45 @@
     // Intentionally disabled: with fondo_web.png now a full-bleed hero background,
     // a pointer-driven tilt could reveal empty edges and conflict with the scrubbed
     // parallax transform. Left as a no-op to preserve the module's function map.
+  }
+
+  function initActiveNavLinks() {
+    // IntersectionObserver highlights nav links when their section is in view.
+    // Uses a single observer; fires on every scroll via threshold.
+    var sectionIds = ['features','servicios','proceso','materiales','aplicaciones','casos-exito','nosotros','recursos','cotizar'];
+    var navLinks = document.querySelectorAll('.site-header nav a[href], .site-header nav button.dropdown-btn');
+    if (!navLinks.length) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        var id = entry.target.id;
+        navLinks.forEach(function(link) {
+          link.classList.remove('nav-active');
+        });
+        // Match nav link to section id
+        var navMap = {
+          'servicios': 'Servicios',
+          'proceso': 'Recursos',
+          'materiales': 'Materiales',
+          'casos-exito': 'Casos de éxito',
+          'nosotros': 'Sobre nosotros',
+          'recursos': 'Recursos',
+          'cotizar': 'Servicios'
+        };
+        // Highlight the matching nav item
+        navLinks.forEach(function(link) {
+          var href = link.getAttribute('href') || '';
+          if (href === '#' + id) link.classList.add('nav-active');
+          if (link.textContent && link.textContent.trim() === navMap[id]) link.classList.add('nav-active');
+        });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+    sectionIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
   }
   function initMobileMenuAnimation() {
     // The menu ships visible in HTML for JS-off progressive enhancement; here JS
