@@ -82,11 +82,10 @@ img { max-width: 100%; height: auto; }
   right: 0;
   z-index: 50;
   pointer-events: none;
-  padding-top: 12px;                               /* floating top gap */
-  transition: padding-top 560ms var(--header-ease);
+  padding-top: 12px;                               /* floating top gap (state-only; layout is never animated) */
 }
 .site-header.is-scrolled {
-  padding-top: 0;                                  /* dock flush to the top */
+  padding-top: 0;                                  /* dock flush — instant state change, no CLS (fixed element) */
 }
 
 /* The morphing glass surface — controls width, inset, radius, blur, tint. */
@@ -118,17 +117,17 @@ img { max-width: 100%; height: auto; }
     inset 0 1px 0 rgba(255, 255, 255, 0.80),
     inset 0 -1px 0 rgba(255, 255, 255, 0.18);
 
+  /* Only compositor-safe properties are animated (Req 9.5 / 9.13): the glass
+     tint, border, shadow and blur crossfade using motion tokens. Geometry
+     (width / max-width / height / border-radius) switches state instantly —
+     layout-affecting properties are never transitioned, so there is no CLS. */
   transition:
-    width           560ms var(--header-ease),
-    max-width       560ms var(--header-ease),
-    height          560ms var(--header-ease),
-    border-radius   480ms var(--header-ease),
-    background      320ms ease,
-    border-color    320ms ease,
-    box-shadow      320ms ease,
-    -webkit-backdrop-filter 420ms ease,
-    backdrop-filter 420ms ease;
-  will-change: width, border-radius;
+    background              var(--motion-duration-base) var(--motion-ease-standard),
+    border-color            var(--motion-duration-base) var(--motion-ease-standard),
+    box-shadow              var(--motion-duration-base) var(--motion-ease-standard),
+    -webkit-backdrop-filter var(--motion-duration-reveal) var(--motion-ease-standard),
+    backdrop-filter         var(--motion-duration-reveal) var(--motion-ease-standard);
+  will-change: background, backdrop-filter;
 }
 
 /* Static light streak across the glass — refraction, not a moving shimmer.
@@ -149,7 +148,7 @@ img { max-width: 100%; height: auto; }
     rgba(255, 255, 255, 0)    100%
   );
   opacity: 0.70;
-  transition: opacity 320ms ease;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 /* Ultra-light corner sheen (pure CSS radial gradients — no images/noise). */
 .header-shell::after {
@@ -163,7 +162,7 @@ img { max-width: 100%; height: auto; }
     radial-gradient(120% 140% at 0% 0%,   rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 42%),
     radial-gradient(120% 160% at 100% 0%, rgba(3, 105, 161, 0.05),  rgba(255, 255, 255, 0) 50%);
   opacity: 0.9;
-  transition: opacity 320ms ease;
+  transition: opacity var(--motion-duration-base) var(--motion-ease-standard);
 }
 
 /* Content row: constant max-width so logo/nav/CTA never redistribute when
@@ -214,10 +213,9 @@ img { max-width: 100%; height: auto; }
   display: flex;
   flex-direction: column;
   gap: 4px;
-  transition:
-    width         560ms var(--header-ease),
-    margin        560ms var(--header-ease),
-    border-radius 480ms var(--header-ease);
+  /* Floating/docked geometry switches state instantly — layout props (width,
+     margin, border-radius) are never animated. Open/close motion is handled by
+     GSAP (opacity / transform) in animations.js. */
 }
 .site-header.is-scrolled #mobile-menu {
   width: 100%;
