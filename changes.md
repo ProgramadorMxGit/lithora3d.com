@@ -1841,3 +1841,27 @@
 * Motivo: hacer efectiva la identificacion de Lithora 3D en Tampico, Ciudad Madero y Altamira y confirmar la revision servida por GitHub Pages.
 * Relacion: despliega la metadata, contenido visible, estilo y JSON-LD local validados previamente.
 * Resultado: ✅ workflow #14 exitoso; titulo, descripcion, cobertura visible, tres ciudades estructuradas, H1 unico, cero overflow y cero advertencias o errores de consola confirmados con Chrome DevTools.
+
+## [2026-07-21]
+
+* Archivo: perfil publico `https://www.instagram.com/lithora3d/`
+* Cambio: se publico una biografia de 111 caracteres orientada a `Impresion 3D en Tampico, Madero y Altamira`, con letreros, llaveros, prototipos, piezas a medida y cotizacion por WhatsApp.
+* Motivo: incorporar terminos de servicio, productos y cobertura local en el campo de Instagram que si participa en descubrimiento y contexto del perfil.
+* Relacion: alinea Instagram con las senales locales ya publicadas en lithora3d.com y Facebook.
+* Resultado: ✅ biografia guardada y verificada publicamente con Chrome DevTools.
+
+## [2026-07-21]
+
+* Archivo: cuenta profesional `@lithora3d` en Instagram
+* Cambio: la cuenta personal se convirtio en cuenta empresarial publica, se asigno y mostro la categoria `Servicio empresarial`, se activo el panel profesional y se habilito la visibilidad del contenido en motores de busqueda.
+* Motivo: obtener categoria publica, insights, controles empresariales y elegibilidad de descubrimiento externo adecuados para una empresa local.
+* Relacion: sustituye el perfil sin categoria ni herramientas profesionales observado al iniciar esta optimizacion.
+* Resultado: ✅ cuenta empresarial creada y categoria visible en el perfil; Instagram confirmo que la cuenta profesional quedo lista.
+
+## [2026-07-21]
+
+* Archivo: configuracion profesional de contacto de Instagram
+* Cambio: se registro el telefono oficial `+52 833 108 0178`, se habilito mostrar informacion de contacto y se configuro `Texto` como metodo principal en lugar de llamada.
+* Motivo: facilitar cotizaciones desde la aplicacion y mantener coherencia con el canal comercial aprobado.
+* Relacion: complementa la biografia que invita a cotizar por WhatsApp y el mismo telefono publicado en web y Facebook.
+* Resultado: ✅ telefono y contacto por texto guardados; los botones son visibles exclusivamente en la aplicacion movil por restriccion explicita de Instagram. El enlace de sitio web tambien solo puede editarse desde la aplicacion movil y la vinculacion nativa de WhatsApp requiere completar la confirmacion del numero fuera del navegador.
