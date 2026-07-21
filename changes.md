@@ -1715,3 +1715,10 @@
 * Motivo: volver a validar navegacion, teclado, foco, tactil, estados, responsive, zoom, consola y metricas despues de los cambios SEO.
 * Relacion: ejecucion final posterior a la contencion horizontal y a la espera correcta del cierre animado.
 * Resultado: ✅ 48 comprobaciones CDP; LCP 1092 ms, CLS 0.00236, INP observado 32 ms y cero errores relevantes de consola.
+## [2026-07-21]
+
+* Archivo: produccion `https://lithora3d.com/`, GitHub Pages run `29840845490`
+* Cambio: se publico el commit `452e1b5` en `main` y se verificaron portada, precios y sitemap con Chrome DevTools.
+* Motivo: hacer efectivas las mejoras SEO y confirmar que el CDN sirve la revision nueva.
+* Relacion: cierre de TASK-069; el envio del sitemap a Search Console sigue separado por falta de acceso a la propiedad.
+* Resultado: ✅ workflow exitoso; titulo nuevo, ContactPoint, FAQ visible/estructurada, seis lastmod, H1 unico, cero overflow y cero mensajes relevantes de consola en produccion.
