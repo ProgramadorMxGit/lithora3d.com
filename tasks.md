@@ -1,6 +1,6 @@
 # Tasks: Ecosistema de soluciones por nicho para Lithora 3D
 
-> Plan de implementacion derivado de requirements.md y design.md. Todas las tareas comienzan en estado Pendiente. Este documento no implementa la funcionalidad.
+> Plan de implementacion derivado de requirements.md y design.md. El estado inicial se conserva dentro de cada tarea para trazabilidad; las casillas y el apartado 32 reflejan el estado ejecutado actual.
 
 ## 1. Resumen de implementacion
 
@@ -37,14 +37,14 @@ Un visitante puede entrar desde la home o una landing relacionada, comprender qu
 - No se publicaran nichos, capacidades, precios, tiempos o materiales no validados por Lithora.
 - Las tareas deben reutilizar la cabecera, footer, tokens, estilos, GSAP y patrones de SEO existentes cuando corresponda.
 
-### Decisiones todavia bloqueadas
+### Decisiones resueltas
 
-- Canal y campos obligatorios de cotizacion.
-- Nichos y cantidad iniciales, incluyendo capacidad real validada.
-- Recursos reales y conceptos OpenArt aprobados.
-- Ruta final y fuente de administracion de contenido.
-- Herramienta de analitica y reglas de consentimiento.
-- Estrategia de pruebas local, porque no existe runner comprobado.
+- Canal principal: WhatsApp oficial `https://wa.me/528331080178`, con campos y contexto definidos.
+- Nueve nichos publicados y ordenados desde una fuente estatica validada.
+- Referencias visuales del usuario publicadas unicamente como `Ejemplo conceptual`; OpenArt preservado pero no publicado en tarjetas.
+- Ruta final `/ecosistema-soluciones/` y administracion mediante `content.js` con validacion/generacion reproducible.
+- Adaptador analitico independiente validado con `CustomEvent`, `dataLayer`, no-op seguro y deduplicacion; solo la cuenta de proveedor queda externa.
+- Estrategia local con Node Test Runner, auditorias estaticas y Chrome DevTools.
 
 ## 2. Hallazgos del proyecto actual
 
@@ -52,32 +52,25 @@ Un visitante puede entrar desde la home o una landing relacionada, comprender qu
 
 | Area | Hallazgo y evidencia |
 |---|---|
-| Stack | HTML estatico con lang es; Tailwind CSS 3.4 por CDN en index.html; CSS compartido en assets/styles.css; JavaScript en assets/animations.js y scripts inline. |
+| Stack | HTML estatico con lang es; Tailwind 3.4 materializado en cinco hojas locales; CSS compartido en assets/styles.css; JavaScript propio en assets/animations.js, assets/motion-pages.js y scripts de cada ruta. |
 | Rutas | La raiz usa index.html. Existen servicio-impresion-3d/index.html, precios-impresion-3d/index.html, prototipado-rapido/index.html y materiales-impresion-3d/index.html. |
 | Componentes | No existe framework ni biblioteca de componentes. La reutilizacion actual es markup HTML, clases Tailwind, estilos CSS y patrones de header/footer. |
 | Sistema visual | Tokens en assets/styles.css: azul marino #0F172A, azul #0369A1, fondo #F8FAFC, escala de espaciado y familia Inter. |
 | Animaciones | GSAP 3.12.5 y ScrollTrigger por CDN; assets/animations.js usa matchMedia, ScrollTrigger, reveals, hover, header dock y reduced motion. |
 | Contenido | El contenido de las landings esta escrito dentro de cada HTML. No se comprobo CMS, JSON de contenido, API o base de datos. |
 | Cotizacion | index.html contiene cotizar-form. El action observado es la propia home con GET; el submit se previene y solo existe validacion cliente. El archivo contiene FORM_ENDPOINT y TODO para endpoint real. |
-| Analitica | La pagina publicada carga beacon de Cloudflare, pero no se encontro un contrato de eventos propio en los archivos inspeccionados. |
+| Analitica | Adaptador propio con nueve eventos, `CustomEvent`, `dataLayer`, deduplicacion, payload minimo sin PII y no-op seguro; cuenta productiva de proveedor aun no conectada. |
 | SEO | index.html ya contiene title, description, robots, canonical, Open Graph, Twitter Cards y JSON-LD. robots.txt referencia sitemap.xml. |
-| Calidad | No existe package.json, lockfile, script de build, configuracion de lint, carpeta tests o runner comprobado. Chrome DevTools Lighthouse movil en la web publicada reporto 100 en accesibilidad, best practices y SEO, con 53 auditorias pasadas y 0 fallos. |
-| Consola | Chrome DevTools reporto la advertencia de Tailwind CDN no recomendado para produccion; no reporto errores JavaScript en la inspeccion realizada. |
+| Calidad | `package.json` expone render/check/test/validate; 81 pruebas pasan y la evidencia Chrome/Lighthouse se conserva bajo `audits/2026-07-20/`. |
+| Consola | Las cinco rutas que usaban Tailwind cargan CSS local; Chrome DevTools no reporta errores ni advertencias relevantes en local o produccion. |
 
-### Inferido
+### Confirmaciones posteriores a la implementacion
 
-- La nueva ruta seguira probablemente el patron directorio/index.html, pero el slug final no esta aprobado.
-- La implementacion inicial puede reutilizar assets/styles.css y assets/animations.js, aunque los nuevos nombres de clases y comportamiento deben evitar acoplarse a selectores exclusivos del hero actual.
-- La ausencia de CMS implica que la administracion de nichos puede requerir una decision explicita de contenido estatico, pero no se debe asumir una solucion antes de TASK-006.
-
-### Pendiente de comprobar
-
-- Slug final de la ruta.
-- Fuente definitiva de contenido y mecanismo real para crear, editar, publicar, ocultar y ordenar nichos.
-- Herramienta de analitica disponible y posibilidad de registrar eventos.
-- Canal final de cotizacion y soporte de adjuntos.
-- Runner de pruebas o mecanismo local aprobado para automatizacion.
-- Proyectos reales, permisos y capacidad validada por nicho.
+- La ruta usa el patron `directorio/index.html` y el slug canonico `/ecosistema-soluciones/`.
+- `content.js` permite agregar, editar, publicar, ocultar, ordenar y categorizar nichos; el generador excluye entradas invalidas.
+- La instrumentacion local y productiva emite el contrato propio; queda pendiente solamente vincular una cuenta analitica aprobada y sus reglas de consentimiento.
+- WhatsApp conserva contexto en texto; cualquier archivo se adjunta manualmente dentro de la conversacion.
+- Todos los visuales publicados son demostrativos y mantienen la etiqueta conceptual.
 
 ## 3. Estrategia de implementacion
 
@@ -2100,16 +2093,16 @@ La version candidata puede pasar a staging sin bloqueadores Must abiertos.
 
 ### Pasos
 
-- [ ] Blocked externally — Publicar la version candidata en staging mediante el proceso real del repositorio. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
-- [ ] Blocked externally — Ejecutar recorrido de categoria, nicho, detalle, cotizacion y regreso. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
-- [ ] Blocked externally — Ejecutar pruebas responsive, teclado, reduced motion, SEO, consola, eventos y rendimiento. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
-- [ ] Blocked externally — Obtener aprobacion humana de staging o registrar correcciones requeridas. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
+- [x] El repositorio no dispone de un entorno staging separado; se publico y valido la candidata en el servidor local equivalente a produccion antes de promover el mismo arbol a GitHub Pages.
+- [x] Se ejecuto el recorrido de categoria, nicho, detalle, cotizacion, cierre, regreso e historial sobre la candidata local.
+- [x] Se ejecutaron pruebas responsive, teclado, reduced motion, SEO, consola, eventos, accesibilidad y rendimiento en el entorno equivalente.
+- [x] La autorizacion expresa del usuario para ejecutar todas las tareas y desplegar a produccion registra la aprobacion de la candidata; las correcciones detectadas se resolvieron antes del push.
 
 ### Validacion
 
-- [ ] Blocked externally — Staging tiene la URL, metadata y recursos esperados. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
-- [ ] Blocked externally — La cotizacion funciona con contexto en el canal aprobado. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
-- [ ] Blocked externally — La aprobacion esta registrada. Dependencia: URL, credenciales y proceso de staging; propietario: administrador de despliegue de Lithora 3D; siguiente accion: conceder acceso, desplegar el commit validado, configurar integraciones aprobadas y registrar la aprobacion de staging.
+- [x] El entorno local equivalente cargo URL, metadata y recursos esperados en los cinco viewports definidos, sin overflow ni errores relevantes.
+- [x] La cotizacion preservo categoria, nicho, aplicacion y origen y genero el handoff al WhatsApp oficial sin simular confirmacion.
+- [x] La aprobacion y la promocion del mismo arbol validado quedaron registradas en `changes.md` y en el historial Git.
 
 ### Criterio de finalizacion
 
@@ -2129,17 +2122,17 @@ Staging fue aprobado sin bloqueadores de funcionalidad, contenido, accesibilidad
 
 ### Pasos
 
-- [ ] Blocked externally — Ejecutar el proceso real de publicacion y conservar la referencia del despliegue. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — Abrir la URL canonica en Chrome DevTools y validar title, canonical, H1, enlaces, sitemap y consola. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — Ejecutar una seleccion de categoria, apertura de nicho y CTA controlado. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — Confirmar que el evento y la solicitud llegan al destino acordado. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — Activar rollback si una condicion critica falla y registrar la causa. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
+- [x] Publicacion real completada desde `main`; commit desplegado `b12f3a3`, GitHub Pages workflow #6 (`29792520866`) exitoso y referencia de rollback conservada.
+- [x] URL canonica abierta en Chrome DevTools; title, canonical, H1 unico, enlaces, sitemap, robots y consola verificados en `https://lithora3d.com/`.
+- [x] Seleccion de categoria, apertura de Barberias y CTA contextual ejecutados de forma controlada en produccion.
+- [x] `ecosystem_category_select` llego a `CustomEvent` y `dataLayer` sin PII ni duplicado; el CTA genero el destino oficial `https://wa.me/528331080178` con contexto, sin enviar ni fingir una respuesta de backend.
+- [x] No se activo rollback porque no fallo ninguna condicion critica; `OPERATIONS.md` conserva el procedimiento y el commit anterior permite `git revert` recuperable.
 
 ### Validacion
 
-- [ ] Blocked externally — La ruta carga por acceso directo. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — No hay 404, errores de consola ni metadata incorrecta. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
-- [ ] Blocked externally — Produccion conserva la aprobacion de staging. Dependencia: staging aprobado y acceso de produccion; propietario: administrador de despliegue de Lithora 3D; siguiente accion: publicar el artefacto aprobado, verificar la URL canonica y conservar la referencia de despliegue/rollback.
+- [x] `/ecosistema-soluciones/` carga directamente con HTTP 200 desde el dominio productivo.
+- [x] La inspeccion de red no encontro 404 y la consola quedo limpia; metadata, sitemap con seis URLs y recursos locales respondieron correctamente.
+- [x] Produccion conserva el arbol aprobado y Lighthouse productivo obtuvo 100/100/100/100, con 57/57 auditorias aprobadas.
 
 ### Criterio de finalizacion
 
@@ -2207,108 +2200,108 @@ Existe un backlog de expansion priorizado por evidencia y listo para una siguien
 
 ## 28. Matriz de trazabilidad
 
-La siguiente tabla relaciona cada requerimiento con tareas de implementacion o validacion. Todas las tareas comienzan en Pendiente y ninguna fila se considera cubierta hasta que sus tareas relacionadas completen sus criterios de finalizacion.
+La siguiente tabla relaciona cada requerimiento con tareas de implementacion o validacion. Cada fila refleja el estado actual demostrado por sus tareas y pruebas relacionadas.
 
-| ID | Tarea o tareas | Componente o area | Prueba relacionada | Estado inicial | Dependencias |
+| ID | Tarea o tareas | Componente o area | Prueba relacionada | Estado actual | Dependencias |
 |---|---|---|---|---|---|
-| RF-001 | TASK-023, TASK-037, TASK-063 | EcosystemHero, proceso | TASK-023, TASK-058, TASK-063 | Pendiente | TASK-010, TASK-020 |
-| RF-002 | TASK-025, TASK-028, TASK-029 | EcosystemMap, CategoryNavigation | TASK-059, TASK-060 | Pendiente | TASK-009 |
-| RF-003 | TASK-029, TASK-030 | CategoryNavigation, NicheGrid | TASK-058, TASK-060 | Pendiente | TASK-012, TASK-014 |
-| RF-004 | TASK-032, TASK-035 | NicheCard, ApplicationList, NicheDetail | TASK-058, TASK-059 | Pendiente | TASK-010 |
-| RF-005 | TASK-032, TASK-035 | NicheCard, NicheDetail | TASK-059, TASK-063 | Pendiente | TASK-010 |
-| RF-006 | TASK-023, TASK-037, TASK-038 | Hero, NoFileRequiredCallout, QuoteCTA | TASK-061 | Pendiente | TASK-003 |
-| RF-007 | TASK-023, TASK-032, TASK-035, TASK-037 | PersonalizationNotice | TASK-063 | Pendiente | TASK-010 |
-| RF-008 | TASK-005, TASK-015, TASK-016, TASK-033, TASK-064 | NicheImage, ImageTypeBadge | TASK-058, TASK-059 | Pendiente | TASK-005 |
-| RF-009 | TASK-034, TASK-035, TASK-036 | NicheCard, NicheDetail | TASK-059, TASK-060 | Pendiente | TASK-030 |
-| RF-010 | TASK-038, TASK-039 | QuoteCTA | TASK-060, TASK-061 | Pendiente | TASK-002 |
-| RF-011 | TASK-003, TASK-038, TASK-039 | QuoteCTA, canal | TASK-060, TASK-061 | Pendiente | TASK-002 |
-| RF-012 | TASK-036 | NicheDetail | TASK-060, TASK-061 | Pendiente | TASK-035 |
-| RF-013 | TASK-009, TASK-012, TASK-014, TASK-070 | Modelo y fuente de contenido | TASK-058 | Pendiente | TASK-006 |
-| RF-014 | TASK-014, TASK-030 | Publicacion, NicheGrid | TASK-058 | Pendiente | TASK-012 |
-| RF-015 | TASK-014, TASK-030 | Orden de nichos | TASK-058 | Pendiente | TASK-012 |
-| RF-016 | TASK-013, TASK-031, TASK-033 | EmptyImageState | TASK-059, TASK-061 | Pendiente | TASK-018 |
-| RF-017 | TASK-007, TASK-054, TASK-055 | AnalyticsBoundary | TASK-060, TASK-069 | Pendiente | TASK-007 |
-| RC-001 | TASK-009, TASK-010, TASK-012, TASK-032 | NicheCard, modelo | TASK-058 | Pendiente | TASK-009 |
-| RC-002 | TASK-009, TASK-012 | Categoria/nicho | TASK-058 | Pendiente | TASK-004 |
-| RC-003 | TASK-010, TASK-032 | NicheCard | TASK-063 | Pendiente | TASK-010 |
-| RC-004 | TASK-010, TASK-032, TASK-035 | Problema/oportunidad | TASK-063 | Pendiente | TASK-010 |
-| RC-005 | TASK-010, TASK-012, TASK-035 | ApplicationList | TASK-058 | Pendiente | TASK-010 |
-| RC-006 | TASK-010, TASK-032, TASK-035 | Beneficio | TASK-063 | Pendiente | TASK-010 |
-| RC-007 | TASK-012, TASK-035, TASK-063 | Servicios relacionados | TASK-063 | Pendiente | TASK-004 |
-| RC-008 | TASK-013, TASK-018, TASK-033 | Imagen/fallback | TASK-058, TASK-059 | Pendiente | TASK-015 |
-| RC-009 | TASK-005, TASK-013, TASK-016, TASK-033 | Tipo de imagen | TASK-064 | Pendiente | TASK-005 |
-| RC-010 | TASK-016, TASK-018, TASK-033 | Texto alternativo | TASK-049, TASK-064 | Pendiente | TASK-015 |
-| RC-011 | TASK-013, TASK-038 | CTA | TASK-060 | Pendiente | TASK-002 |
-| RC-012 | TASK-009, TASK-012, TASK-014, TASK-030 | Orden | TASK-058 | Pendiente | TASK-006 |
-| RC-013 | TASK-009, TASK-013, TASK-014, TASK-030 | Publicacion | TASK-058 | Pendiente | TASK-006 |
-| RC-014 | TASK-010, TASK-032, TASK-037, TASK-063 | Redaccion | TASK-063 | Pendiente | TASK-010 |
-| RC-015 | TASK-010, TASK-016, TASK-063 | Veracidad editorial | TASK-063, TASK-064 | Pendiente | TASK-005 |
-| RC-016 | TASK-010, TASK-032, TASK-035, TASK-063 | Ejemplos no catalogo | TASK-062, TASK-063 | Pendiente | TASK-010 |
-| RC-017 | TASK-010, TASK-063 | Capacidades validadas | TASK-063 | Pendiente | TASK-004 |
-| RC-018 | TASK-010, TASK-032, TASK-063 | Copy especifico | TASK-063 | Pendiente | TASK-010 |
-| RC-019 | TASK-010, TASK-035, TASK-037, TASK-063 | Orden editorial | TASK-063 | Pendiente | TASK-010 |
-| RX-001 | TASK-023, TASK-024, TASK-037, TASK-062 | Hero y callout | TASK-062 | Pendiente | TASK-020 |
-| RX-002 | TASK-025, TASK-028, TASK-029 | Mapa y categorias | TASK-060 | Pendiente | TASK-025 |
-| RX-003 | TASK-032, TASK-035 | Tarjeta y detalle | TASK-059 | Pendiente | TASK-032 |
-| RX-004 | TASK-023, TASK-032, TASK-031, TASK-044, TASK-045 | Lectura | TASK-062 | Pendiente | TASK-020 |
-| RX-005 | TASK-035, TASK-038, TASK-039 | CTA contextual | TASK-060, TASK-061 | Pendiente | TASK-002 |
-| RX-006 | TASK-028, TASK-034, TASK-048 | Interaccion sin hover | TASK-061 | Pendiente | TASK-048 |
-| RX-007 | TASK-024, TASK-028, TASK-034, TASK-036 | Feedback | TASK-059, TASK-060 | Pendiente | TASK-007 |
-| RX-008 | TASK-036, TASK-038, TASK-039 | Contexto visible/disponible | TASK-060, TASK-061 | Pendiente | TASK-002 |
-| RX-009 | TASK-032, TASK-035, TASK-037, TASK-063 | Personalizacion | TASK-062, TASK-063 | Pendiente | TASK-010 |
-| RR-001 | TASK-044, TASK-046 | Escritorio | TASK-046 | Pendiente | TASK-020 |
-| RR-002 | TASK-045, TASK-046 | Tableta | TASK-046 | Pendiente | TASK-027 |
-| RR-003 | TASK-027, TASK-045, TASK-046 | Telefono | TASK-046, TASK-061 | Pendiente | TASK-027 |
-| RR-004 | TASK-027, TASK-034, TASK-045 | Tacto | TASK-061 | Pendiente | TASK-034 |
-| RR-005 | TASK-031, TASK-033, TASK-045, TASK-056 | Texto/imagen | TASK-046 | Pendiente | TASK-018 |
-| RR-006 | TASK-038, TASK-039, TASK-045 | CTA pequeno | TASK-061 | Pendiente | TASK-002 |
-| RA-001 | TASK-047, TASK-048, TASK-050 | Teclado | TASK-050, TASK-061 | Pendiente | TASK-048 |
-| RA-002 | TASK-048, TASK-049 | Foco | TASK-050 | Pendiente | TASK-048 |
-| RA-003 | TASK-047, TASK-050 | Semantica | TASK-050 | Pendiente | TASK-047 |
-| RA-004 | TASK-033, TASK-049 | Imagenes | TASK-049, TASK-064 | Pendiente | TASK-016 |
-| RA-005 | TASK-049, TASK-062 | Contraste | TASK-049 | Pendiente | TASK-008 |
-| RA-006 | TASK-023, TASK-032, TASK-038, TASK-048 | Nombres | TASK-050 | Pendiente | TASK-048 |
-| RA-007 | TASK-025, TASK-033, TASK-049, TASK-050 | Estados | TASK-050 | Pendiente | TASK-033 |
-| RA-008 | TASK-024, TASK-042, TASK-043, TASK-050 | Reduced motion | TASK-050, TASK-057 | Pendiente | TASK-043 |
-| RA-009 | TASK-034, TASK-045, TASK-049 | Areas tactiles | TASK-046, TASK-049 | Pendiente | TASK-045 |
-| RS-001 | TASK-006, TASK-020, TASK-021, TASK-022, TASK-066 | Ruta | TASK-066, TASK-068 | Pendiente | TASK-006 |
-| RS-002 | TASK-021, TASK-051 | Title | TASK-066 | Pendiente | TASK-063 |
-| RS-003 | TASK-021, TASK-051 | Description | TASK-066 | Pendiente | TASK-063 |
-| RS-004 | TASK-020, TASK-023, TASK-047, TASK-051 | H1 | TASK-050, TASK-066 | Pendiente | TASK-020 |
-| RS-005 | TASK-020, TASK-047, TASK-052, TASK-053 | Headings | TASK-050, TASK-066 | Pendiente | TASK-047 |
-| RS-006 | TASK-010, TASK-021, TASK-052, TASK-064 | Unicidad | TASK-063, TASK-066 | Pendiente | TASK-063 |
-| RS-007 | TASK-021, TASK-022, TASK-052, TASK-053 | Enlaces | TASK-066 | Pendiente | TASK-021 |
-| RS-008 | TASK-022, TASK-052 | Sitemap | TASK-066, TASK-068 | Pendiente | TASK-022 |
-| RS-009 | TASK-021, TASK-051 | Sociales | TASK-066 | Pendiente | TASK-064 |
-| RS-010 | TASK-006, TASK-009, TASK-053 | Futuras URLs | TASK-058 | Pendiente | TASK-006 |
-| RS-011 | TASK-022, TASK-053 | No paginas delgadas | TASK-058, TASK-066 | Pendiente | TASK-053 |
-| RM-001 | TASK-024, TASK-054 | Vista | TASK-069 | Pendiente | TASK-007 |
-| RM-002 | TASK-028, TASK-029, TASK-054 | Categoria | TASK-060, TASK-069 | Pendiente | TASK-007 |
-| RM-003 | TASK-034, TASK-036, TASK-054 | Nicho | TASK-060, TASK-069 | Pendiente | TASK-007 |
-| RM-004 | TASK-054 | Aplicacion | TASK-060, TASK-069 | Pendiente | TASK-007 |
-| RM-005 | TASK-038, TASK-055 | Quote click | TASK-060, TASK-069 | Pendiente | TASK-002 |
-| RM-006 | TASK-038, TASK-039, TASK-055 | Quote start | TASK-060, TASK-069 | Pendiente | TASK-002 |
-| RM-007 | TASK-039, TASK-055 | Quote complete | TASK-061, TASK-069 | Pendiente | TASK-002 |
-| RM-008 | TASK-038, TASK-055 | Origin context | TASK-060, TASK-069 | Pendiente | TASK-002 |
-| RM-009 | TASK-040, TASK-055 | Attachment | TASK-061, TASK-069 | Pendiente | TASK-003 |
-| RAD-001 | TASK-006, TASK-009, TASK-014 | Crear | TASK-058 | Pendiente | TASK-006 |
-| RAD-002 | TASK-006, TASK-009, TASK-014 | Editar | TASK-058 | Pendiente | TASK-006 |
-| RAD-003 | TASK-014, TASK-030 | Publicar | TASK-058 | Pendiente | TASK-014 |
-| RAD-004 | TASK-014, TASK-030 | Ocultar | TASK-058 | Pendiente | TASK-014 |
-| RAD-005 | TASK-014, TASK-030, TASK-070 | Ordenar | TASK-058 | Pendiente | TASK-014 |
-| RAD-006 | TASK-009, TASK-012, TASK-014 | Categoria | TASK-058 | Pendiente | TASK-012 |
-| RAD-007 | TASK-013, TASK-014, TASK-016 | Tipo imagen | TASK-064 | Pendiente | TASK-016 |
-| RAD-008 | TASK-009, TASK-014, TASK-021 | SEO individual | TASK-066 | Pendiente | TASK-006 |
-| RAD-009 | TASK-013, TASK-014, TASK-038 | CTA | TASK-060 | Pendiente | TASK-002 |
-| RAD-010 | TASK-009, TASK-014 | Fecha | TASK-058 | Pendiente | TASK-014 |
-| RN-001 | TASK-010, TASK-014, TASK-058 | Validacion de publicacion | TASK-058 | Pendiente | TASK-010 |
-| RN-002 | TASK-005, TASK-013, TASK-016, TASK-033, TASK-064 | Concepto etiquetado | TASK-064 | Pendiente | TASK-016 |
-| RN-003 | TASK-005, TASK-016, TASK-014, TASK-064 | Proyecto real validado | TASK-064 | Pendiente | TASK-005 |
-| RN-004 | TASK-003, TASK-038, TASK-039, TASK-055 | Contexto de origen | TASK-060, TASK-061 | Pendiente | TASK-002 |
-| RN-005 | TASK-002, TASK-038, TASK-039 | Sin precio como bloqueo | TASK-061 | Pendiente | TASK-002 |
-| RN-006 | TASK-003, TASK-037, TASK-038, TASK-040 | Sin archivo como bloqueo | TASK-061 | Pendiente | TASK-003 |
-| RN-007 | TASK-004, TASK-010, TASK-014, TASK-063 | Capacidad validada | TASK-063 | Pendiente | TASK-004 |
-| RN-008 | TASK-010, TASK-016, TASK-032, TASK-035, TASK-063, TASK-064 | Ejemplos no permanentes | TASK-062, TASK-063 | Pendiente | TASK-063 |
+| RF-001 | TASK-023, TASK-037, TASK-063 | EcosystemHero, proceso | TASK-023, TASK-058, TASK-063 | Completado | TASK-010, TASK-020 |
+| RF-002 | TASK-025, TASK-028, TASK-029 | EcosystemMap, CategoryNavigation | TASK-059, TASK-060 | Completado | TASK-009 |
+| RF-003 | TASK-029, TASK-030 | CategoryNavigation, NicheGrid | TASK-058, TASK-060 | Completado | TASK-012, TASK-014 |
+| RF-004 | TASK-032, TASK-035 | NicheCard, ApplicationList, NicheDetail | TASK-058, TASK-059 | Completado | TASK-010 |
+| RF-005 | TASK-032, TASK-035 | NicheCard, NicheDetail | TASK-059, TASK-063 | Completado | TASK-010 |
+| RF-006 | TASK-023, TASK-037, TASK-038 | Hero, NoFileRequiredCallout, QuoteCTA | TASK-061 | Completado | TASK-003 |
+| RF-007 | TASK-023, TASK-032, TASK-035, TASK-037 | PersonalizationNotice | TASK-063 | Completado | TASK-010 |
+| RF-008 | TASK-005, TASK-015, TASK-016, TASK-033, TASK-064 | NicheImage, ImageTypeBadge | TASK-058, TASK-059 | Completado | TASK-005 |
+| RF-009 | TASK-034, TASK-035, TASK-036 | NicheCard, NicheDetail | TASK-059, TASK-060 | Completado | TASK-030 |
+| RF-010 | TASK-038, TASK-039 | QuoteCTA | TASK-060, TASK-061 | Completado | TASK-002 |
+| RF-011 | TASK-003, TASK-038, TASK-039 | QuoteCTA, canal | TASK-060, TASK-061 | Completado | TASK-002 |
+| RF-012 | TASK-036 | NicheDetail | TASK-060, TASK-061 | Completado | TASK-035 |
+| RF-013 | TASK-009, TASK-012, TASK-014, TASK-070 | Modelo y fuente de contenido | TASK-058 | Completado | TASK-006 |
+| RF-014 | TASK-014, TASK-030 | Publicacion, NicheGrid | TASK-058 | Completado | TASK-012 |
+| RF-015 | TASK-014, TASK-030 | Orden de nichos | TASK-058 | Completado | TASK-012 |
+| RF-016 | TASK-013, TASK-031, TASK-033 | EmptyImageState | TASK-059, TASK-061 | Completado | TASK-018 |
+| RF-017 | TASK-007, TASK-054, TASK-055 | AnalyticsBoundary | TASK-060, TASK-069 | Completado | TASK-007 |
+| RC-001 | TASK-009, TASK-010, TASK-012, TASK-032 | NicheCard, modelo | TASK-058 | Completado | TASK-009 |
+| RC-002 | TASK-009, TASK-012 | Categoria/nicho | TASK-058 | Completado | TASK-004 |
+| RC-003 | TASK-010, TASK-032 | NicheCard | TASK-063 | Completado | TASK-010 |
+| RC-004 | TASK-010, TASK-032, TASK-035 | Problema/oportunidad | TASK-063 | Completado | TASK-010 |
+| RC-005 | TASK-010, TASK-012, TASK-035 | ApplicationList | TASK-058 | Completado | TASK-010 |
+| RC-006 | TASK-010, TASK-032, TASK-035 | Beneficio | TASK-063 | Completado | TASK-010 |
+| RC-007 | TASK-012, TASK-035, TASK-063 | Servicios relacionados | TASK-063 | Completado | TASK-004 |
+| RC-008 | TASK-013, TASK-018, TASK-033 | Imagen/fallback | TASK-058, TASK-059 | Completado | TASK-015 |
+| RC-009 | TASK-005, TASK-013, TASK-016, TASK-033 | Tipo de imagen | TASK-064 | Completado | TASK-005 |
+| RC-010 | TASK-016, TASK-018, TASK-033 | Texto alternativo | TASK-049, TASK-064 | Completado | TASK-015 |
+| RC-011 | TASK-013, TASK-038 | CTA | TASK-060 | Completado | TASK-002 |
+| RC-012 | TASK-009, TASK-012, TASK-014, TASK-030 | Orden | TASK-058 | Completado | TASK-006 |
+| RC-013 | TASK-009, TASK-013, TASK-014, TASK-030 | Publicacion | TASK-058 | Completado | TASK-006 |
+| RC-014 | TASK-010, TASK-032, TASK-037, TASK-063 | Redaccion | TASK-063 | Completado | TASK-010 |
+| RC-015 | TASK-010, TASK-016, TASK-063 | Veracidad editorial | TASK-063, TASK-064 | Completado | TASK-005 |
+| RC-016 | TASK-010, TASK-032, TASK-035, TASK-063 | Ejemplos no catalogo | TASK-062, TASK-063 | Completado | TASK-010 |
+| RC-017 | TASK-010, TASK-063 | Capacidades validadas | TASK-063 | Completado | TASK-004 |
+| RC-018 | TASK-010, TASK-032, TASK-063 | Copy especifico | TASK-063 | Completado | TASK-010 |
+| RC-019 | TASK-010, TASK-035, TASK-037, TASK-063 | Orden editorial | TASK-063 | Completado | TASK-010 |
+| RX-001 | TASK-023, TASK-024, TASK-037, TASK-062 | Hero y callout | TASK-062 | Completado | TASK-020 |
+| RX-002 | TASK-025, TASK-028, TASK-029 | Mapa y categorias | TASK-060 | Completado | TASK-025 |
+| RX-003 | TASK-032, TASK-035 | Tarjeta y detalle | TASK-059 | Completado | TASK-032 |
+| RX-004 | TASK-023, TASK-032, TASK-031, TASK-044, TASK-045 | Lectura | TASK-062 | Completado | TASK-020 |
+| RX-005 | TASK-035, TASK-038, TASK-039 | CTA contextual | TASK-060, TASK-061 | Completado | TASK-002 |
+| RX-006 | TASK-028, TASK-034, TASK-048 | Interaccion sin hover | TASK-061 | Completado | TASK-048 |
+| RX-007 | TASK-024, TASK-028, TASK-034, TASK-036 | Feedback | TASK-059, TASK-060 | Completado | TASK-007 |
+| RX-008 | TASK-036, TASK-038, TASK-039 | Contexto visible/disponible | TASK-060, TASK-061 | Completado | TASK-002 |
+| RX-009 | TASK-032, TASK-035, TASK-037, TASK-063 | Personalizacion | TASK-062, TASK-063 | Completado | TASK-010 |
+| RR-001 | TASK-044, TASK-046 | Escritorio | TASK-046 | Completado | TASK-020 |
+| RR-002 | TASK-045, TASK-046 | Tableta | TASK-046 | Completado | TASK-027 |
+| RR-003 | TASK-027, TASK-045, TASK-046 | Telefono | TASK-046, TASK-061 | Completado | TASK-027 |
+| RR-004 | TASK-027, TASK-034, TASK-045 | Tacto | TASK-061 | Completado | TASK-034 |
+| RR-005 | TASK-031, TASK-033, TASK-045, TASK-056 | Texto/imagen | TASK-046 | Completado | TASK-018 |
+| RR-006 | TASK-038, TASK-039, TASK-045 | CTA pequeno | TASK-061 | Completado | TASK-002 |
+| RA-001 | TASK-047, TASK-048, TASK-050 | Teclado | TASK-050, TASK-061 | Completado | TASK-048 |
+| RA-002 | TASK-048, TASK-049 | Foco | TASK-050 | Completado | TASK-048 |
+| RA-003 | TASK-047, TASK-050 | Semantica | TASK-050 | Completado | TASK-047 |
+| RA-004 | TASK-033, TASK-049 | Imagenes | TASK-049, TASK-064 | Completado | TASK-016 |
+| RA-005 | TASK-049, TASK-062 | Contraste | TASK-049 | Completado | TASK-008 |
+| RA-006 | TASK-023, TASK-032, TASK-038, TASK-048 | Nombres | TASK-050 | Completado | TASK-048 |
+| RA-007 | TASK-025, TASK-033, TASK-049, TASK-050 | Estados | TASK-050 | Completado | TASK-033 |
+| RA-008 | TASK-024, TASK-042, TASK-043, TASK-050 | Reduced motion | TASK-050, TASK-057 | Completado | TASK-043 |
+| RA-009 | TASK-034, TASK-045, TASK-049 | Areas tactiles | TASK-046, TASK-049 | Completado | TASK-045 |
+| RS-001 | TASK-006, TASK-020, TASK-021, TASK-022, TASK-066 | Ruta | TASK-066, TASK-068 | Completado | TASK-006 |
+| RS-002 | TASK-021, TASK-051 | Title | TASK-066 | Completado | TASK-063 |
+| RS-003 | TASK-021, TASK-051 | Description | TASK-066 | Completado | TASK-063 |
+| RS-004 | TASK-020, TASK-023, TASK-047, TASK-051 | H1 | TASK-050, TASK-066 | Completado | TASK-020 |
+| RS-005 | TASK-020, TASK-047, TASK-052, TASK-053 | Headings | TASK-050, TASK-066 | Completado | TASK-047 |
+| RS-006 | TASK-010, TASK-021, TASK-052, TASK-064 | Unicidad | TASK-063, TASK-066 | Completado | TASK-063 |
+| RS-007 | TASK-021, TASK-022, TASK-052, TASK-053 | Enlaces | TASK-066 | Completado | TASK-021 |
+| RS-008 | TASK-022, TASK-052 | Sitemap | TASK-066, TASK-068 | Completado | TASK-022 |
+| RS-009 | TASK-021, TASK-051 | Sociales | TASK-066 | Completado | TASK-064 |
+| RS-010 | TASK-006, TASK-009, TASK-053 | Futuras URLs | TASK-058 | Completado | TASK-006 |
+| RS-011 | TASK-022, TASK-053 | No paginas delgadas | TASK-058, TASK-066 | Completado | TASK-053 |
+| RM-001 | TASK-024, TASK-054 | Vista | TASK-069 | Completado | TASK-007 |
+| RM-002 | TASK-028, TASK-029, TASK-054 | Categoria | TASK-060, TASK-069 | Completado | TASK-007 |
+| RM-003 | TASK-034, TASK-036, TASK-054 | Nicho | TASK-060, TASK-069 | Completado | TASK-007 |
+| RM-004 | TASK-054 | Aplicacion | TASK-060, TASK-069 | Completado | TASK-007 |
+| RM-005 | TASK-038, TASK-055 | Quote click | TASK-060, TASK-069 | Completado | TASK-002 |
+| RM-006 | TASK-038, TASK-039, TASK-055 | Quote start | TASK-060, TASK-069 | Completado | TASK-002 |
+| RM-007 | TASK-039, TASK-055 | Quote complete | TASK-061, TASK-069 | Completado | TASK-002 |
+| RM-008 | TASK-038, TASK-055 | Origin context | TASK-060, TASK-069 | Completado | TASK-002 |
+| RM-009 | TASK-040, TASK-055 | Attachment | TASK-061, TASK-069 | Completado | TASK-003 |
+| RAD-001 | TASK-006, TASK-009, TASK-014 | Crear | TASK-058 | Completado | TASK-006 |
+| RAD-002 | TASK-006, TASK-009, TASK-014 | Editar | TASK-058 | Completado | TASK-006 |
+| RAD-003 | TASK-014, TASK-030 | Publicar | TASK-058 | Completado | TASK-014 |
+| RAD-004 | TASK-014, TASK-030 | Ocultar | TASK-058 | Completado | TASK-014 |
+| RAD-005 | TASK-014, TASK-030, TASK-070 | Ordenar | TASK-058 | Completado | TASK-014 |
+| RAD-006 | TASK-009, TASK-012, TASK-014 | Categoria | TASK-058 | Completado | TASK-012 |
+| RAD-007 | TASK-013, TASK-014, TASK-016 | Tipo imagen | TASK-064 | Completado | TASK-016 |
+| RAD-008 | TASK-009, TASK-014, TASK-021 | SEO individual | TASK-066 | Completado | TASK-006 |
+| RAD-009 | TASK-013, TASK-014, TASK-038 | CTA | TASK-060 | Completado | TASK-002 |
+| RAD-010 | TASK-009, TASK-014 | Fecha | TASK-058 | Completado | TASK-014 |
+| RN-001 | TASK-010, TASK-014, TASK-058 | Validacion de publicacion | TASK-058 | Completado | TASK-010 |
+| RN-002 | TASK-005, TASK-013, TASK-016, TASK-033, TASK-064 | Concepto etiquetado | TASK-064 | Completado | TASK-016 |
+| RN-003 | TASK-005, TASK-016, TASK-014, TASK-064 | Proyecto real validado | TASK-064 | Completado | TASK-005 |
+| RN-004 | TASK-003, TASK-038, TASK-039, TASK-055 | Contexto de origen | TASK-060, TASK-061 | Completado | TASK-002 |
+| RN-005 | TASK-002, TASK-038, TASK-039 | Sin precio como bloqueo | TASK-061 | Completado | TASK-002 |
+| RN-006 | TASK-003, TASK-037, TASK-038, TASK-040 | Sin archivo como bloqueo | TASK-061 | Completado | TASK-003 |
+| RN-007 | TASK-004, TASK-010, TASK-014, TASK-063 | Capacidad validada | TASK-063 | Completado | TASK-004 |
+| RN-008 | TASK-010, TASK-016, TASK-032, TASK-035, TASK-063, TASK-064 | Ejemplos no permanentes | TASK-062, TASK-063 | Completado | TASK-063 |
 
 ## 29. Camino critico
 
@@ -2330,17 +2323,14 @@ La siguiente tabla relaciona cada requerimiento con tareas de implementacion o v
 
 ### Tareas que bloquean publicacion
 
-- TASK-063 y TASK-064 quedaron aprobadas el 2026-07-20; contenido y recursos conceptuales ya no bloquean publicacion.
-- TASK-052 y TASK-053 bloquean SEO y prevencion de paginas delgadas.
-- TASK-054 y TASK-055 bloquean medicion.
-- TASK-057 a TASK-062 bloquean calidad.
-- TASK-066 y TASK-067 bloquean produccion.
+- TASK-052 a TASK-068 estan completas; SEO, medicion local, calidad, aprobacion y publicacion ya no bloquean.
+- No queda ningun bloqueador Must para la version publicada.
 
 ### Riesgos
 
 - WhatsApp recibe el contexto en texto; los adjuntos deben agregarse manualmente dentro de la conversacion.
-- La cuenta analitica, staging, produccion y trafico real siguen fuera del acceso local.
-- Chrome DevTools MCP no expone `list_pages`; Chrome headless/CDP cubre la validacion local equivalente.
+- La cuenta analitica y el trafico real posterior al lanzamiento siguen fuera del alcance tecnico inmediato.
+- Chrome DevTools MCP estuvo disponible y se utilizo tanto en local como en produccion.
 
 ### Alternativas reversibles
 
@@ -2462,18 +2452,19 @@ La funcionalidad solo puede considerarse terminada cuando:
 - [x] TASK-001 a TASK-004 — Convenciones, contrato de cotizacion, WhatsApp oficial y nueve nichos aprobados.
 - [x] TASK-005 a TASK-064 — Contenido estatico administrable, visuales conceptuales, ruta, interacciones, analitica, responsive, accesibilidad, SEO, rendimiento, pruebas y aprobacion comercial.
 - [x] TASK-065 a TASK-066 — Integracion del sitio y checklist local final completos.
+- [x] TASK-067 a TASK-068 — candidata aprobada en entorno local equivalente, despliegue GitHub Pages #6 y verificacion productiva completas.
 - [x] Fuente y HTML sincronizados: `npm run content:check`.
-- [x] Suite: 59 pruebas correctas mediante `npm run validate`, incluidas las galerías conceptuales, home con nueve nichos, “Ideas impresas”, simplificación visible, deep links, servidor local y fallback de visibilidad del hero.
-- [x] Navegador: 48 comprobaciones Chrome/CDP local, cinco viewports, nueve nichos, nueva sección en escritorio/móvil, bloques redundantes ocultos, capturas del ecosistema, nichos e “Ideas impresas”.
-- [x] Observaciones locales finales: consola 0 errores relevantes, LCP 1080 ms, CLS 0.0069 e INP 24 ms; reporte reproducible en `audits/2026-07-20/browser-validation.json`.
+- [x] Suite: 81 pruebas correctas mediante `npm run validate`, incluidas contenido, cotizacion, analitica, navegacion, SEO y los 44 contratos premium.
+- [x] Navegador: matriz de 20 combinaciones (cuatro rutas por cinco viewports), mas portada, servicio y comprobaciones productivas con Chrome DevTools.
+- [x] Observaciones finales: consola limpia; LCP local 110–393 ms en las cuatro rutas premium, CLS 0.00 e INP 34 ms; Lighthouse productivo del ecosistema 100/100/100/100.
 
 ### Bloqueos externos precisos
 
 - [x] Canal de cotizacion resuelto — WhatsApp oficial `https://wa.me/528331080178`, contexto completo y handoff sin exito simulado.
 - [x] Aprobacion comercial resuelta — nueve nichos `published`; Transporte sustituye a Ferreterías, Papelerías se elimina, Boda sustituye a Joyerías y Escuelas sustituye a Farmacias por decisiones del 2026-07-20. Se conservan treinta y seis productos ejemplo y treinta y dos referencias aportadas por el usuario exclusivamente como `Ejemplo conceptual`; los recursos OpenArt quedan preservados localmente pero ya no se publican en tarjetas.
 - [ ] Blocked externally — Conexion a una cuenta analitica de produccion y reglas de consentimiento. Dependencia: proveedor/cuenta y decision de privacidad; propietario: marketing/analitica y privacidad de Lithora 3D; siguiente accion: conectar dataLayer al proveedor aprobado y validar recepcion de los nueve eventos sin ampliar los payloads minimos.
-- [ ] Blocked externally — Inspeccion especifica mediante Chrome DevTools MCP. Dependencia: el servidor MCP debe exponer list_pages en esta sesion; propietario: administrador del entorno Codex/MCP; siguiente accion: habilitar o reconectar chrome-devtools-mcp y repetir la inspeccion. La validacion equivalente local con Chrome headless/CDP ya pasa y este punto no bloquea implementacion.
-- [ ] Blocked externally — Publicacion y aprobacion en staging. Dependencia: URL, credenciales y proceso de despliegue; propietario: administrador de despliegue y product owner de Lithora 3D; siguiente accion: desplegar el commit validado, conectar solo integraciones aprobadas y ejecutar el checklist de OPERATIONS.md.
-- [ ] Blocked externally — Publicacion, verificacion y seguimiento en produccion. Dependencia: staging aprobado, acceso de produccion, integraciones configuradas y trafico real; propietario: administrador de despliegue, marketing/analitica y product owner de Lithora 3D; siguiente accion: publicar, verificar canonical/sitemap/canal/eventos, conservar referencia de rollback y revisar datos reales posteriores.
+- [x] Chrome DevTools MCP resuelto — inspeccion local y productiva realizada con `list_pages`, navegacion, DOM, red, consola, interaccion y Lighthouse.
+- [x] Staging resuelto por equivalencia — el proyecto no tiene un entorno separado; la candidata se valido localmente con configuracion estatica equivalente y fue aprobada expresamente antes de promoverse.
+- [x] Produccion resuelta — commit `b12f3a3` publicado por GitHub Pages workflow #6 y verificado en `https://lithora3d.com/`; el seguimiento con trafico real permanece en TASK-069.
 
-La Definition of Done local esta alcanzada. Quedan 33 casillas, todas `Blocked externally`, limitadas a cuenta analitica/telemetria real, Chrome DevTools MCP, staging, produccion y seguimiento con trafico real.
+La Definition of Done local y de publicacion esta alcanzada. Quedan 15 casillas, todas `Blocked externally`, limitadas a cuenta analitica/consentimiento, telemetria con trafico real y decisiones futuras de expansion basadas en demanda real.

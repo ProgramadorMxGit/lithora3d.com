@@ -83,3 +83,16 @@ La fase quedó implementada sobre el sitio existente mediante contratos nominale
 Las métricas son de laboratorio local y no sustituyen datos de campo de usuarios reales. El intento de atajo de teclado para zoom del navegador no cambió el zoom del perfil MCP; se verificaron en su lugar 320–1440 px y `zoom: 200%` sin overflow, además de la semántica accesible. No quedan tareas locales de implementación o validación para esta fase.
 
 Definition of Done local: **alcanzada**.
+
+## Verificacion productiva
+
+- Rama y commit: `main` en `b12f3a3`.
+- GitHub Pages: workflow #6, ejecucion `29792520866`, completado correctamente en 1 min 1 s.
+- Dominio inspeccionado con Chrome DevTools: `https://lithora3d.com/` y acceso directo a `/ecosistema-soluciones/`, `/precios-impresion-3d/`, `/prototipado-rapido/`, `/materiales-impresion-3d/` y `/servicio-impresion-3d/`.
+- Red/consola: recursos criticos HTTP 200, sin 404 ni mensajes relevantes; cinco paginas usan Tailwind materializado localmente y no cargan su runtime CDN.
+- Soluciones: nueve nichos, 45 etiquetas conceptuales, cuatro categorias, H1 unico, cero overflow y motor premium `premium-widget-motion` con 22 contratos, un observer y diez listeners.
+- Cotizacion/analitica: destino oficial `wa.me/528331080178`, contexto conservado; `ecosystem_category_select` observado en `CustomEvent` y `dataLayer`, sin PII y sin duplicado por segundo clic.
+- SEO: canonical y metadata correctos; sitemap productivo contiene las seis URLs indexables y `robots.txt` lo declara.
+- Lighthouse productivo del ecosistema: Accesibilidad 100, Buenas practicas 100, SEO 100 y navegacion agentica 100; 57/57 auditorias aprobadas. Evidencia en `audits/2026-07-20/production-lighthouse-solutions/`.
+
+Definition of Done de publicacion: **alcanzada**.

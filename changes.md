@@ -1552,3 +1552,67 @@
 * Motivo: eliminar el aviso de producción, reducir dependencia externa y conservar exactamente la composición visual ya renderizada.
 * Relación: misma estrategia validada previamente en Precios, Prototipado y Materiales; ahora cubre todas las rutas que utilizaban Tailwind.
 * Resultado: ✅ CSS local generado (Home 16,283 bytes; Servicio 8,858 bytes), pendiente regresión visual y de consola.
+
+## [2026-07-20]
+
+* Archivo: `audits/2026-07-20/production-lighthouse-solutions/`
+* Cambio: auditoría Lighthouse de la ruta productiva `https://lithora3d.com/ecosistema-soluciones/` después del workflow de GitHub Pages #6.
+* Motivo: comprobar el resultado desplegado en el dominio real, no limitar la evidencia al servidor local.
+* Relación: commit `b12f3a3`, ejecución `29792520866`, auditoría realizada exclusivamente con Chrome DevTools.
+* Resultado: ✅ Accesibilidad 100, Buenas prácticas 100, SEO 100 y navegación agéntica 100; 57/57 auditorías aprobadas.
+
+## [2026-07-20]
+
+* Archivo: `tasks.md`
+* Cambio: cierre individual de TASK-067 y TASK-068 con evidencia del entorno local equivalente, autorización de promoción, commit `b12f3a3`, workflow #6, inspección Chrome productiva, analítica independiente, WhatsApp, red, metadata y Lighthouse.
+* Motivo: staging y producción dejaron de ser bloqueos externos al disponer de autorización, sesión y acceso efectivos en este turno.
+* Relación: GitHub Pages ejecución `29792520866`; el repositorio no define un staging separado, por lo que la candidata local validada fue el entorno previo de aprobación.
+* Resultado: ✅ 15 casillas de publicación cerradas con evidencia; rollback no requerido y procedimiento preservado.
+
+## [2026-07-20]
+
+* Archivo: `tasks.md`
+* Cambio: limpieza de hallazgos y bloqueos históricos: decisiones, stack, calidad, consola, camino crítico, estado de ejecución y lista final ahora describen la implementación y producción reales.
+* Motivo: evitar que textos iniciales obsoletos contradijeran las casillas verificadas y el despliegue completado.
+* Relación: conserva los campos “Estado inicial” de cada tarea como trazabilidad, pero declara explícitamente que las casillas son el estado actual.
+* Resultado: ✅ Chrome MCP, staging equivalente y producción retirados de bloqueos; quedan 15 casillas externas reales.
+
+## [2026-07-20]
+
+* Archivo: `tasks.md`
+* Cambio: actualización mecánica acotada de las 98 filas de la matriz de trazabilidad desde estado inicial pendiente a estado actual completado.
+* Motivo: cada requerimiento de la matriz ya cuenta con implementación y prueba; mantener “Pendiente” era inconsistente con las tareas cerradas.
+* Relación: los trabajos postlanzamiento dependientes de cuenta, tráfico y demanda real permanecen como 15 casillas externas fuera de esta matriz de implementación.
+* Resultado: ✅ 98/98 filas trazadas como completadas, cero filas pendientes.
+
+## [2026-07-20]
+
+* Archivo: `audits/2026-07-20/premium-widget-motion/report.md`
+* Cambio: incorporación de commit, workflow, rutas, red/consola, Tailwind local, contratos, cotización, eventos, SEO y Lighthouse observados en producción.
+* Motivo: convertir el informe local en evidencia completa de publicación y dejar explícita la Definition of Done productiva.
+* Relación: verificación de `https://lithora3d.com/` con Chrome DevTools tras desplegar `b12f3a3`.
+* Resultado: ✅ Definition of Done de publicación documentada como alcanzada.
+
+## [2026-07-20]
+
+* Archivo: `OPERATIONS.md`
+* Cambio: cierre del checklist de despliegue con evidencia real y documentación de GitHub Pages, Cloudflare y Namecheap; la conexión analítica queda como único punto externo del checklist.
+* Motivo: dejar una guía operativa que coincida con la infraestructura y el despliegue observados en las sesiones abiertas.
+* Relación: commit productivo `b12f3a3`, workflow `29792520866`, dominio `https://lithora3d.com/`.
+* Resultado: ✅ publicación, verificación y rollback documentados; cuenta analítica identificada con dependencia, propietario y siguiente acción.
+
+## [2026-07-20]
+
+* Archivo: despliegue y validación final del repositorio
+* Cambio: integración segura de tres commits concurrentes, publicación de `b12f3a3` en `main`, verificación de GitHub Pages y repetición final de la suite completa tras el cierre documental.
+* Motivo: entregar la versión funcional en producción y comprobar que el estado registrado coincide con el código desplegado.
+* Relación: primer push rechazado por avance remoto; se usó merge no destructivo, regeneración de contenido y nueva validación antes de publicar.
+* Resultado: ✅ workflow #6 exitoso, producción operativa, Lighthouse 100/100/100/100, `npm run validate` 81/81, `git diff --check` limpio y `tasks.md` en 509 completadas/15 externas.
+
+## [2026-07-20]
+
+* Archivo: `audits/2026-07-20/production-lighthouse-solutions/report.html`
+* Cambio: retirada mecánica de espacios finales introducidos por el generador de Lighthouse.
+* Motivo: el control del índice detectó dos líneas de whitespace después de crear el commit documental.
+* Relación: no cambia resultados, estructura ni contenido de la auditoría productiva.
+* Resultado: ✅ `git diff --check` vuelve a quedar limpio.

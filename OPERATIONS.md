@@ -24,13 +24,20 @@ Flujo editorial:
 ## Checklist de despliegue
 
 - [x] Contenido inicial, referencia visual y uso conceptual aprobados el 2026-07-20.
-- [ ] Verificar que `https://wa.me/528331080178` abre el número oficial y conserva el contexto desde staging.
-- [ ] Conectar la cuenta de analítica y consentimiento si aplica.
-- [ ] Ejecutar `npm run content:check`, `npm run validate`, `npm run test:browser` y `npm run audit:static`.
-- [ ] Revisar `audits/2026-07-20/` y confirmar cero errores relevantes de consola.
-- [ ] Servir la raíz por HTTPS preservando rutas con `index.html`, MIME JavaScript y `CNAME`.
-- [ ] Verificar `/ecosistema-soluciones/`, `robots.txt`, `sitemap.xml`, canonical y enlaces tras subir.
-- [ ] Registrar fecha, commit y responsable del despliegue.
+- [x] Verificar que `https://wa.me/528331080178` abre el número oficial y conserva el contexto desde la candidata y producción, sin enviar un mensaje de prueba.
+- [ ] Blocked externally — Conectar la cuenta de analítica y consentimiento. Dependencia: proveedor/cuenta y decisión de privacidad; propietario: marketing/analítica y privacidad de Lithora 3D; siguiente acción: conectar el `dataLayer` existente sin ampliar los payloads mínimos.
+- [x] Ejecutar `npm run content:check`, `npm run validate`, validación Chrome DevTools y auditoría estática incluida en la suite.
+- [x] Revisar `audits/2026-07-20/` y confirmar cero errores relevantes de consola.
+- [x] Servir la raíz por HTTPS preservando rutas con `index.html` y MIME JavaScript.
+- [x] Verificar `/ecosistema-soluciones/`, `robots.txt`, `sitemap.xml`, canonical y enlaces tras subir.
+- [x] Registrar despliegue: 2026-07-20, commit `b12f3a3`, responsable `ProgramadorMxGit`, GitHub Pages workflow #6 (`29792520866`).
+
+## Arquitectura productiva confirmada
+
+- Repositorio y publicación: GitHub `ProgramadorMxGit/lithora3d.com`, rama `main`, carpeta raíz, GitHub Pages mediante `pages-build-deployment`.
+- DNS, proxy HTTPS y señales administradas de `robots.txt`: Cloudflare.
+- Registrador del dominio `lithora3d.com`: Namecheap, delegado a los nameservers de Cloudflare.
+- No existe un entorno de staging separado; la candidata se valida en el servidor local equivalente y luego se promueve sin transformar los archivos.
 
 ## Rollback
 
