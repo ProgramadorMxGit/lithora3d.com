@@ -1769,3 +1769,11 @@
 * Motivo: comprobar contenido sincronizado, sintaxis JavaScript y regresiones antes de publicar.
 * Relacion: valida el refuerzo de identidad social agregado a `Organization.sameAs`.
 * Resultado: ✅ 9 nichos sincronizados, comprobaciones de sintaxis correctas y 82 de 82 pruebas aprobadas.
+
+## [2026-07-21]
+
+* Archivo: produccion `https://lithora3d.com/`, GitHub Pages run `29848521860`
+* Cambio: se publico el commit `e8c90b8` y se verifico con Chrome DevTools que la entidad `Organization` expone los perfiles oficiales de Facebook e Instagram en `sameAs`.
+* Motivo: hacer efectiva en produccion la relacion entre el dominio y los perfiles sociales de Lithora 3D.
+* Relacion: despliega y valida el refuerzo estructurado de identidad social.
+* Resultado: ✅ workflow #12 exitoso; `sameAs`, titulo y canonical confirmados en el HTML publico.
