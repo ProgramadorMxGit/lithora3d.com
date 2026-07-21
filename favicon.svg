@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Lithora 3D">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <path d="M64 18 100 39v50L64 110 28 89V39Z" fill="none" stroke="#F8FAFC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 18v46m0 0 36 25m-36-25L28 89" fill="none" stroke="#7DD3FC" stroke-width="6" stroke-linecap="round"/>
+</svg>

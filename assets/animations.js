@@ -7,6 +7,10 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Una pestaña suspendida o un CDN incompleto no debe dejar el hero invisible.
+    // La secuencia normal termina antes; este seguro solo limpia opacidad residual.
+    window.setTimeout(ensureHeroVisible, 2000);
+
     // Defensive init: if GSAP or ScrollTrigger failed to load, keep everything visible.
     if (!window.gsap || !window.ScrollTrigger) {
       initReducedMotionFallback();
@@ -45,6 +49,13 @@
         initMobileMenuAnimation();
       });
   });
+
+  function ensureHeroVisible() {
+    document.querySelectorAll('header, .hero-badge, #hero h1 span, .hero-copy, .hero-cta a, .hero__background').forEach(function (element) {
+      element.style.removeProperty('opacity');
+      element.style.removeProperty('visibility');
+    });
+  }
 
   // ---- Function stubs (bodies implemented in tasks 4.2–4.10) ----
   function initReducedMotionFallback() {

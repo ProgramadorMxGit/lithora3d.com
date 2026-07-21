@@ -1,0 +1,542 @@
+/* Premium Widget Motion: scoped progressive enhancement for four commercial routes. */
+body[data-motion-page] {
+  --motion-instant: 70ms;
+  --motion-press: 110ms;
+  --motion-hover: 180ms;
+  --motion-state: 240ms;
+  --motion-category: 280ms;
+  --motion-close: 190ms;
+  --motion-expand: 340ms;
+  --motion-editorial: 420ms;
+  --motion-assemble: 520ms;
+  --motion-bridge: 620ms;
+  --motion-ease-in: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-out: cubic-bezier(.4, 0, 1, 1);
+  --motion-ease-response: cubic-bezier(.2, .8, .2, 1);
+  --motion-ease-expand: cubic-bezier(.2, .9, .2, 1);
+  --motion-accent: #0284c7;
+  --motion-accent-soft: rgba(56, 189, 248, .2);
+  --motion-yellow: #facc15;
+  overflow-x: clip;
+}
+
+body[data-motion-page] [data-motion-widget] {
+  --spot-x: 50%;
+  --spot-y: 50%;
+}
+
+body[data-motion-page] main > section {
+  position: relative;
+  isolation: isolate;
+}
+
+body[data-motion-page] main > section > div {
+  position: relative;
+  z-index: 1;
+}
+
+body[data-motion-page] :is(a, button, [tabindex], article) {
+  transition:
+    transform var(--motion-hover) var(--motion-ease-response),
+    border-color var(--motion-hover) var(--motion-ease-response),
+    background-color var(--motion-hover) var(--motion-ease-response),
+    color var(--motion-hover) var(--motion-ease-response),
+    box-shadow var(--motion-state) var(--motion-ease-response);
+}
+
+body[data-motion-page] main :is(a, button):active {
+  transform: scale(.985);
+  transition-duration: var(--motion-press);
+}
+
+body[data-motion-page] :is(a, button, [tabindex]):focus-visible {
+  outline: 3px solid #38bdf8;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 5px rgba(56, 189, 248, .16);
+}
+
+body[data-motion-page] main > section:first-child::before {
+  position: absolute;
+  inset: -8rem 0 auto;
+  height: 34rem;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 82% 28%, rgba(14, 165, 233, .13), transparent 32%),
+    linear-gradient(180deg, rgba(239, 246, 255, .72), transparent 92%);
+  content: "";
+  pointer-events: none;
+}
+
+body[data-motion-page] main > section:not(:first-child):not(:last-child)::after {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(92%, 1180px);
+  height: 1px;
+  transform: translateX(-50%) scaleX(.12);
+  transform-origin: center;
+  background: linear-gradient(90deg, transparent, rgba(3, 105, 161, .25), transparent);
+  content: "";
+  transition: transform var(--motion-bridge) var(--motion-ease-in);
+  pointer-events: none;
+}
+
+body[data-motion-page] main > section:has([data-motion-state="stable"])::after,
+body[data-motion-page] main > section[data-motion-state="stable"]::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Shared assembly anatomy. */
+body[data-motion-page] [data-motion-signature="measure"],
+body[data-motion-page] [data-motion-signature="sketch"],
+body[data-motion-page] [data-motion-signature="selection-plane"] {
+  position: relative;
+  padding-inline-start: 18px;
+}
+
+body[data-motion-page] [data-motion-signature="measure"]::before,
+body[data-motion-page] [data-motion-signature="sketch"]::before,
+body[data-motion-page] [data-motion-signature="selection-plane"]::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  transform: scaleY(.2);
+  transform-origin: top;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--motion-accent), #7dd3fc 68%, transparent);
+  content: "";
+  transition: transform var(--motion-state) var(--motion-ease-in);
+}
+
+body[data-motion-page] [data-motion-signature="sketch"]::before {
+  background: repeating-linear-gradient(180deg, #0284c7 0 8px, transparent 8px 13px);
+}
+
+body[data-motion-page] [data-motion-signature="selection-plane"]::before {
+  background: linear-gradient(180deg, #0f172a, #38bdf8 54%, transparent);
+}
+
+body[data-motion-page] [data-motion-signature]:is(.is-assembled, [data-motion-state="stable"])::before {
+  transform: scaleY(1);
+}
+
+body[data-motion-page] [data-motion-signature$="panel"],
+body[data-motion-page] [data-motion-signature="validation-points"],
+body[data-motion-page] [data-motion-signature="criteria-layers"] {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 54px rgba(15, 23, 42, .1);
+}
+
+body[data-motion-page] [data-motion-signature$="panel"]::before,
+body[data-motion-page] [data-motion-signature="validation-points"]::before,
+body[data-motion-page] [data-motion-signature="criteria-layers"]::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #0369a1, #38bdf8 54%, transparent);
+  content: "";
+}
+
+body[data-motion-page] [data-motion-signature="validation-points"] li,
+body[data-motion-page] [data-motion-signature="criteria-layers"] li,
+body[data-motion-page="solutions"] .process-list li {
+  position: relative;
+  padding-left: 22px;
+}
+
+body[data-motion-page] [data-motion-signature="validation-points"] li::before,
+body[data-motion-page] [data-motion-signature="criteria-layers"] li::before {
+  position: absolute;
+  top: .55em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #0284c7;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+}
+
+/* Prices: measurement rules and settled comparison columns. */
+body[data-motion-page="prices"] [data-motion-widget="PRI-W05"] .grid,
+body[data-motion-page="prices"] [data-motion-widget="PRI-W06"] .grid {
+  position: relative;
+}
+
+body[data-motion-page="prices"] [data-motion-widget="PRI-W05"] .grid::before,
+body[data-motion-page="prices"] [data-motion-widget="PRI-W06"] .grid::before {
+  position: absolute;
+  inset: auto 0 -8px;
+  height: 1px;
+  transform: scaleX(.18);
+  transform-origin: left;
+  background: linear-gradient(90deg, #0369a1, #7dd3fc 60%, transparent);
+  content: "";
+  transition: transform var(--motion-assemble) var(--motion-ease-in);
+}
+
+body[data-motion-page="prices"] [data-motion-state="stable"] .grid::before {
+  transform: scaleX(1);
+}
+
+body[data-motion-page="prices"] [data-motion-widget="PRI-W05"] article {
+  overflow: hidden;
+}
+
+body[data-motion-page="prices"] [data-motion-widget="PRI-W05"] article::after {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  width: 34px;
+  height: 1px;
+  background: #7dd3fc;
+  box-shadow: 0 -5px 0 rgba(125, 211, 252, .58), 0 -10px 0 rgba(125, 211, 252, .28);
+  content: "";
+}
+
+body[data-motion-page="prices"] [data-motion-widget="PRI-W06"] article {
+  border-bottom-width: 3px;
+}
+
+body[data-motion-page="prices"] [data-motion-widget="PRI-W07"] .grid > div {
+  box-shadow: inset 0 1px 0 #fff;
+}
+
+/* Prototype: connected progression and converging validation layers. */
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] .grid,
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W06"] .grid {
+  position: relative;
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] .grid::before {
+  position: absolute;
+  top: 50%;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+  z-index: -1;
+  transform: scaleX(.15);
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, rgba(3,105,161,.32) 16%, rgba(3,105,161,.32) 84%, transparent);
+  content: "";
+  transition: transform var(--motion-bridge) var(--motion-ease-in);
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"][data-motion-state="stable"] .grid::before {
+  transform: scaleX(1);
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] article {
+  transform: none;
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] article:focus-within {
+  border-color: rgba(3,105,161,.48);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W06"] article {
+  box-shadow: 0 7px 18px rgba(15,23,42,.04);
+}
+
+body[data-motion-page="prototype"] [data-motion-widget="PRO-W06"] article:nth-child(even) {
+  background: linear-gradient(145deg, #fff, #f8fbff);
+}
+
+/* Materials: Spotlight Card + restrained Border Glow + shared group relation. */
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] .grid {
+  position: relative;
+  isolation: isolate;
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article,
+body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article {
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(241,245,249,.94));
+  box-shadow: inset 0 1px 0 #fff, 0 9px 24px rgba(15,23,42,.05);
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article::after,
+body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(180px circle at var(--spot-x) var(--spot-y), rgba(56,189,248,.16), transparent 68%);
+  content: "";
+  opacity: 0;
+  transition: opacity var(--motion-hover) var(--motion-ease-response);
+  pointer-events: none;
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article > *,
+body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article:is([data-pointer-active="true"], :focus-within)::after,
+body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]:is([data-pointer-active="true"], :focus-within)::after {
+  opacity: 1;
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article:focus-within,
+body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]:focus-within,
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W12"] [aria-current="true"] {
+  border-color: rgba(250,204,21,.72);
+  box-shadow: 0 0 0 1px rgba(250,204,21,.2), 0 14px 30px rgba(15,23,42,.08);
+}
+
+body[data-motion-page="materials"] [data-motion-widget="MAT-W06"] .grid {
+  padding: 10px;
+  border: 1px solid rgba(148,163,184,.24);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(226,232,240,.42));
+}
+
+/* Solutions: finite network, causal states, gallery and quote surface. */
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W03"] :is(.orbit-ring, .orbit-label),
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W05"] :is(.map-lines, .map-category) {
+  will-change: transform, opacity;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W03"][data-motion-state="stable"] :is(.orbit-ring, .orbit-label) {
+  will-change: auto;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W06"] .map-category:is(.active, :focus-visible),
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W08"] a:is(.active, :focus-visible) {
+  position: relative;
+  z-index: 3;
+  border-color: rgba(250,204,21,.62);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W08"] a::after,
+body[data-motion-page="solutions"] .ecosystem-desktop-nav a::after {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin-top: 5px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: currentColor;
+  content: "";
+  transition: transform var(--motion-hover) var(--motion-ease-response);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W08"] a:is(.active, :hover, :focus-visible)::after,
+body[data-motion-page="solutions"] .ecosystem-desktop-nav a:is(.active, :hover, :focus-visible)::after {
+  transform: scaleX(1);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W13"] {
+  transform-origin: var(--detail-origin, 50%) 0;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W14"] figure > div,
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W11"] {
+  position: relative;
+  overflow: hidden;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W14"] figure > div::after,
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W11"]::before {
+  position: absolute;
+  inset: -40% auto -40% -55%;
+  width: 28%;
+  z-index: 1;
+  transform: translate3d(-150%,0,0) rotate(12deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+body[data-motion-page="solutions"] :is(.image-badge, [data-motion-widget="SOL-W14"] figure span) {
+  z-index: 2;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W12"] [data-application] {
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W12"] [aria-current="true"] {
+  background: rgba(250,204,21,.08);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W18"]::before {
+  position: absolute;
+  top: 12%;
+  bottom: 12%;
+  left: 19px;
+  width: 1px;
+  transform: scaleY(.14);
+  transform-origin: top;
+  background: linear-gradient(180deg, #38bdf8, rgba(56,189,248,.16));
+  content: "";
+  transition: transform var(--motion-bridge) var(--motion-ease-in);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W18"] {
+  position: relative;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W18"][data-motion-state="stable"]::before {
+  transform: scaleY(1);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W19"].is-context-confirmed {
+  border-color: rgba(125,211,252,.52);
+  background: rgba(56,189,248,.08);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W20"] {
+  transition: border-color var(--motion-state) ease, box-shadow var(--motion-state) ease, background-color var(--motion-state) ease;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W20"][data-motion-channel-state="loading"] {
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 3px rgba(125,211,252,.12);
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W20"][data-motion-channel-state="error"] {
+  border-color: #fca5a5;
+}
+
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W20"][data-motion-channel-state="handoff"],
+body[data-motion-page="solutions"] [data-motion-widget="SOL-W20"][data-motion-channel-state="success"] {
+  border-color: #86efac;
+}
+
+body[data-motion-page="solutions"] .quote-form .detail-quote {
+  color: #7dd3fc;
+}
+
+/* Specular Button: local, finite and exclusive to approved conversion surfaces. */
+body[data-motion-page] [data-motion-signature="specular-cta"] :is(a, button),
+body[data-motion-page] :is(a, button)[data-motion-signature="specular-cta"] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body[data-motion-page] [data-motion-signature="specular-cta"] :is(a, button)::after,
+body[data-motion-page] :is(a, button)[data-motion-signature="specular-cta"]::after {
+  position: absolute;
+  inset: -70% auto -70% -36%;
+  width: 18%;
+  z-index: 0;
+  transform: translate3d(-220%,0,0) rotate(14deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.48), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article:hover,
+  body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]:hover {
+    transform: translateY(-3px) scale(1.008);
+    border-color: rgba(3,105,161,.38);
+    box-shadow: 0 14px 30px rgba(15,23,42,.08);
+  }
+
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W14"] figure > div:hover::after,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W11"]:hover::before {
+    animation: lithora-glare 240ms var(--motion-ease-response) 1 both;
+  }
+
+  body[data-motion-page] [data-motion-signature="specular-cta"] :is(a, button):hover::after,
+  body[data-motion-page] [data-motion-signature="specular-cta"] :is(a, button):focus-visible::after,
+  body[data-motion-page] :is(a, button)[data-motion-signature="specular-cta"]:is(:hover, :focus-visible)::after {
+    animation: lithora-specular 210ms var(--motion-ease-response) 1 both;
+  }
+}
+
+@keyframes lithora-glare {
+  from { transform: translate3d(-220%,0,0) rotate(12deg); }
+  to { transform: translate3d(620%,0,0) rotate(12deg); }
+}
+
+@keyframes lithora-specular {
+  from { transform: translate3d(-220%,0,0) rotate(14deg); }
+  to { transform: translate3d(820%,0,0) rotate(14deg); }
+}
+
+/* Compact and touch variants are designed separately, not scaled desktop effects. */
+@media (max-width: 767px), (pointer: coarse) {
+  body[data-motion-page] [data-motion-signature="measure"],
+  body[data-motion-page] [data-motion-signature="sketch"],
+  body[data-motion-page] [data-motion-signature="selection-plane"] {
+    padding-inline-start: 0;
+    padding-top: 12px;
+  }
+
+  body[data-motion-page] [data-motion-signature="measure"]::before,
+  body[data-motion-page] [data-motion-signature="sketch"]::before,
+  body[data-motion-page] [data-motion-signature="selection-plane"]::before {
+    inset: 0 0 auto;
+    width: 100%;
+    height: 2px;
+    transform: scaleX(1);
+  }
+
+  body[data-motion-page] main > section:not(:first-child):not(:last-child)::after {
+    width: calc(100% - 32px);
+  }
+
+  body[data-motion-page="prices"] [data-motion-widget="PRI-W05"] .grid::before,
+  body[data-motion-page="prices"] [data-motion-widget="PRI-W06"] .grid::before,
+  body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] .grid::before,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W18"]::before {
+    display: none;
+  }
+
+  body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article:hover,
+  body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]:hover {
+    transform: none;
+  }
+
+  body[data-motion-page="materials"] [data-motion-widget="MAT-W05"] article::after,
+  body[data-motion-page="solutions"] [data-motion-signature="spotlight-origin"]::after,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W14"] figure > div::after,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W11"]::before {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  body[data-motion-page="solutions"] .niche-image-wrap { min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-motion-page] *,
+  body[data-motion-page] *::before,
+  body[data-motion-page] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  body[data-motion-page] :is(article, a, button, [data-motion-widget]):hover {
+    transform: none !important;
+  }
+
+  body[data-motion-page] main > section::after,
+  body[data-motion-page] [data-motion-signature]::before,
+  body[data-motion-page="prototype"] [data-motion-widget="PRO-W05"] .grid::before,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W18"]::before {
+    transform: none !important;
+  }
+
+  body[data-motion-page] [data-pointer-active]::after,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W11"]::before,
+  body[data-motion-page="solutions"] [data-motion-widget="SOL-W14"] figure > div::after {
+    display: none !important;
+  }
+}
