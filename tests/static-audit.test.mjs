@@ -61,6 +61,16 @@ test('SEO estructurado usa datos aprobados y coincide con contenido visible', ()
   assert.match(home, /"@type": "ContactPoint"/);
   assert.match(home, /"telephone": "\+52-833-108-0178"/);
   assert.match(home, /"sameAs": \[[\s\S]*https:\/\/www\.facebook\.com\/Lithora3D\/[\s\S]*https:\/\/www\.instagram\.com\/lithora3d\//);
+  assert.match(home, /<title>Impresi&oacute;n 3D en Tampico, Madero y Altamira \| Lithora 3D<\/title>/);
+  assert.match(home, /"areaServed": \["Tampico", "Ciudad Madero", "Altamira", "MX"\]/);
+  for (const city of ['Tampico', 'Ciudad Madero', 'Altamira']) {
+    assert.match(home, new RegExp(`"@type": "City",\\s+"name": "${city}"`));
+  }
+  assert.match(home, /Atención local en la zona sur de Tamaulipas y proyectos para todo México\./);
+  assert.match(home, /Impresión 3D en Tampico, Ciudad Madero y Altamira/);
+  const homeJsonLd = [...home.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+  assert.ok(homeJsonLd.length > 0);
+  homeJsonLd.forEach(([, source]) => assert.doesNotThrow(() => JSON.parse(source)));
   assert.doesNotMatch(home, />BOFU</i);
   assert.doesNotMatch(home, /captar b[uú]squedas|Landing enfocada/i);
 

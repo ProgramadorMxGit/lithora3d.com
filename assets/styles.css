@@ -452,6 +452,27 @@ img { max-width: 100%; height: auto; }
   color: var(--color-text-muted);
   margin: 0;
 }
+.hero-locality {
+  align-self: flex-start;
+  margin: -10px 0 0;
+  padding-left: 1.25rem;
+  color: #334155;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  position: relative;
+}
+.hero-locality::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.4em;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid #0369a1;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
 .btn-primary, .btn-secondary { min-height: 48px; border-radius: 12px; font-weight: 600; }
 
 /* Feature cards refinement: tighter padding, softer shadow, larger radius */
@@ -499,6 +520,7 @@ img { max-width: 100%; height: auto; }
   .hero__container { padding: 90px 20px 64px; }
   .hero__content { max-width: 100%; gap: 20px; }
   .hero-copy { font-size: 1.0625rem; }
+  .hero-locality { margin-top: -6px; }
   .hero-cta { width: 100%; }
   .hero-cta a { flex: 1 1 auto; justify-content: center; }
 }

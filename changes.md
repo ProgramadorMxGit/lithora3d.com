@@ -1777,3 +1777,59 @@
 * Motivo: hacer efectiva en produccion la relacion entre el dominio y los perfiles sociales de Lithora 3D.
 * Relacion: despliega y valida el refuerzo estructurado de identidad social.
 * Resultado: ✅ workflow #12 exitoso; `sameAs`, titulo y canonical confirmados en el HTML publico.
+
+## [2026-07-21]
+
+* Archivo: pagina publica `https://www.facebook.com/Lithora3D/`
+* Cambio: se agregaron `Tampico, Mexico`, `Ciudad Madero, Mexico` y `Altamira, Mexico` como areas publicas de servicio.
+* Motivo: reforzar la identificacion local de Lithora 3D sin publicar una direccion fisica no confirmada.
+* Relacion: complementa la categoria, biografia, telefono, sitio e Instagram configurados en la optimizacion social anterior.
+* Resultado: ✅ las tres ciudades quedaron guardadas y verificadas con Chrome DevTools en la seccion publica de informacion de contacto.
+
+## [2026-07-21]
+
+* Archivo: `index.html`
+* Cambio: se incorporaron Tampico, Ciudad Madero y Altamira en el titulo, descripcion, tarjetas sociales, H1, mensaje visible de cobertura y pie de pagina; el marcado `Service` y `ContactPoint` ahora declara esas ciudades y conserva Mexico como cobertura adicional.
+* Motivo: mejorar la relevancia geografica y hacer que usuarios y buscadores identifiquen a Lithora 3D como servicio local de la zona sur de Tamaulipas.
+* Relacion: refleja en el sitio las mismas areas de servicio publicadas en Facebook y evita inventar un domicilio fisico.
+* Resultado: ✅ senales locales visibles y estructuradas implementadas sin limitar la cobertura nacional.
+
+## [2026-07-21]
+
+* Archivo: `assets/styles.css`, `index.html`
+* Cambio: se presento la cobertura local como una linea compacta con indicador geografico dentro del hero y se conservo el H1 ya validado para evitar alargarlo y degradar su composicion responsive.
+* Motivo: integrar la nueva senal local con jerarquia clara y sin comprometer legibilidad, altura inicial ni estabilidad visual.
+* Relacion: mejora visualmente la incorporacion geografica del cambio anterior.
+* Resultado: ✅ tratamiento local ligero, legible y adaptable agregado al hero.
+
+## [2026-07-21]
+
+* Archivo: `tests/static-audit.test.mjs`
+* Cambio: se agregaron regresiones para el titulo local, las tres ciudades en `ContactPoint` y `Service`, la cobertura visible y la validez JSON del marcado de portada.
+* Motivo: impedir que futuras ediciones eliminen o desalineen las nuevas senales geograficas.
+* Relacion: cubre automaticamente la implementacion local en `index.html`.
+* Resultado: ✅ cobertura automatizada incorporada para metadata, contenido visible y datos estructurados locales.
+
+## [2026-07-21]
+
+* Archivo: validacion local del repositorio
+* Cambio: se ejecuto `npm run validate` despues de incorporar las senales de servicio local.
+* Motivo: comprobar sincronizacion de contenido, sintaxis JavaScript, enlaces, metadata, JSON-LD y regresiones antes de validar en navegador.
+* Relacion: valida los cambios locales de portada y su cobertura automatizada.
+* Resultado: ✅ 9 nichos sincronizados, sintaxis correcta y 82 de 82 pruebas aprobadas.
+
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/local-seo-desktop.png`, `audits/2026-07-21/local-seo-mobile.png`, evidencia CDP de `audits/2026-07-20/`
+* Cambio: se comprobo con Chrome DevTools la portada local en escritorio y movil, y se ejecuto la suite completa de navegador despues del refuerzo geografico.
+* Motivo: validar composicion, legibilidad, H1 unico, JSON-LD, ausencia de desbordamiento y errores de consola antes de publicar.
+* Relacion: validacion visual y funcional posterior a las senales locales agregadas.
+* Resultado: ✅ 48 comprobaciones CDP aprobadas; cero overflow y errores de consola; LCP 1212 ms, CLS 0.00236 e INP observado 32 ms.
+
+## [2026-07-21]
+
+* Archivo: pagina publica `https://www.facebook.com/Lithora3D/`
+* Cambio: la biografia se actualizo para comenzar con `Impresion 3D en Tampico, Ciudad Madero y Altamira`, conservar los productos principales, la cobertura nacional y la cotizacion por WhatsApp.
+* Motivo: alinear la descripcion de la entidad social con las senales geograficas visibles y estructuradas del sitio.
+* Relacion: completa las tres areas de servicio agregadas previamente y mejora la consistencia local entre Facebook y lithora3d.com.
+* Resultado: ✅ biografia guardada y verificada con Chrome DevTools; se omitio compartirla como publicacion para no generar contenido redundante en el feed.
