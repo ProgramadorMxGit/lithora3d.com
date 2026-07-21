@@ -1833,3 +1833,11 @@
 * Motivo: alinear la descripcion de la entidad social con las senales geograficas visibles y estructuradas del sitio.
 * Relacion: completa las tres areas de servicio agregadas previamente y mejora la consistencia local entre Facebook y lithora3d.com.
 * Resultado: ✅ biografia guardada y verificada con Chrome DevTools; se omitio compartirla como publicacion para no generar contenido redundante en el feed.
+
+## [2026-07-21]
+
+* Archivo: produccion `https://lithora3d.com/`, GitHub Pages run `29849654983`
+* Cambio: se publico el commit `a494b84` en `main` y se verificaron las senales locales directamente en el dominio publico.
+* Motivo: hacer efectiva la identificacion de Lithora 3D en Tampico, Ciudad Madero y Altamira y confirmar la revision servida por GitHub Pages.
+* Relacion: despliega la metadata, contenido visible, estilo y JSON-LD local validados previamente.
+* Resultado: ✅ workflow #14 exitoso; titulo, descripcion, cobertura visible, tres ciudades estructuradas, H1 unico, cero overflow y cero advertencias o errores de consola confirmados con Chrome DevTools.
