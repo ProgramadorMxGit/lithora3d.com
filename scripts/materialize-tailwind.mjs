@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const auditRoot = path.join(root, 'audits', '2026-07-20', 'premium-widget-motion');
-const pages = ['prices', 'prototype', 'materials'];
+const pages = ['prices', 'prototype', 'materials', 'home', 'service'];
 
 for (const page of pages) {
   const captured = path.join(auditRoot, `tailwind-${page}.json`);

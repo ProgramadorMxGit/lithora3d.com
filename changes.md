@@ -1520,3 +1520,35 @@
 * Motivo: dejar el conjunto publicable limpio y verificable antes de crear el commit de producción.
 * Relación: higiene final posterior al cierre de TASK-PWM-001–056.
 * Resultado: ✅ árbol de trabajo sin errores de espacios según `git diff --check`; los avisos restantes son únicamente conversión local LF/CRLF de Git.
+
+## [2026-07-20]
+
+* Archivo: `index.html`, `assets/styles.css`, `assets/animations.js`
+* Cambio: integración no destructiva de los tres commits que aparecieron en `origin/main` antes del despliegue; se conservaron la marca Lithora, el trabajo remoto de cabecera/animación y la metadata, navegación, contenido y fecha vigentes de la implementación validada.
+* Motivo: el primer `push` fue rechazado por avance remoto y era necesario preservar el trabajo concurrente sin forzar la rama.
+* Relación: resolución del único conflicto, localizado en `index.html`; los dos archivos de assets se fusionaron automáticamente.
+* Resultado: ✅ conflicto resuelto con la versión funcional más completa; la primera revalidación detectó fragmentos de contenido estático desincronizados por el merge.
+
+## [2026-07-20]
+
+* Archivo: `index.html`, `ecosistema-soluciones/index.html`
+* Cambio: regeneración de los fragmentos administrados por `scripts/render-ecosystem.mjs` después de integrar `origin/main`.
+* Motivo: restaurar la identidad exacta entre `content.js`, la portada y la ruta del ecosistema sin rehacer contenido manualmente.
+* Relación: corrección derivada de la revalidación posterior al merge remoto.
+* Resultado: ✅ nueve nichos publicados y sincronizados nuevamente.
+
+## [2026-07-20]
+
+* Archivo: `audits/2026-07-20/premium-widget-motion/tailwind-home.json`, `audits/2026-07-20/premium-widget-motion/tailwind-service.json`
+* Cambio: captura con Chrome DevTools del CSS Tailwind realmente generado para la portada y la página de servicio.
+* Motivo: la comprobación posterior al merge detectó el aviso productivo del CDN de Tailwind todavía presente en esas dos rutas.
+* Relación: amplía a las rutas restantes la materialización local ya aplicada a Precios, Prototipado y Materiales.
+* Resultado: ✅ hojas efectivas capturadas sin recurrir a un proveedor web alternativo.
+
+## [2026-07-20]
+
+* Archivo: `index.html`, `servicio-impresion-3d/index.html`, `scripts/materialize-tailwind.mjs`, `assets/tailwind-home.css`, `assets/tailwind-service.css`
+* Cambio: sustitución de los dos últimos usos del runtime CDN de Tailwind por hojas locales reproducibles y ampliación del materializador a cinco páginas.
+* Motivo: eliminar el aviso de producción, reducir dependencia externa y conservar exactamente la composición visual ya renderizada.
+* Relación: misma estrategia validada previamente en Precios, Prototipado y Materiales; ahora cubre todas las rutas que utilizaban Tailwind.
+* Resultado: ✅ CSS local generado (Home 16,283 bytes; Servicio 8,858 bytes), pendiente regresión visual y de consola.
