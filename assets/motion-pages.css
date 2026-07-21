@@ -1,4 +1,8 @@
 /* Premium Widget Motion: scoped progressive enhancement for four commercial routes. */
+html:has(body[data-motion-page]) {
+  overflow-x: clip;
+}
+
 body[data-motion-page] {
   --motion-instant: 70ms;
   --motion-press: 110ms;

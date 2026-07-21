@@ -48,33 +48,44 @@
         },
         {
           "@type": "Service",
+          "@id": "https://lithora3d.com/servicio-impresion-3d/#service",
           "name": "Servicio de impresion 3D",
           "serviceType": "Impresion 3D profesional",
           "provider": {
-            "@type": "Organization",
-            "name": "Lithora 3D",
-            "url": "https://lithora3d.com/"
+            "@id": "https://lithora3d.com/#organization"
           },
           "url": "https://lithora3d.com/servicio-impresion-3d/",
-          "description": "Servicio de impresion 3D para prototipos, piezas personalizadas, refacciones y series cortas."
+          "description": "Servicio de impresion 3D para prototipos, piezas personalizadas, refacciones y series cortas.",
+          "areaServed": {
+            "@type": "Country",
+            "name": "Mexico"
+          }
         },
         {
           "@type": "FAQPage",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Que proyectos entran en el servicio de impresion 3D?",
+              "name": "Necesito tener un archivo 3D?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Lithora 3D atiende prototipos, refacciones, piezas funcionales, accesorios personalizados y series cortas para validacion o produccion inicial."
+                "text": "Ayuda mucho, pero no es obligatorio. Si solo tienes una pieza de referencia, medidas o un boceto, el proyecto puede revisarse para definir la mejor ruta de fabricacion."
               }
             },
             {
               "@type": "Question",
-              "name": "Que necesito para solicitar una cotizacion?",
+              "name": "Este servicio sirve para una sola pieza?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Lo ideal es compartir archivo 3D, medidas, cantidad, uso final, material deseado y fecha objetivo. Si aun no tienes modelo, puede revisarse la pieza o el boceto."
+                "text": "Si. Una de las ventajas de la impresion 3D es producir desde una unidad hasta lotes pequenos sin invertir en moldes."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Que materiales suelen usarse?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Depende del proyecto. PLA funciona para validacion visual, PETG y ASA para piezas funcionales, TPU para flexibilidad y Nylon o compuestos para exigencia mecanica."
               }
             }
           ]

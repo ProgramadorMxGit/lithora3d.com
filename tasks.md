@@ -2454,7 +2454,7 @@ La funcionalidad solo puede considerarse terminada cuando:
 - [x] TASK-065 a TASK-066 — Integracion del sitio y checklist local final completos.
 - [x] TASK-067 a TASK-068 — candidata aprobada en entorno local equivalente, despliegue GitHub Pages #6 y verificacion productiva completas.
 - [x] Fuente y HTML sincronizados: `npm run content:check`.
-- [x] Suite: 81 pruebas correctas mediante `npm run validate`, incluidas contenido, cotizacion, analitica, navegacion, SEO y los 44 contratos premium.
+- [x] Suite: 82 pruebas correctas mediante `npm run validate`, incluidas contenido, cotizacion, analitica, navegacion, SEO y los 44 contratos premium; validacion CDP adicional: 48 comprobaciones correctas.
 - [x] Navegador: matriz de 20 combinaciones (cuatro rutas por cinco viewports), mas portada, servicio y comprobaciones productivas con Chrome DevTools.
 - [x] Observaciones finales: consola limpia; LCP local 110–393 ms en las cuatro rutas premium, CLS 0.00 e INP 34 ms; Lighthouse productivo del ecosistema 100/100/100/100.
 
@@ -2467,4 +2467,16 @@ La funcionalidad solo puede considerarse terminada cuando:
 - [x] Staging resuelto por equivalencia — el proyecto no tiene un entorno separado; la candidata se valido localmente con configuracion estatica equivalente y fue aprobada expresamente antes de promoverse.
 - [x] Produccion resuelta — commit `b12f3a3` publicado por GitHub Pages workflow #6 y verificado en `https://lithora3d.com/`; el seguimiento con trafico real permanece en TASK-069.
 
-La Definition of Done local y de publicacion esta alcanzada. Quedan 15 casillas, todas `Blocked externally`, limitadas a cuenta analitica/consentimiento, telemetria con trafico real y decisiones futuras de expansion basadas en demanda real.
+La Definition of Done local y de publicacion esta alcanzada. Quedan 16 casillas, todas `Blocked externally`, limitadas a Search Console, cuenta analitica/consentimiento, telemetria con trafico real y decisiones futuras de expansion basadas en demanda real.
+
+## TASK-069 — Investigacion y refuerzo SEO basado en SERP
+
+- [x] Auditar con Chrome DevTools produccion, metadata, canonicals, headings, enlaces, imagenes y JSON-LD de las seis rutas indexables.
+- [x] Ejecutar dorks y consultas sin personalizacion para servicio, precio, prototipado, materiales, fabricacion bajo demanda, piezas personalizadas y aplicaciones para negocios.
+- [x] Documentar competidores, intenciones, preguntas observadas, oportunidades y limites sin prometer un volumen garantizado de visitas.
+- [x] Sincronizar FAQPage con preguntas y respuestas visibles en precios, prototipado, materiales y servicio.
+- [x] Agregar ContactPoint con el WhatsApp aprobado y unificar las referencias a Organization.
+- [x] Agregar lastmod e imagen conceptual al sitemap y conservar las seis URL canonicas.
+- [x] Agregar ItemList para los nueve nichos conceptuales publicados sin crear paginas individuales delgadas.
+- [x] Eliminar jerga SEO interna del HTML y cubrir los contratos nuevos con pruebas automatizadas.
+- [ ] Blocked externally — Verificar la propiedad de dominio `lithora3d.com`, enviar el sitemap y consultar cobertura/consultas reales en Google Search Console. Dependencia: acceso de propietario DNS o invitacion a la propiedad; propietario: titular del dominio/marketing de Lithora 3D; siguiente accion: verificar la propiedad o conceder acceso a la cuenta abierta y despues enviar `https://lithora3d.com/sitemap.xml`.

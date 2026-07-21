@@ -1,5 +1,5 @@
 {
-  "url": "http://127.0.0.1:54215/ecosistema-soluciones/",
+  "url": "http://127.0.0.1:59712/ecosistema-soluciones/",
   "browser": "Chrome local via CDP fallback",
   "checks": [
     "carga directa /ecosistema-soluciones/",
@@ -53,15 +53,15 @@
   ],
   "count": 48,
   "observations": {
-    "navigation": 1138.6000000014901,
-    "cls": 0.006882935714450101,
-    "lcp": 1080,
+    "navigation": 1090.699999988079,
+    "cls": 0.0023632801639578076,
+    "lcp": 1092,
     "events": [
-      24,
-      24,
-      24
+      32,
+      32,
+      32
     ],
-    "inp": 24,
+    "inp": 32,
     "consoleErrors": []
   },
   "result": "pass"

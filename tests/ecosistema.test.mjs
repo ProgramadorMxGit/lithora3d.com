@@ -246,7 +246,7 @@ test('la home integra Ideas impresas con imagen responsive y cotizacion real', (
 
 test('la portada retira del recorrido visible los bloques internos o redundantes', () => {
   const html = read(homePath);
-  assert.match(html, /<section[^>]+hidden aria-hidden="true">[\s\S]*?BÚSQUEDAS CLAVE/);
+  assert.match(html, /<section[^>]+hidden aria-hidden="true">[\s\S]*?GUÍAS DEL SERVICIO/);
   for (const id of ['materiales', 'aplicaciones', 'casos-exito']) {
     assert.match(html, new RegExp(`<section id="${id}"[^>]+hidden aria-hidden="true"`));
   }

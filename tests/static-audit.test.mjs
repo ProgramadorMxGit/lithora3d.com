@@ -50,6 +50,34 @@ test('sitemap contiene cada ruta indexable y robots lo declara', () => {
     assert.ok(sitemap.includes(`<loc>${url}</loc>`), url);
   }
   assert.match(robots, /Sitemap:\s*https:\/\/lithora3d\.com\/sitemap\.xml/i);
+  assert.equal((sitemap.match(/<lastmod>2026-07-21<\/lastmod>/g) || []).length, htmlFiles.length);
+  assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
+  assert.match(sitemap, /<image:caption>Ejemplos conceptuales/);
+});
+
+test('SEO estructurado usa datos aprobados y coincide con contenido visible', () => {
+  const home = read(path.join(root, 'index.html'));
+  assert.match(home, /"@type": "ContactPoint"/);
+  assert.match(home, /"telephone": "\+52-833-108-0178"/);
+  assert.doesNotMatch(home, />BOFU</i);
+  assert.doesNotMatch(home, /captar b[uú]squedas|Landing enfocada/i);
+
+  const prices = read(path.join(root, 'precios-impresion-3d', 'index.html'));
+  assert.match(prices, /"name": "Cuanto cuesta hacer una impresion 3D\?"/);
+  assert.match(prices, /&iquest;Cu&aacute;nto cuesta hacer una impresi&oacute;n 3D\?/);
+  assert.match(prices, /&iquest;La impresi&oacute;n 3D se cobra por hora o por pieza\?/);
+
+  const materials = read(path.join(root, 'materiales-impresion-3d', 'index.html'));
+  assert.match(materials, /"name": "Que material es mejor, PLA o PETG\?"/);
+  assert.match(materials, /&iquest;Qu&eacute; material es mejor, PLA o PETG\?/);
+
+  const prototype = read(path.join(root, 'prototipado-rapido', 'index.html'));
+  assert.match(prototype, /"@type": "FAQPage"/);
+  assert.match(prototype, /&iquest;Qu&eacute; es un prototipo r&aacute;pido\?/);
+
+  const ecosystem = read(path.join(root, 'ecosistema-soluciones', 'index.html'));
+  assert.match(ecosystem, /"@type":"ItemList"/);
+  assert.match(ecosystem, /"numberOfItems":9/);
 });
 
 test('Open Graph, JSON-LD y SEO del ecosistema son validos', () => {

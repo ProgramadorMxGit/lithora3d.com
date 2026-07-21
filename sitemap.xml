@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://lithora3d.com/</loc>
+    <lastmod>2026-07-21</lastmod>
+    <image:image>
+      <image:loc>https://lithora3d.com/assets/lading/seccion_idea_01.webp</image:loc>
+      <image:title>Ideas de productos personalizados con impresion 3D</image:title>
+      <image:caption>Ejemplos conceptuales de productos impresos en 3D para negocios.</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://lithora3d.com/servicio-impresion-3d/</loc>
+    <lastmod>2026-07-21</lastmod>
   </url>
   <url>
     <loc>https://lithora3d.com/precios-impresion-3d/</loc>
+    <lastmod>2026-07-21</lastmod>
   </url>
   <url>
     <loc>https://lithora3d.com/prototipado-rapido/</loc>
+    <lastmod>2026-07-21</lastmod>
   </url>
   <url>
     <loc>https://lithora3d.com/materiales-impresion-3d/</loc>
+    <lastmod>2026-07-21</lastmod>
   </url>
   <url>
     <loc>https://lithora3d.com/ecosistema-soluciones/</loc>
+    <lastmod>2026-07-21</lastmod>
   </url>
 </urlset>

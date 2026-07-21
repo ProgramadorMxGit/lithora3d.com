@@ -176,6 +176,7 @@ def run():
         cdp.evaluate("document.querySelector('#nicho-dentistas .niche-open').click()")
         check("un detalle abierto por categoria", cdp.evaluate("[...document.querySelectorAll('[data-niche-card][data-category=industria] .niche-detail')].filter(e=>!e.hidden).length === 1"))
         cdp.evaluate("document.querySelector('#nicho-dentistas .detail-close').click()")
+        cdp.wait_for("document.activeElement === document.querySelector('#nicho-dentistas .niche-open')")
         check("restauracion de foco al cerrar", cdp.evaluate("document.activeElement === document.querySelector('#nicho-dentistas .niche-open')"))
 
         cdp.call("Emulation.setTouchEmulationEnabled", {"enabled": True, "maxTouchPoints": 5})

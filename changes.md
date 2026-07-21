@@ -1616,3 +1616,102 @@
 * Motivo: el control del índice detectó dos líneas de whitespace después de crear el commit documental.
 * Relación: no cambia resultados, estructura ni contenido de la auditoría productiva.
 * Resultado: ✅ `git diff --check` vuelve a quedar limpio.
+
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/google-site-index.txt`
+* Cambio: captura accesible de la consulta avanzada `site:lithora3d.com` en Google México mediante Chrome DevTools.
+* Motivo: establecer la cobertura indexada observable antes de proponer o implementar mejoras SEO.
+* Relación: inicio de la auditoría SEO profunda posterior al despliegue productivo.
+* Resultado: ⚠️ evidencia capturada; análisis de resultados e intención todavía en curso.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/search-console-not-verified.txt`
+* Cambio: se guardó evidencia de Chrome DevTools de que la sesión actual no tiene acceso a la propiedad de dominio `lithora3d.com` en Google Search Console.
+* Motivo: separar un problema real de medición/indexación de los cambios SEO que sí pueden completarse localmente.
+* Relación: amplía el dork `site:lithora3d.com`, que mostró indexación visible limitada y un snippet desactualizado.
+* Resultado: ✅ evidencia capturada; verificar o conceder acceso a la propiedad queda como acción externa.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/research-report.md`
+* Cambio: se documento la investigacion de produccion, dorks, intenciones, competidores, oportunidades y limites de crecimiento SEO.
+* Motivo: convertir la evidencia de DevTools en una estrategia verificable sin cambiar el giro de impresion 3D ni prometer trafico garantizado.
+* Relacion: consolida las capturas de indexacion y acceso a Search Console registradas en esta fecha.
+* Resultado: ✅ diagnostico y prioridades documentados.
+## [2026-07-21]
+
+* Archivo: `index.html`, `servicio-impresion-3d/index.html`, `prototipado-rapido/index.html`, `sitemap.xml`
+* Cambio: se priorizo la consulta principal en el titulo de inicio, se unifico la entidad Organization, se agrego el WhatsApp aprobado como ContactPoint, se incorporaron cobertura Mexico, idioma/fecha y `lastmod`, y se agrego una imagen conceptual elegible al sitemap.
+* Motivo: mejorar comprension de entidad, rastreo y descubrimiento sin inventar direccion, perfiles sociales ni tarifas.
+* Relacion: implementa las prioridades tecnicas del informe SEO del 2026-07-21.
+* Resultado: ✅ metadatos y grafo estructurado reforzados con datos aprobados.
+## [2026-07-21]
+
+* Archivo: `precios-impresion-3d/index.html`, `prototipado-rapido/index.html`, `materiales-impresion-3d/index.html`
+* Cambio: se agregaron preguntas y respuestas visibles basadas en las consultas observadas, se sincronizo cada FAQPage con el contenido visible y se reemplazo la etiqueta interna `BOFU` por lenguaje para clientes.
+* Motivo: responder intenciones reales de precio, prototipado y seleccion de material sin inventar tarifas ni usar jerga de marketing.
+* Relacion: aplica la prioridad de contenido util y marcado honesto del informe SEO.
+* Resultado: ✅ contenido ampliado y datos estructurados alineados con la pagina.
+## [2026-07-21]
+
+* Archivo: `ecosistema-soluciones/index.html`
+* Cambio: se reoriento el titulo hacia impresion 3D para negocios y proyectos y se agrego un ItemList de los nueve nichos conceptuales publicados.
+* Motivo: describir mejor la intencion comercial real sin competir como rotulista ni presentar ejemplos conceptuales como proyectos ejecutados.
+* Relacion: responde al analisis de las SERP de piezas personalizadas y letreros para negocios.
+* Resultado: ✅ landing y listado estructurado alineados con el giro de Lithora 3D.
+## [2026-07-21]
+
+* Archivo: `index.html`, `prototipado-rapido/index.html`, `tests/static-audit.test.mjs`
+* Cambio: se sustituyo jerga interna de marketing por lenguaje comprensible y se agregaron pruebas para contacto aprobado, FAQ visible, ItemList, lastmod e imagen conceptual en sitemap.
+* Motivo: evitar texto orientado al buscador en el HTML y proteger automaticamente los contratos SEO nuevos.
+* Relacion: corrige la inconsistencia detectada entre contenido para clientes y etiquetas internas de fases anteriores.
+* Resultado: ✅ lenguaje depurado y cobertura automatizada agregada.
+## [2026-07-21]
+
+* Archivo: `tests/ecosistema.test.mjs`, `tasks.md`
+* Cambio: se actualizo la expectativa del bloque oculto al nuevo lenguaje y se registro TASK-069 con ocho entregables SEO completados y el acceso exacto pendiente de Search Console.
+* Motivo: corregir la unica regresion de prueba y mantener el estado operativo trazable.
+* Relacion: sigue el fallo detectado por `npm run validate` tras retirar la etiqueta `BÚSQUEDAS CLAVE`.
+* Resultado: ✅ prueba corregida y bloqueo externo precisado con dependencia, propietario y accion.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/prices-mobile.webp`
+* Cambio: se capturo con Chrome DevTools la pagina de precios completa a 390 px con emulacion movil y tactil.
+* Motivo: comprobar que el nuevo bloque FAQ conserva lectura, jerarquia y ausencia de desbordamiento.
+* Relacion: valida visualmente el contenido agregado en la fase SEO.
+* Resultado: ✅ evidencia movil guardada; `scrollWidth - clientWidth = 0`.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/lighthouse-ecosystem/report.json`, `audits/2026-07-21/seo/lighthouse-ecosystem/report.html`
+* Cambio: se ejecuto Lighthouse movil en Chrome DevTools sobre la landing local de soluciones.
+* Motivo: validar SEO, accesibilidad y buenas practicas despues de agregar el ItemList y cambiar el titulo.
+* Relacion: evidencia de cierre para TASK-069.
+* Resultado: ✅ SEO 100, accesibilidad 100, buenas practicas 100 y agentic browsing 99; 56 auditorias aprobadas de 57.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-21/seo/ecosystem-performance.json.json.gz`
+* Cambio: se guardo una traza movil de rendimiento de la landing local de soluciones con Chrome DevTools.
+* Motivo: observar metricas de experiencia despues del refuerzo SEO y distinguir laboratorio de datos reales.
+* Relacion: complementa Lighthouse; no reemplaza CrUX ni telemetria de usuarios.
+* Resultado: ✅ LCP observado 132 ms y CLS 0.00 sin throttling; INP y datos de campo no disponibles por ausencia de interaccion/trafico real.
+## [2026-07-21]
+
+* Archivo: `tests/browser_validation.py`
+* Cambio: el validador espera la finalizacion de la animacion de cierre antes de comprobar la restauracion de foco.
+* Motivo: la implementacion restaura foco en el callback final de motion; la asercion inmediata producia una carrera aunque el comportamiento se completara correctamente.
+* Relacion: corrige el unico fallo de `npm run test:browser` observado despues de la validacion SEO.
+* Resultado: ✅ la prueba ahora mide el contrato final y no el estado transitorio.
+## [2026-07-21]
+
+* Archivo: `assets/motion-pages.css`
+* Cambio: se limito tambien en el elemento raiz el desbordamiento horizontal decorativo de las cuatro rutas con motion.
+* Motivo: el validador encontro que un estado transitorio de detalle podia ampliar `documentElement.scrollWidth` en desktop aunque el body ya usaba `overflow-x: clip`.
+* Relacion: corrige el segundo fallo encontrado por la suite de navegador tras resolver su carrera de foco.
+* Resultado: ✅ contencion horizontal reforzada sin alterar layout ni interaccion.
+## [2026-07-21]
+
+* Archivo: `audits/2026-07-20/browser-validation.json`, capturas responsive de `audits/2026-07-20/`, `tasks.md`
+* Cambio: la suite CDP regenero evidencia de escritorio, laptop, tablet, movil, pantalla pequena, detalles y secciones de inicio; se actualizo el conteo final de pruebas.
+* Motivo: volver a validar navegacion, teclado, foco, tactil, estados, responsive, zoom, consola y metricas despues de los cambios SEO.
+* Relacion: ejecucion final posterior a la contencion horizontal y a la espera correcta del cierre animado.
+* Resultado: ✅ 48 comprobaciones CDP; LCP 1092 ms, CLS 0.00236, INP observado 32 ms y cero errores relevantes de consola.

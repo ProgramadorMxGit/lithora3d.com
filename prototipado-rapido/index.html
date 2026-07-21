@@ -49,15 +49,47 @@
         },
         {
           "@type": "Service",
+          "@id": "https://lithora3d.com/prototipado-rapido/#service",
           "name": "Prototipado rapido",
           "serviceType": "Prototipado rapido con impresion 3D",
           "provider": {
-            "@type": "Organization",
-            "name": "Lithora 3D",
-            "url": "https://lithora3d.com/"
+            "@id": "https://lithora3d.com/#organization"
           },
           "url": "https://lithora3d.com/prototipado-rapido/",
-          "description": "Servicio de prototipado rapido para validar forma, ajuste y funcion con impresion 3D."
+          "description": "Servicio de prototipado rapido para validar forma, ajuste y funcion con impresion 3D.",
+          "areaServed": {
+            "@type": "Country",
+            "name": "Mexico"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Que es un prototipo rapido?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Es una version fisica fabricada para aprender antes de producir: permite revisar forma, ergonomia, ensamble o funcion y corregir el diseno con menor riesgo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Un prototipo tiene que verse como el producto final?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No siempre. Un prototipo visual prioriza apariencia; uno funcional prioriza ajuste, resistencia o movimiento. Definir la pregunta que debe responder evita pagar por caracteristicas innecesarias."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Cuantas iteraciones puede necesitar un prototipo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Depende del riesgo y de lo que se descubra en cada prueba. Conviene cambiar una variable importante por iteracion y registrar el resultado antes de fabricar la siguiente version."
+              }
+            }
+          ]
         }
       ]
     }
@@ -159,9 +191,30 @@
       </div>
     </section>
 
+    <section class="section-pad bg-white" aria-labelledby="faq-prototipos-title">
+      <div class="max-w-[1000px] mx-auto px-6">
+        <p class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">PREGUNTAS FRECUENTES</p>
+        <h2 id="faq-prototipos-title" class="text-3xl font-bold text-[#0F172A] text-center mb-10">Lo esencial antes de fabricar un prototipo</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <article class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Qu&eacute; es un prototipo r&aacute;pido?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Es una versi&oacute;n f&iacute;sica fabricada para aprender antes de producir: permite revisar forma, ergonom&iacute;a, ensamble o funci&oacute;n y corregir el dise&ntilde;o con menor riesgo.</p>
+          </article>
+          <article class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Debe verse como el producto final?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">No siempre. Un prototipo visual prioriza apariencia; uno funcional prioriza ajuste, resistencia o movimiento. Definir la pregunta que debe responder evita pagar por caracter&iacute;sticas innecesarias.</p>
+          </article>
+          <article class="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Cu&aacute;ntas iteraciones puede necesitar?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Depende del riesgo y de lo que se descubra en cada prueba. Conviene cambiar una variable importante por iteraci&oacute;n y registrar el resultado antes de fabricar la siguiente versi&oacute;n.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section-pad bg-[#0F172A] text-white" data-motion-widget="PRO-W07" data-motion-signature="specular-cta">
       <div class="max-w-[1000px] mx-auto px-6 text-center">
-        <p class="text-[#7DD3FC] text-xs font-semibold uppercase tracking-widest mb-3">CONVERSI&Oacute;N</p>
+        <p class="text-[#7DD3FC] text-xs font-semibold uppercase tracking-widest mb-3">SIGUIENTE PASO</p>
         <h2 class="text-3xl lg:text-4xl font-bold mb-4">Si el proyecto necesita aprender r&aacute;pido, empieza por un prototipo</h2>
         <p class="text-[#CBD5E1] leading-relaxed mb-8">Comp&aacute;rtenos el archivo o la idea, el tipo de prueba que necesitas y el contexto de uso. As&iacute; la propuesta se enfoca en la validaci&oacute;n correcta, no solo en imprimir por imprimir.</p>
         <div class="flex flex-wrap items-center justify-center gap-4">

@@ -58,10 +58,26 @@
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Por que no existe un precio unico por impresion 3D?",
+              "name": "Cuanto cuesta hacer una impresion 3D?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Cada pieza cambia por volumen, orientacion, soportes, material, acabado, tiempo de maquina y urgencia. Un precio unico casi siempre termina siendo irreal."
+                "text": "No hay una cifra unica: el costo cambia por volumen, material, tiempo de maquina, soportes, acabado, cantidad y urgencia. Una cotizacion revisa esas variables sobre el archivo o las medidas del proyecto."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "La impresion 3D se cobra por hora o por pieza?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "El tiempo de maquina influye, pero Lithora 3D prepara una cotizacion por proyecto. Tambien se consideran material, preparacion, soportes, acabado, riesgo y cantidad."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Por que dos piezas del mismo tamano pueden costar distinto?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "La orientacion, el relleno, los soportes, la altura de capa, la geometria y el material pueden cambiar el tiempo y la dificultad aunque las medidas exteriores sean parecidas."
               }
             },
             {
@@ -69,7 +85,7 @@
               "name": "Que informacion acelera una cotizacion?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Archivo 3D o medidas, cantidad, uso final, material deseado, acabado esperado y fecha objetivo."
+                "text": "Archivo 3D o medidas, cantidad, uso final, material deseado, acabado esperado y fecha objetivo. Si no existe archivo, una referencia clara ayuda a definir el alcance de diseno."
               }
             }
           ]
@@ -107,7 +123,7 @@
         <p class="text-sm text-[#64748B] mb-6" data-motion-widget="PRI-W02"><a href="/" class="hover:text-[#0369A1]">Inicio</a> / Precios de impresi&oacute;n 3D</p>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div data-motion-widget="PRI-W03" data-motion-signature="measure">
-            <span class="inline-flex items-center gap-2 rounded-full bg-[#EFF6FF] text-[#0369A1] px-3 py-1 text-xs font-semibold uppercase tracking-widest mb-5">BOFU</span>
+            <span class="inline-flex items-center gap-2 rounded-full bg-[#EFF6FF] text-[#0369A1] px-3 py-1 text-xs font-semibold uppercase tracking-widest mb-5">Gu&iacute;a de cotizaci&oacute;n</span>
             <h1 class="text-4xl lg:text-6xl font-bold text-[#0F172A] leading-tight mb-5">Precios de impresi&oacute;n 3D: qu&eacute; se toma en cuenta para cotizar bien</h1>
             <p class="text-lg text-[#334155] leading-relaxed mb-8">Si buscas "precio impresi&oacute;n 3D", lo importante no es una cifra gen&eacute;rica. Lo importante es entender qu&eacute; variables cambian el costo y qu&eacute; datos necesitas compartir para obtener una cotizaci&oacute;n &uacute;til.</p>
             <div class="flex flex-wrap gap-4">
@@ -200,6 +216,31 @@
               <li>Si ya existe una pieza previa o referencia f&iacute;sica.</li>
             </ul>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad bg-[#F8FAFC]" aria-labelledby="faq-precios-title">
+      <div class="max-w-[1000px] mx-auto px-6">
+        <p class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">PREGUNTAS FRECUENTES</p>
+        <h2 id="faq-precios-title" class="text-3xl font-bold text-[#0F172A] text-center mb-10">Respuestas claras antes de pedir precio</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Cu&aacute;nto cuesta hacer una impresi&oacute;n 3D?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">No hay una cifra &uacute;nica: el costo cambia por volumen, material, tiempo de m&aacute;quina, soportes, acabado, cantidad y urgencia. Una cotizaci&oacute;n revisa esas variables sobre el archivo o las medidas del proyecto.</p>
+          </article>
+          <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;La impresi&oacute;n 3D se cobra por hora o por pieza?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">El tiempo de m&aacute;quina influye, pero Lithora 3D prepara una cotizaci&oacute;n por proyecto. Tambi&eacute;n se consideran material, preparaci&oacute;n, soportes, acabado, riesgo y cantidad.</p>
+          </article>
+          <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Por qu&eacute; dos piezas del mismo tama&ntilde;o pueden costar distinto?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">La orientaci&oacute;n, el relleno, los soportes, la altura de capa, la geometr&iacute;a y el material pueden cambiar el tiempo y la dificultad aunque las medidas exteriores sean parecidas.</p>
+          </article>
+          <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+            <h3 class="text-lg font-semibold text-[#0F172A] mb-2">&iquest;Qu&eacute; informaci&oacute;n acelera una cotizaci&oacute;n?</h3>
+            <p class="text-sm text-[#334155] leading-relaxed">Archivo 3D o medidas, cantidad, uso final, material deseado, acabado esperado y fecha objetivo. Si no existe archivo, una referencia clara ayuda a definir el alcance de dise&ntilde;o.</p>
+          </article>
         </div>
       </div>
     </section>
