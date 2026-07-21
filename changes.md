@@ -1737,3 +1737,35 @@
 * Motivo: cerrar el bloqueo de acceso a Search Console con el metodo reversible aprobado y registrar evidencia real de indexacion.
 * Relacion: completa el cambio anterior que dejo preparada la etiqueta HTML y sustituye el bloqueo DNS por una propiedad URL-prefix funcional.
 * Resultado: ✅ propiedad verificada; sitemap `Correcto` con seis paginas descubiertas; portada indexada; cinco rutas descubiertas aun sin rastrear; solicitud prioritaria aceptada para `/servicio-impresion-3d/`; sin acciones manuales ni problemas de seguridad; informes de rendimiento y Core Web Vitals en procesamiento por falta de datos de campo.
+
+## [2026-07-21]
+
+* Archivo: pagina publica `https://www.facebook.com/Lithora3D/`
+* Cambio: se reemplazaron la categoria `Videojuego`, el enlace de YouTube y la biografia generica por `Servicio de impresion`, `https://lithora3d.com/` y una presentacion comercial orientada a impresion 3D; tambien se publicaron el telefono oficial `+52 833 108 0178`, el idioma `Espanol estandar` y el enlace social `instagram.com/lithora3d`.
+* Motivo: alinear la entidad de Facebook con el giro real, reforzar sus terminos descriptivos y conectar la pagina social con el sitio y el canal comercial aprobados.
+* Relacion: complementa la optimizacion SEO on-site y la verificacion de Search Console realizadas anteriormente.
+* Resultado: ✅ datos publicos verificados con Chrome DevTools; la vinculacion nativa del boton de WhatsApp no se completo porque Meta devolvio `El usuario no tiene permiso para esta accion`, por lo que requiere un administrador con control total sobre la pagina o el activo comercial. No se eliminaron los reels historicos de programacion para preservar su alcance y evitar una accion destructiva.
+
+## [2026-07-21]
+
+* Archivo: resultados de Google para `site:facebook.com/Lithora3D Lithora3D`
+* Cambio: se comprobo mediante Chrome DevTools la visibilidad indexada actual de la pagina de Facebook despues de actualizar sus datos.
+* Motivo: separar la optimizacion de la entidad de su posterior rastreo e indexacion por buscadores.
+* Relacion: valida el punto de partida externo de la optimizacion social.
+* Resultado: ⚠️ Google no muestra actualmente resultados para ese patron; los cambios de perfil quedaron publicos, pero el rastreo y la indexacion dependen de Meta y Google y no son inmediatos.
+
+## [2026-07-21]
+
+* Archivo: `index.html`, `tests/static-audit.test.mjs`
+* Cambio: se agregaron los perfiles oficiales de Facebook e Instagram a `Organization.sameAs` y una regresion automatizada que preserva ambas URLs.
+* Motivo: reforzar desde el dominio oficial que los perfiles sociales pertenecen a la misma entidad de Lithora 3D.
+* Relacion: completa la conexion bidireccional iniciada al enlazar el sitio e Instagram desde la pagina de Facebook.
+* Resultado: ✅ marcado estructurado actualizado con datos publicos confirmados y cobertura automatizada agregada.
+
+## [2026-07-21]
+
+* Archivo: validacion local del repositorio
+* Cambio: se ejecuto `npm run validate` despues de incorporar los perfiles sociales oficiales a la entidad estructurada.
+* Motivo: comprobar contenido sincronizado, sintaxis JavaScript y regresiones antes de publicar.
+* Relacion: valida el refuerzo de identidad social agregado a `Organization.sameAs`.
+* Resultado: ✅ 9 nichos sincronizados, comprobaciones de sintaxis correctas y 82 de 82 pruebas aprobadas.

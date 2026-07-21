@@ -60,6 +60,7 @@ test('SEO estructurado usa datos aprobados y coincide con contenido visible', ()
   assert.match(home, /<meta name="google-site-verification" content="[A-Za-z0-9_-]+">/);
   assert.match(home, /"@type": "ContactPoint"/);
   assert.match(home, /"telephone": "\+52-833-108-0178"/);
+  assert.match(home, /"sameAs": \[[\s\S]*https:\/\/www\.facebook\.com\/Lithora3D\/[\s\S]*https:\/\/www\.instagram\.com\/lithora3d\//);
   assert.doesNotMatch(home, />BOFU</i);
   assert.doesNotMatch(home, /captar b[uú]squedas|Landing enfocada/i);
 
