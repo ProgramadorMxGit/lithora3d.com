@@ -57,6 +57,7 @@ test('sitemap contiene cada ruta indexable y robots lo declara', () => {
 
 test('SEO estructurado usa datos aprobados y coincide con contenido visible', () => {
   const home = read(path.join(root, 'index.html'));
+  assert.match(home, /<meta name="google-site-verification" content="[A-Za-z0-9_-]+">/);
   assert.match(home, /"@type": "ContactPoint"/);
   assert.match(home, /"telephone": "\+52-833-108-0178"/);
   assert.doesNotMatch(home, />BOFU</i);

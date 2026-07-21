@@ -1722,3 +1722,10 @@
 * Motivo: hacer efectivas las mejoras SEO y confirmar que el CDN sirve la revision nueva.
 * Relacion: cierre de TASK-069; el envio del sitemap a Search Console sigue separado por falta de acceso a la propiedad.
 * Resultado: ✅ workflow exitoso; titulo nuevo, ContactPoint, FAQ visible/estructurada, seis lastmod, H1 unico, cero overflow y cero mensajes relevantes de consola en produccion.
+## [2026-07-21]
+
+* Archivo: `index.html`, `tests/static-audit.test.mjs`
+* Cambio: se incorporo la etiqueta oficial de verificacion de la propiedad URL-prefix `https://lithora3d.com/` solicitada desde Google Search Console y una regresion automatizada para preservarla.
+* Motivo: las cuentas abiertas no tenian acceso a una propiedad de Lithora y el DNS autoritativo pertenece a Cloudflare sin sesion; la etiqueta HTML permite verificar el sitio desde el despliegue ya controlado.
+* Relacion: resuelve de forma reversible el bloqueo registrado en TASK-069 sin cambiar nameservers ni DNS.
+* Resultado: ⚠️ etiqueta implementada localmente; despliegue, verificacion y envio del sitemap pendientes.
