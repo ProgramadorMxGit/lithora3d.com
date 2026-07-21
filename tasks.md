@@ -2465,9 +2465,9 @@ La funcionalidad solo puede considerarse terminada cuando:
 - [ ] Blocked externally — Conexion a una cuenta analitica de produccion y reglas de consentimiento. Dependencia: proveedor/cuenta y decision de privacidad; propietario: marketing/analitica y privacidad de Lithora 3D; siguiente accion: conectar dataLayer al proveedor aprobado y validar recepcion de los nueve eventos sin ampliar los payloads minimos.
 - [x] Chrome DevTools MCP resuelto — inspeccion local y productiva realizada con `list_pages`, navegacion, DOM, red, consola, interaccion y Lighthouse.
 - [x] Staging resuelto por equivalencia — el proyecto no tiene un entorno separado; la candidata se valido localmente con configuracion estatica equivalente y fue aprobada expresamente antes de promoverse.
-- [x] Produccion resuelta — commit `b12f3a3` publicado por GitHub Pages workflow #6 y verificado en `https://lithora3d.com/`; el seguimiento con trafico real permanece en TASK-069.
+- [x] Produccion resuelta — commit `5f82cde` publicado por GitHub Pages workflow #10 y verificado en `https://lithora3d.com/`; el seguimiento con trafico real permanece en TASK-069.
 
-La Definition of Done local y de publicacion esta alcanzada. Quedan 16 casillas, todas `Blocked externally`, limitadas a Search Console, cuenta analitica/consentimiento, telemetria con trafico real y decisiones futuras de expansion basadas en demanda real.
+La Definition of Done local y de publicacion esta alcanzada. Quedan 15 casillas, todas `Blocked externally`, limitadas a cuenta analitica/consentimiento, telemetria con trafico real y decisiones futuras de expansion basadas en demanda real.
 
 ## TASK-069 — Investigacion y refuerzo SEO basado en SERP
 
@@ -2479,4 +2479,4 @@ La Definition of Done local y de publicacion esta alcanzada. Quedan 16 casillas,
 - [x] Agregar lastmod e imagen conceptual al sitemap y conservar las seis URL canonicas.
 - [x] Agregar ItemList para los nueve nichos conceptuales publicados sin crear paginas individuales delgadas.
 - [x] Eliminar jerga SEO interna del HTML y cubrir los contratos nuevos con pruebas automatizadas.
-- [ ] Blocked externally — Verificar la propiedad de dominio `lithora3d.com`, enviar el sitemap y consultar cobertura/consultas reales en Google Search Console. Dependencia: acceso de propietario DNS o invitacion a la propiedad; propietario: titular del dominio/marketing de Lithora 3D; siguiente accion: verificar la propiedad o conceder acceso a la cuenta abierta y despues enviar `https://lithora3d.com/sitemap.xml`.
+- [x] Search Console resuelto — propiedad URL-prefix `https://lithora3d.com/` verificada por etiqueta HTML el 2026-07-21; `https://lithora3d.com/sitemap.xml` enviado y procesado como `Correcto` con seis paginas descubiertas. La portada figura indexada; las otras cinco URL figuran `Descubierta: actualmente sin indexar`, y Google acepto una solicitud prioritaria para `/servicio-impresion-3d/`. Rendimiento, cobertura agregada y Core Web Vitals siguen procesandose por alta reciente/falta de datos de campo, no por un bloqueo de acceso.

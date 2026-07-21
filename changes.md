@@ -1729,3 +1729,11 @@
 * Motivo: las cuentas abiertas no tenian acceso a una propiedad de Lithora y el DNS autoritativo pertenece a Cloudflare sin sesion; la etiqueta HTML permite verificar el sitio desde el despliegue ya controlado.
 * Relacion: resuelve de forma reversible el bloqueo registrado en TASK-069 sin cambiar nameservers ni DNS.
 * Resultado: ⚠️ etiqueta implementada localmente; despliegue, verificacion y envio del sitemap pendientes.
+
+## [2026-07-21]
+
+* Archivo: produccion `https://lithora3d.com/`, Google Search Console y `tasks.md`
+* Cambio: se desplego el commit `5f82cde` mediante GitHub Pages workflow #10, se confirmo en el HTML publico la etiqueta de verificacion, se verifico la propiedad URL-prefix, se envio `sitemap.xml` y se actualizo el estado operativo de TASK-069.
+* Motivo: cerrar el bloqueo de acceso a Search Console con el metodo reversible aprobado y registrar evidencia real de indexacion.
+* Relacion: completa el cambio anterior que dejo preparada la etiqueta HTML y sustituye el bloqueo DNS por una propiedad URL-prefix funcional.
+* Resultado: ✅ propiedad verificada; sitemap `Correcto` con seis paginas descubiertas; portada indexada; cinco rutas descubiertas aun sin rastrear; solicitud prioritaria aceptada para `/servicio-impresion-3d/`; sin acciones manuales ni problemas de seguridad; informes de rendimiento y Core Web Vitals en procesamiento por falta de datos de campo.
