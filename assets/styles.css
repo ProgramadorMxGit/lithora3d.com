@@ -946,22 +946,90 @@ section[id] { scroll-margin-top: 100px; }
 }
 .faq-btn[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
 
-/* Cotizar: formulario externo conectado a Google Sheets */
-.quote-form-shell {
+/* Transición desde los dos CTA principales hacia /cotizar/ */
+.quote-transition-layer {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  visibility: hidden;
+  color: #7dd3fc;
+}
+.quote-transition-layer__wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(14,165,233,.2), transparent 34%),
+    linear-gradient(135deg, rgba(3,105,161,.97), rgba(7,17,31,.99) 58%);
+  clip-path: circle(0 at 50% 50%);
+}
+.quote-transition-layer__track {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  width: min(78vw, 580px);
+  opacity: 0;
+  transform: translateY(14px);
+}
+.quote-transition-layer__line {
+  position: absolute;
+  top: 22px;
+  left: 0;
   width: 100%;
-  min-width: 0;
-  overflow: hidden;
-  border-radius: 0.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(125,211,252,.78), transparent);
+  transform: scaleX(0);
+}
+.quote-transition-layer__cube {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: center;
+  border: 1px solid rgba(125,211,252,.32);
+  border-radius: 18px;
+  background: #07111f;
+  box-shadow: 0 0 0 9px rgba(14,165,233,.08), 0 22px 55px rgba(0,0,0,.38);
+}
+.quote-transition-layer__copy {
+  color: #e0f2fe;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+.quote-transition-active .quote-transition-layer { visibility: visible; }
+.quote-transition-active .quote-transition-layer__wash {
+  animation: quote-wash-in .68s cubic-bezier(.22,1,.36,1) both;
+}
+.quote-transition-active .quote-transition-layer__track {
+  animation: quote-track-in .46s .12s cubic-bezier(.22,1,.36,1) both;
+}
+.quote-transition-active .quote-transition-layer__line {
+  animation: quote-line-in .5s .14s cubic-bezier(.22,1,.36,1) both;
+}
+.quote-transition-active .quote-transition-layer__cube {
+  animation: quote-cube-in .58s .08s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes quote-wash-in {
+  to { clip-path: circle(150% at 50% 50%); }
+}
+@keyframes quote-track-in {
+  to { opacity: 1; transform: none; }
+}
+@keyframes quote-line-in {
+  to { transform: scaleX(1); }
+}
+@keyframes quote-cube-in {
+  0% { opacity: 0; transform: translateX(-90px) rotate(-18deg) scale(.7); }
+  68% { opacity: 1; transform: translateX(8px) rotate(4deg) scale(1.06); }
+  100% { opacity: 1; transform: none; }
 }
 
-.tally-quote-frame {
-  display: block;
-  width: 100%;
-  min-height: 1160px;
-  border: 0;
-  background: transparent;
-}
-
-@media (max-width: 639px) {
-  .tally-quote-frame { min-height: 1200px; }
+@media (prefers-reduced-motion: reduce) {
+  .quote-transition-layer { display: none; }
 }

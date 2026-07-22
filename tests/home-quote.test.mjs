@@ -5,24 +5,43 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const styles = fs.readFileSync(path.join(root, 'assets', 'styles.css'), 'utf8');
+const read = (...parts) => fs.readFileSync(path.join(root, ...parts), 'utf8');
+const home = read('index.html');
+const quote = read('cotizar', 'index.html');
+const homeStyles = read('assets', 'styles.css');
+const quoteStyles = read('assets', 'quote-page.css');
+const transition = read('assets', 'quote-transition.js');
 
-test('la portada integra el formulario de cotización publicado', () => {
-  assert.match(home, /https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1/);
-  assert.match(home, /src="https:\/\/tally\.so\/widgets\/embed\.js"[^>]*defer/);
-  assert.match(home, /title="Formulario de solicitud de cotización de Lithora3D"/);
-  assert.match(home, /href="https:\/\/tally\.so\/r\/ODeE7a"/);
+test('los dos CTA principales abren la página de cotización con transición', () => {
+  const animatedLinks = [...home.matchAll(/<a[^>]+href="\/cotizar\/"[^>]+data-quote-link[^>]*>/g)];
+  assert.equal(animatedLinks.length, 2);
+  assert.match(home, /src="\/assets\/quote-transition\.js"[^>]*defer/);
+  assert.match(transition, /querySelectorAll\('\[data-quote-link\]'\)/);
+  assert.match(transition, /window\.location\.assign\(link\.href\)/);
+  assert.match(homeStyles, /\.quote-transition-layer\s*\{/);
+  assert.match(homeStyles, /prefers-reduced-motion:\s*reduce/);
 });
 
-test('la portada comunica fecha y foto opcionales con el límite correcto', () => {
-  assert.match(home, /Fecha aproximada requerida \(opcional\)/);
-  assert.match(home, /Foto de referencia \(opcional, máximo 10 MB\)/);
-});
-
-test('se retiró el formulario local que bloqueaba el envío real', () => {
+test('la portada deja de duplicar el formulario y todos sus CTA usan la ruta nueva', () => {
+  assert.doesNotMatch(home, /href="#cotizar"/);
+  assert.doesNotMatch(home, /id="cotizar"/);
+  assert.doesNotMatch(home, /tally\.so\/embed\/ODeE7a/);
   assert.doesNotMatch(home, /id="cotizar-form"/);
-  assert.doesNotMatch(home, /wire to real endpoint/i);
-  assert.match(styles, /\.tally-quote-frame\s*\{/);
-  assert.match(styles, /min-height:\s*1160px/);
+  assert.ok((home.match(/href="\/cotizar\/"/g) || []).length >= 10);
+});
+
+test('la ruta de cotización conserva el formulario real en la columna derecha', () => {
+  assert.match(quote, /<link rel="canonical" href="https:\/\/lithora3d\.com\/cotizar\/">/);
+  assert.match(quote, /id="formulario-cotizacion"/);
+  assert.match(quote, /https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1/);
+  assert.match(quote, /title="Formulario de solicitud de cotización de Lithora3D"/);
+  assert.match(quote, /src="https:\/\/tally\.so\/widgets\/embed\.js"[^>]*defer/);
+});
+
+test('la columna izquierda queda preparada para reemplazarla por el timelapse', () => {
+  assert.match(quote, /data-animation-slot="print-timelapse"/);
+  assert.match(quote, /Espacio listo para el timelapse de impresión/);
+  assert.match(quoteStyles, /grid-template-columns:\s*minmax\(0,\s*1\.05fr\)\s+minmax\(520px,\s*\.95fr\)/);
+  assert.match(quoteStyles, /\.quote-visual\s*\{[\s\S]*?position:\s*sticky/);
+  assert.match(quoteStyles, /@media \(max-width:\s*880px\)/);
 });
