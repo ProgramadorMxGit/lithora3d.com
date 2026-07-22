@@ -41,7 +41,8 @@ test('la ruta de cotización conserva el formulario real en la columna derecha',
 test('la columna izquierda queda preparada para reemplazarla por el timelapse', () => {
   assert.match(quote, /data-animation-slot="print-timelapse"/);
   assert.match(quote, /Espacio listo para el timelapse de impresión/);
-  assert.match(quoteStyles, /grid-template-columns:\s*minmax\(0,\s*1\.05fr\)\s+minmax\(520px,\s*\.95fr\)/);
+  assert.match(quoteStyles, /grid-template-columns:\s*minmax\(620px,\s*1\.22fr\)\s+minmax\(500px,\s*\.78fr\)/);
+  assert.match(quoteStyles, /min-height:\s*clamp\(460px,\s*55vh,\s*620px\)/);
   assert.match(quoteStyles, /\.quote-visual\s*\{[\s\S]*?position:\s*sticky/);
   assert.match(quoteStyles, /@media \(max-width:\s*880px\)/);
 });
