@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-2">
+  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-3">
 </head>
 <body data-page="quote">
   <a class="skip-link" href="#formulario-cotizacion">Saltar al formulario</a>
@@ -42,15 +42,15 @@
   </header>
 
   <main class="quote-layout">
-    <section class="quote-visual" aria-labelledby="quote-visual-title">
+    <section class="quote-visual" aria-label="Proceso de impresión 3D">
       <div class="quote-visual__copy">
         <p class="quote-eyebrow"><span aria-hidden="true"></span> DEL ARCHIVO A LA PIEZA</p>
-        <h2 id="quote-visual-title">Tu idea toma forma, capa por capa.</h2>
+        <h2>Tu idea toma forma, capa por capa.</h2>
         <p>Mientras nos cuentas sobre tu proyecto, aquí podrás ver el proceso de una impresión 3D en cámara rápida.</p>
       </div>
 
       <!-- Reemplazar el contenido interior de este slot por el video/animación timelapse. -->
-      <div class="quote-media-slot" data-animation-slot="print-timelapse" aria-label="Espacio preparado para una animación del proceso de impresión 3D">
+      <div class="quote-media-slot" data-animation-slot="print-timelapse" aria-label="Animación del proceso de impresión 3D">
         <div class="printer-scene" aria-hidden="true">
           <div class="printer-scene__rail"></div>
           <div class="printer-scene__head">
@@ -63,19 +63,7 @@
           <div class="printer-scene__bed"></div>
           <div class="printer-scene__grid"></div>
         </div>
-        <div class="quote-media-slot__label">
-          <span class="quote-media-slot__icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
-          </span>
-          <span><strong>Vista del proceso</strong><small>Espacio listo para el timelapse de impresión</small></span>
-        </div>
       </div>
-
-      <ul class="quote-assurances" aria-label="Ventajas del proceso de cotización">
-        <li><span>01</span>Revisión personalizada</li>
-        <li><span>02</span>Respuesta clara</li>
-        <li><span>03</span>Sin compromiso</li>
-      </ul>
     </section>
 
     <section class="quote-form-panel" id="formulario-cotizacion" aria-labelledby="quote-title">

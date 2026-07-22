@@ -99,10 +99,11 @@ a { color: inherit; }
   flex-direction: column;
   justify-content: center;
   min-height: calc(100vh - 1px);
-  padding: 96px 0 56px;
+  padding: 52px 0;
   view-transition-name: quote-visual;
 }
 .quote-visual__copy {
+  display: none;
   max-width: 680px;
   margin: 0 auto 28px;
   text-align: center;
@@ -152,15 +153,13 @@ a { color: inherit; }
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: clamp(460px, 55vh, 620px);
+  min-height: clamp(560px, 72vh, 720px);
   margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid rgba(125, 211, 252, .2);
-  border-radius: 26px;
-  background:
-    linear-gradient(145deg, rgba(255,255,255,.045), transparent 42%),
-    rgba(3, 10, 21, .74);
-  box-shadow: 0 32px 80px rgba(0, 0, 0, .3), inset 0 1px rgba(255,255,255,.04);
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .quote-media-slot::before {
   content: "";
@@ -172,14 +171,9 @@ a { color: inherit; }
   filter: blur(18px);
 }
 .quote-media-slot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 58%, rgba(3, 10, 21, .88));
+  content: none;
 }
-.printer-scene { position: absolute; inset: 0; overflow: hidden; }
+.printer-scene { position: absolute; inset: 0; overflow: visible; }
 .printer-scene__grid {
   position: absolute;
   inset: 0;
@@ -392,16 +386,16 @@ body[data-page="quote"] .quote-form-panel { animation: quote-enter-form .85s .16
 @media (max-width: 1080px) {
   .quote-layout { grid-template-columns: minmax(0, 1fr) minmax(470px, .92fr); gap: 36px; }
   .quote-visual h2 { font-size: clamp(2.2rem, 4.5vw, 3.8rem); }
-  .quote-media-slot { min-height: 450px; }
+  .quote-media-slot { min-height: 560px; }
 }
 
 @media (max-width: 880px) {
   .quote-header { width: min(100% - 40px, 720px); grid-template-columns: 1fr auto; }
   .quote-header__status { display: none; }
   .quote-layout { display: block; width: min(100% - 40px, 720px); }
-  .quote-visual { position: relative; min-height: 0; padding: 74px 0 28px; }
-  .quote-visual__copy { margin-bottom: 26px; }
-  .quote-media-slot { min-height: 360px; }
+  .quote-visual { position: relative; min-height: 0; padding: 42px 0 20px; }
+  .quote-visual__copy { display: block; margin-bottom: 26px; }
+  .quote-media-slot { min-height: 430px; overflow: hidden; }
   .quote-form-panel { padding: 72px 0 20px; }
   .quote-footer { width: min(100% - 40px, 720px); }
 }
@@ -412,12 +406,10 @@ body[data-page="quote"] .quote-form-panel { animation: quote-enter-form .85s .16
   .quote-back { font-size: 0; gap: 0; }
   .quote-back svg { width: 22px; height: 22px; }
   .quote-layout { width: min(100% - 32px, 720px); }
-  .quote-visual { padding-top: 56px; }
+  .quote-visual { padding-top: 34px; }
   .quote-visual h2 { font-size: 2.45rem; }
   .quote-visual__copy > p:last-child { font-size: .93rem; }
-  .quote-media-slot { min-height: 290px; margin-top: 28px; border-radius: 20px; }
-  .quote-media-slot__label { right: 16px; bottom: 15px; left: 16px; }
-  .quote-assurances { grid-template-columns: 1fr; gap: 10px; }
+  .quote-media-slot { min-height: 350px; }
   .quote-form-panel { padding-top: 64px; }
   .quote-form-panel h1 { font-size: 2.35rem; }
   .quote-form-frame { margin-inline: -6px; border-radius: 21px; padding: 10px; }
