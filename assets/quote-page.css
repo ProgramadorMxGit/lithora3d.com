@@ -351,7 +351,7 @@ a { color: inherit; }
   box-shadow: 0 34px 90px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.05);
   padding: clamp(16px, 2.1vw, 30px);
 }
-.quote-tally-frame { display: block; width: 100%; min-height: 1200px; border: 0; background: transparent; }
+.quote-tally-frame { display: block; width: 100%; min-height: 0; border: 0; background: #0b1728; }
 .quote-form-frame noscript { color: #cbd5e1; }
 .quote-form-frame noscript a { color: var(--quote-cyan); }
 
@@ -413,7 +413,6 @@ body[data-page="quote"] .quote-form-panel { animation: quote-enter-form .85s .16
   .quote-form-panel { padding-top: 64px; }
   .quote-form-panel h1 { font-size: 2.35rem; }
   .quote-form-frame { margin-inline: -6px; border-radius: 21px; padding: 10px; }
-  .quote-tally-frame { min-height: 1220px; }
   .quote-footer { width: min(100% - 32px, 720px); }
   .quote-footer span:last-child { display: none; }
 }

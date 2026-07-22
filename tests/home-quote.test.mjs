@@ -34,8 +34,11 @@ test('la ruta de cotización conserva el formulario real en la columna derecha',
   assert.match(quote, /<link rel="canonical" href="https:\/\/lithora3d\.com\/cotizar\/">/);
   assert.match(quote, /id="formulario-cotizacion"/);
   assert.match(quote, /https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1/);
+  assert.doesNotMatch(quote, /\s+src="https:\/\/tally\.so\/embed\/ODeE7a/);
+  assert.match(quote, /data-tally-src="https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1"/);
   assert.match(quote, /title="Formulario de solicitud de cotización de Lithora3D"/);
   assert.match(quote, /src="https:\/\/tally\.so\/widgets\/embed\.js"[^>]*defer/);
+  assert.match(quoteStyles, /\.quote-tally-frame\s*\{[^}]*min-height:\s*0;[^}]*background:\s*#0b1728/);
 });
 
 test('la columna izquierda queda preparada para reemplazarla por el timelapse', () => {
