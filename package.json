@@ -9,7 +9,7 @@
     "content:render": "node scripts/render-ecosystem.mjs",
     "content:check": "node scripts/render-ecosystem.mjs --check",
     "images:responsive": "python scripts/generate-responsive-images.py",
-    "check": "node --check assets/motion-pages.js && node --check ecosistema-soluciones/ecosistema.js && node --check ecosistema-soluciones/content.js && node --check ecosistema-soluciones/analytics.js && node --check ecosistema-soluciones/quote-channel.js",
+    "check": "node --check assets/motion-pages.js && node --check assets/quote-video.js && node --check ecosistema-soluciones/ecosistema.js && node --check ecosistema-soluciones/content.js && node --check ecosistema-soluciones/analytics.js && node --check ecosistema-soluciones/quote-channel.js",
     "validate": "npm run content:check && npm run check && npm test",
     "audit:static": "node --test tests/static-audit.test.mjs"
   }

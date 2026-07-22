@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-4">
+  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-5">
 </head>
 <body data-page="quote">
   <a class="skip-link" href="#formulario-cotizacion">Saltar al formulario</a>
@@ -49,20 +49,17 @@
         <p>Mientras nos cuentas sobre tu proyecto, aquí podrás ver el proceso de una impresión 3D en cámara rápida.</p>
       </div>
 
-      <!-- Reemplazar el contenido interior de este slot por el video/animación timelapse. -->
-      <div class="quote-media-slot" data-animation-slot="print-timelapse" aria-label="Animación del proceso de impresión 3D">
-        <div class="printer-scene" aria-hidden="true">
-          <div class="printer-scene__rail"></div>
-          <div class="printer-scene__head">
-            <span></span>
-          </div>
-          <div class="printer-scene__beam"></div>
-          <div class="printer-scene__piece">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-          </div>
-          <div class="printer-scene__bed"></div>
-          <div class="printer-scene__grid"></div>
-        </div>
+      <div class="quote-media-slot" data-animation-slot="print-timelapse" aria-label="Impresión 3D en cámara rápida">
+        <video
+          class="quote-process-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Video en cámara rápida del proceso de impresión 3D">
+          <source src="/assets/video_cotizacion/video_cotizacion.mp4" type="video/mp4">
+        </video>
       </div>
     </section>
 
@@ -96,6 +93,7 @@
     <span>Impresión 3D en México</span>
   </footer>
 
+  <script src="/assets/quote-video.js" defer></script>
   <script src="https://tally.so/widgets/embed.js" defer></script>
 </body>
 </html>

@@ -164,14 +164,46 @@ a { color: inherit; }
 .quote-media-slot::before {
   content: "";
   position: absolute;
-  inset: 8% 12% 16%;
+  inset: 7% 4% 5%;
   z-index: -1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(14,165,233,.2), transparent 68%);
-  filter: blur(18px);
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(245, 158, 11, .12), transparent 34%),
+    radial-gradient(ellipse at 50% 58%, rgba(14, 165, 233, .18), transparent 66%);
+  filter: blur(28px);
 }
 .quote-media-slot::after {
-  content: none;
+  content: "";
+  position: absolute;
+  inset: 5% 2%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 35%, rgba(125, 211, 252, .055) 48%, transparent 61%);
+  mask-image: radial-gradient(ellipse 76% 74% at 50% 50%, #000 46%, transparent 100%);
+  animation: quote-video-sheen 9s ease-in-out infinite;
+}
+.quote-process-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: min(100%, 740px);
+  max-width: none;
+  aspect-ratio: 1;
+  border: 0;
+  outline: 0;
+  object-fit: cover;
+  object-position: center;
+  background: #020810;
+  filter: contrast(1.05) saturate(.94) brightness(.97) drop-shadow(0 36px 70px rgba(0, 0, 0, .36));
+  -webkit-mask-image: radial-gradient(ellipse 52% 54% at 50% 50%, #000 58%, rgba(0,0,0,.9) 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 52% 54% at 50% 50%, #000 58%, rgba(0,0,0,.9) 70%, transparent 100%);
+  transform: translate(-50%, -50%) scale(1.025);
+  transform-origin: center;
+  animation:
+    quote-video-reveal 1.15s .16s var(--quote-ease) both,
+    quote-video-breathe 13s 1.3s ease-in-out infinite alternate;
 }
 .printer-scene { position: absolute; inset: 0; overflow: visible; }
 .printer-scene__grid {
@@ -370,6 +402,19 @@ a { color: inherit; }
   0%, 12% { transform: translateX(-125px); }
   45%, 58% { transform: translateX(95px); }
   100% { transform: translateX(-20px); }
+}
+@keyframes quote-video-reveal {
+  from { opacity: 0; filter: contrast(1.05) saturate(.8) brightness(.72) blur(10px); }
+  to { opacity: 1; filter: contrast(1.05) saturate(.94) brightness(.97) blur(0); }
+}
+@keyframes quote-video-breathe {
+  from { transform: translate(-50%, -50%) scale(1.025); }
+  to { transform: translate(-50%, -50%) scale(1.055); }
+}
+@keyframes quote-video-sheen {
+  0%, 18% { opacity: 0; transform: translateX(-7%); }
+  42%, 58% { opacity: .9; }
+  82%, 100% { opacity: 0; transform: translateX(7%); }
 }
 @keyframes quote-enter-visual {
   from { opacity: 0; transform: translate3d(-34px, 0, 0) scale(.985); }

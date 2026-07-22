@@ -11,6 +11,7 @@ const quote = read('cotizar', 'index.html');
 const homeStyles = read('assets', 'styles.css');
 const quoteStyles = read('assets', 'quote-page.css');
 const transition = read('assets', 'quote-transition.js');
+const quoteVideo = read('assets', 'quote-video.js');
 
 test('los dos CTA principales abren la página de cotización con transición', () => {
   const animatedLinks = [...home.matchAll(/<a[^>]+href="\/cotizar\/"[^>]+data-quote-link[^>]*>/g)];
@@ -45,11 +46,19 @@ test('la columna izquierda queda preparada para reemplazarla por el timelapse', 
   assert.match(quote, /data-animation-slot="print-timelapse"/);
   assert.match(quote, /Tu idea toma forma, capa por capa\./);
   assert.doesNotMatch(quote, /Vista del proceso/);
+  assert.match(quote, /<video[\s\S]*?class="quote-process-video"[\s\S]*?autoplay[\s\S]*?muted[\s\S]*?loop[\s\S]*?playsinline[\s\S]*?preload="metadata"/);
+  assert.match(quote, /<source src="\/assets\/video_cotizacion\/video_cotizacion\.mp4" type="video\/mp4">/);
+  assert.doesNotMatch(quote, /class="printer-scene/);
+  assert.match(quote, /src="\/assets\/quote-video\.js"[^>]*defer/);
   assert.match(quoteStyles, /grid-template-columns:\s*minmax\(620px,\s*1\.22fr\)\s+minmax\(500px,\s*\.78fr\)/);
   assert.match(quoteStyles, /min-height:\s*clamp\(560px,\s*72vh,\s*720px\)/);
   assert.match(quoteStyles, /\.quote-visual__copy\s*\{[\s\S]*?display:\s*none/);
   assert.match(quoteStyles, /@media \(max-width:\s*880px\)[\s\S]*?\.quote-visual__copy\s*\{\s*display:\s*block/);
   assert.match(quoteStyles, /\.quote-media-slot\s*\{[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;[\s\S]*?box-shadow:\s*none/);
+  assert.match(quoteStyles, /\.quote-process-video\s*\{[\s\S]*?mask-image:\s*radial-gradient/);
+  assert.match(quoteVideo, /IntersectionObserver/);
+  assert.match(quoteVideo, /prefers-reduced-motion:\s*reduce/);
+  assert.match(quoteVideo, /visibilitychange/);
   assert.match(quoteStyles, /\.quote-visual\s*\{[\s\S]*?position:\s*sticky/);
   assert.match(quoteStyles, /@media \(max-width:\s*880px\)/);
 });
