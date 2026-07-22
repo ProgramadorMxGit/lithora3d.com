@@ -946,7 +946,22 @@ section[id] { scroll-margin-top: 100px; }
 }
 .faq-btn[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
 
-/* Cotizar dark form fields */
-#cotizar input::placeholder,
-#cotizar textarea::placeholder { color: #64748B; }
-#cotizar select option { background: #1E293B; color: white; }
+/* Cotizar: formulario externo conectado a Google Sheets */
+.quote-form-shell {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.tally-quote-frame {
+  display: block;
+  width: 100%;
+  min-height: 1160px;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 639px) {
+  .tally-quote-frame { min-height: 1200px; }
+}
