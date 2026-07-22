@@ -12,6 +12,8 @@ const homeStyles = read('assets', 'styles.css');
 const quoteStyles = read('assets', 'quote-page.css');
 const transition = read('assets', 'quote-transition.js');
 const quoteVideo = read('assets', 'quote-video.js');
+const quoteSuccess = read('assets', 'quote-success.js');
+const quoteHandoff = read('assets', 'quote-handoff.js');
 
 test('los dos CTA principales abren la página de cotización con transición', () => {
   const animatedLinks = [...home.matchAll(/<a[^>]+href="\/cotizar\/"[^>]+data-quote-link[^>]*>/g)];
@@ -36,7 +38,7 @@ test('la ruta de cotización conserva el formulario real en la columna derecha',
   assert.match(quote, /id="formulario-cotizacion"/);
   assert.match(quote, /https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1/);
   assert.doesNotMatch(quote, /\s+src="https:\/\/tally\.so\/embed\/ODeE7a/);
-  assert.match(quote, /data-tally-src="https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1"/);
+  assert.match(quote, /data-tally-src="https:\/\/tally\.so\/embed\/ODeE7a\?[^"\s]*dynamicHeight=1[^"\s]*"/);
   assert.match(quote, /title="Formulario de solicitud de cotización de Lithora3D"/);
   assert.match(quote, /src="https:\/\/tally\.so\/widgets\/embed\.js"[^>]*defer/);
   assert.match(quoteStyles, /\.quote-tally-frame\s*\{[^}]*min-height:\s*0;[^}]*background:\s*#0b1728/);
@@ -61,4 +63,53 @@ test('la columna izquierda queda preparada para reemplazarla por el timelapse', 
   assert.match(quoteVideo, /visibilitychange/);
   assert.match(quoteStyles, /\.quote-visual\s*\{[\s\S]*?position:\s*sticky/);
   assert.match(quoteStyles, /@media \(max-width:\s*880px\)/);
+});
+
+test('la confirmación solo nace del envío exitoso confirmado por Tally', () => {
+  assert.match(quote, /formEventsForwarding=1/);
+  assert.doesNotMatch(quote, /data-tally-on-submit/);
+  assert.match(quote, /src="\/assets\/quote-success\.js"[^>]*defer/);
+  assert.match(quoteSuccess, /event\.origin\s*!==\s*'https:\/\/tally\.so'/);
+  assert.match(quoteSuccess, /event\.source\s*!==\s*frame\.contentWindow/);
+  assert.match(quoteSuccess, /data\?\.event\s*!==\s*'Tally\.FormSubmitted'/);
+  assert.match(quoteSuccess, /window\.addEventListener\('message',\s*onTallyMessage/);
+  assert.match(quoteSuccess, /payload\?\.formId\s*!==\s*FORM_ID/);
+  assert.match(quoteSuccess, /window\.lithoraQuoteSuccess/);
+  assert.match(quoteSuccess, /state\s*!==\s*STATE\.READY/);
+  assert.match(quoteSuccess, /window\.location\.replace\('\/'\)/);
+  assert.doesNotMatch(quoteSuccess, /location\.assign/);
+});
+
+test('la secuencia de éxito conserva redacción, estados y accesibilidad completos', () => {
+  assert.match(quote, /Tu solicitud se ha enviado exitosamente/);
+  assert.match(quote, /Gracias por confiar en nosotros\./);
+  assert.doesNotMatch(quote, /nostros/i);
+  assert.match(quote, /role="status"[\s\S]*?aria-live="polite"[\s\S]*?aria-atomic="true"/);
+  assert.match(quoteSuccess, /BUTTON:\s*'button-confirmation'/);
+  assert.match(quoteSuccess, /EXPANSION:\s*'expansion'/);
+  assert.match(quoteSuccess, /SUCCESS:\s*'success-screen'/);
+  assert.match(quoteSuccess, /EXIT:\s*'success-exit'/);
+  assert.match(quoteSuccess, /NAVIGATING:\s*'navigating-home'/);
+  assert.match(quoteSuccess, /COMPLETE:\s*'complete'/);
+  assert.match(quoteSuccess, /prefers-reduced-motion:\s*reduce/);
+  assert.match(quoteSuccess, /visualViewport\?\.addEventListener\('resize'/);
+  assert.match(quoteSuccess, /Math\.hypot/);
+  assert.match(quoteSuccess, /element\.animate/);
+  assert.match(quoteSuccess, /\.finished/);
+  assert.match(quoteSuccess, /AbortController/);
+  assert.match(quoteSuccess, /event\.persisted/);
+  assert.match(quoteStyles, /height:\s*100dvh/);
+  assert.match(quoteStyles, /env\(safe-area-inset-top\)/);
+});
+
+test('la portada recibe el traspaso verde sin repetirlo al recargar o volver atrás', () => {
+  assert.match(home, /lithora:quote-success-handoff/);
+  assert.match(home, /class="quote-handoff-layer"/);
+  assert.match(home, /src="\/assets\/quote-handoff\.js"[^>]*defer/);
+  assert.match(homeStyles, /\.quote-handoff-layer\s*\{/);
+  assert.match(homeStyles, /quote-handoff-reveal/);
+  assert.match(quoteHandoff, /sessionStorage\.removeItem\(HANDOFF_KEY\)/);
+  assert.match(quoteHandoff, /window\.scrollTo\(0,\s*0\)/);
+  assert.match(quoteHandoff, /transitionend/);
+  assert.match(quoteHandoff, /event\.persisted/);
 });

@@ -13,10 +13,11 @@
   <meta property="og:description" content="Cuéntanos qué necesitas fabricar y recibe una propuesta clara de Lithora 3D.">
   <meta property="og:url" content="https://lithora3d.com/cotizar/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="prefetch" href="/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-5">
+  <link rel="stylesheet" href="/assets/quote-page.css?v=20260722-6">
 </head>
 <body data-page="quote">
   <a class="skip-link" href="#formulario-cotizacion">Saltar al formulario</a>
@@ -72,7 +73,7 @@
 
       <div class="quote-form-frame">
         <iframe
-          data-tally-src="https://tally.so/embed/ODeE7a?alignLeft=1&hideTitle=1&dynamicHeight=1"
+          data-tally-src="https://tally.so/embed/ODeE7a?alignLeft=1&hideTitle=1&dynamicHeight=1&formEventsForwarding=1"
           loading="eager"
           width="100%"
           height="1200"
@@ -88,12 +89,44 @@
     </section>
   </main>
 
+  <div class="quote-success" data-quote-success data-state="ready" aria-hidden="true">
+    <div class="quote-success__wash" aria-hidden="true"></div>
+
+    <div class="quote-success__seed" aria-hidden="true">
+      <span class="quote-success__seed-check">
+        <svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="m7.5 14.2 4.1 4.1L20.8 9"/>
+        </svg>
+      </span>
+      <span class="quote-success__seed-label">Solicitud enviada</span>
+    </div>
+
+    <section
+      class="quote-success__content"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-labelledby="quote-success-title"
+      aria-hidden="true"
+      tabindex="-1">
+      <div class="quote-success__emblem" aria-hidden="true">
+        <svg viewBox="0 0 132 132" fill="none">
+          <circle class="quote-success__ring" cx="66" cy="66" r="52"/>
+          <path class="quote-success__check" d="M42 66.5 58.5 83 91 49.5"/>
+        </svg>
+      </div>
+      <h2 id="quote-success-title">Tu solicitud se ha enviado exitosamente</h2>
+      <p>Gracias por confiar en nosotros.</p>
+    </section>
+  </div>
+
   <footer class="quote-footer">
     <span>© 2026 Lithora 3D</span>
     <span>Impresión 3D en México</span>
   </footer>
 
   <script src="/assets/quote-video.js" defer></script>
+  <script src="/assets/quote-success.js" defer></script>
   <script src="https://tally.so/widgets/embed.js" defer></script>
 </body>
 </html>

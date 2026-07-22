@@ -25,8 +25,18 @@
   <meta name="twitter:title" content="Impresi&oacute;n 3D en Tampico, Madero y Altamira | Lithora 3D">
   <meta name="twitter:description" content="Prototipos, letreros y piezas personalizadas con atenci&oacute;n local en la zona sur de Tamaulipas.">
   <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.svg">
+  <script>
+    try {
+      const quoteHandoff = Number(sessionStorage.getItem('lithora:quote-success-handoff'));
+      if (quoteHandoff && Date.now() - quoteHandoff < 15000) {
+        document.documentElement.classList.add('quote-handoff');
+      } else {
+        sessionStorage.removeItem('lithora:quote-success-handoff');
+      }
+    } catch {}
+  </script>
   <link rel="stylesheet" href="assets/tailwind-home.css">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/styles.css?v=20260722-2">
   <link rel="preload" as="image" href="assets/fondo_web.png" fetchpriority="high">
   <script type="application/ld+json">
     {
@@ -148,6 +158,7 @@
   </script>
 </head>
 <body class="antialiased text-[#020617] bg-[#F8FAFC]">
+  <div class="quote-handoff-layer" aria-hidden="true"></div>
 
   <!-- HEADER -->
   <header class="site-header" id="site-header">
@@ -1261,6 +1272,7 @@
 
   </script>
 
+  <script src="/assets/quote-handoff.js" defer></script>
   <script src="/assets/quote-transition.js" defer></script>
 
 </body>

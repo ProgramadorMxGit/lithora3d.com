@@ -946,6 +946,34 @@ section[id] { scroll-margin-top: 100px; }
 }
 .faq-btn[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
 
+/* Continuidad verde al volver desde una solicitud confirmada */
+.quote-handoff-layer {
+  position: fixed;
+  z-index: 2147483000;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255,255,255,.085), transparent 36%),
+    linear-gradient(145deg, #0a8f5b, #08754d);
+  will-change: opacity;
+}
+html.quote-handoff,
+html.quote-handoff body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+html.quote-handoff .quote-handoff-layer {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+html.quote-handoff.quote-handoff-reveal .quote-handoff-layer {
+  opacity: 0;
+  transition: opacity .78s cubic-bezier(.22, 1, .36, 1);
+}
+
 /* Transición desde los dos CTA principales hacia /cotizar/ */
 .quote-transition-layer {
   position: fixed;
@@ -1032,4 +1060,7 @@ section[id] { scroll-margin-top: 100px; }
 
 @media (prefers-reduced-motion: reduce) {
   .quote-transition-layer { display: none; }
+  html.quote-handoff.quote-handoff-reveal .quote-handoff-layer {
+    transition-duration: .24s;
+  }
 }
