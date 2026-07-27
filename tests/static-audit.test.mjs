@@ -52,6 +52,8 @@ test('sitemap contiene cada ruta indexable y robots lo declara', () => {
   assert.match(robots, /Sitemap:\s*https:\/\/lithora3d\.com\/sitemap\.xml/i);
   assert.equal((sitemap.match(/<lastmod>2026-07-21<\/lastmod>/g) || []).length, htmlFiles.length);
   assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
+  assert.match(sitemap, /<image:loc>https:\/\/lithora3d\.com\/assets\/lading\/seccion-idea\.webp<\/image:loc>/);
+  assert.ok(fs.existsSync(path.join(root, 'assets', 'lading', 'seccion-idea.webp')));
   assert.match(sitemap, /<image:caption>Ejemplos conceptuales/);
 });
 
