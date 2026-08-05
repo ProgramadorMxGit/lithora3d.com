@@ -25,9 +25,20 @@ CUERPO = re.sub(r'src="data:image/png;base64,[^"]+"', 'src="/assets/logo.png"', 
 # La cabecera de la app duplicaba el H1 de la pagina. Dos H1 es justo el defecto
 # que arrastra el competidor principal; aqui se degrada a texto de marca.
 CUERPO, n_h1 = re.subn(r'<h1>\s*Creador de Llaveros\s*<span class="grad">3D</span>\s*</h1>',
-                       '<p class="app-wordmark">Creador de Llaveros <span class="grad">3D</span></p>',
+                       '<h1>Generador de llaveros 3D <span class="grad">con nombre</span></h1>',
                        CUERPO)
 assert n_h1 == 1, f'se esperaba 1 H1 de la app, se encontraron {n_h1}'
+CUERPO = CUERPO.replace(
+    '<p>Escribe un nombre, elige colores y descárgalo listo para imprimir</p>',
+    '<p>Gratis, sin registro y sin límite de descargas · STL y 3MF multicolor</p>')
+# En el sitio propio, "hecho por Lithora 3D" apuntando a la home es ruido:
+# se convierte en la salida comercial util.
+CUERPO = CUERPO.replace(
+    '<a class="brand-link" href="https://lithora3d.com" target="_blank" rel="noopener">',
+    '<a class="brand-link" href="/cotizar/">')
+CUERPO = CUERPO.replace(
+    '<span class="hide-sm">hecho por</span>&nbsp;<b>Lithora 3D</b> ↗',
+    '<span class="hide-sm">¿Sin impresora?</span>&nbsp;<b>Te lo imprimimos</b> →')
 
 FAQ = [
  ("¿Es realmente gratis?",
@@ -155,17 +166,7 @@ PAGINA = '''<!DOCTYPE html>
   <a href="/">Inicio</a> <span aria-hidden="true">/</span> <span>Generador de llaveros 3D</span>
 </nav>
 
-<section class="intro">
-  <h1>Generador de llaveros 3D con nombre</h1>
-  <p class="intro-lead">Escribe los nombres, elige el estilo y desc&aacute;rgalo listo para imprimir.
-  <strong>Gratis, sin registro y sin l&iacute;mite de descargas</strong>, en STL o en 3MF multicolor para Bambu Studio.</p>
-  <ul class="intro-chips">
-    <li>STL y 3MF</li>
-    <li>Multicolor sin configurar</li>
-    <li>Con &ntilde; y tildes</li>
-    <li>Nada sale de tu equipo</li>
-  </ul>
-</section>
+
 
 {cuerpo}
 

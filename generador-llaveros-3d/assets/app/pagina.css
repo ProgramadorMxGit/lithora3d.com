@@ -2,65 +2,25 @@
    La app conserva estilos.css sin cambios; esto solo la rodea. */
 
 .miga {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 14px 20px 0;
-  font-size: 13px;
+  padding: 9px 22px 7px;
+  font-size: 12.5px;
   color: var(--ink-soft);
 }
 .miga a { color: #0369A1; text-decoration: none; }
 .miga a:hover { text-decoration: underline; }
 
-/* La app define header{display:flex} de forma global; este bloque usa
-   <section> y fija display:block para no heredar ese aplastado. */
-.intro {
-  display: block;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px 20px 4px;
-}
-.intro h1 {
-  font-size: clamp(26px, 4.2vw, 40px);
-  line-height: 1.15;
-  color: var(--ink);
-  margin: 6px 0 10px;
-  letter-spacing: -0.02em;
-}
-.intro-lead {
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--ink-soft);
-  max-width: 68ch;
-  margin: 0 0 14px;
-}
-.intro-lead strong { color: var(--ink); }
-.intro-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  list-style: none;
-  margin: 0 0 8px;
-  padding: 0;
-}
-.intro-chips li {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--ink);
-  background: #EFF6FF;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 5px 12px;
-}
-
 /* La cabecera de la app deja de ser H1: es solo la marca del widget. */
-.app-wordmark {
-  font-size: 19px;
+/* El H1 real vive dentro de la barra de la app: una sola cabecera, no dos. */
+header h1 {
+  font-size: clamp(17px, 2.4vw, 21px);
   font-weight: 800;
   color: var(--ink);
   margin: 0;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
-.app-wordmark span { color: var(--accent-sky); }
 
 .contenido {
   max-width: 820px;
@@ -189,9 +149,24 @@
 .pie a:hover { text-decoration: underline; }
 .pie-enlaces { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 
+/* En movil el H1 es mas largo que el nombre de marca original, y sin min-width:0
+   un hijo flex no encoge por debajo de su contenido: el titulo se metia debajo
+   del boton. Se deja encoger y partir en dos lineas, y se oculta el subtitulo,
+   que ya vive en la meta description y en el contenido de abajo. */
+@media (max-width: 760px) {
+  header { gap: 10px; }
+  header .brand { min-width: 0; flex: 1 1 auto; }
+  header .brand > div { min-width: 0; }
+  /* estilos.css fija white-space:nowrap en header h1: por eso el titulo
+     largo se salia en vez de partirse. */
+  header h1 { font-size: 15px; line-height: 1.25; white-space: normal; }
+  header .brand > div > p { display: none; }
+  .brand-link { flex: 0 0 auto; }
+}
+
 @media (max-width: 900px) {
   .contenido { padding: 4px 16px 32px; }
   .intro { padding: 8px 16px 4px; }
-  .miga { padding: 12px 16px 0; }
+  .miga { padding: 8px 15px 6px; }
   .bloque-servicio { padding: 22px 18px; }
 }
