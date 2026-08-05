@@ -361,7 +361,7 @@ img { max-width: 100%; height: auto; }
 
 /* ============================================================
    HELIX 3D — Hero (full-bleed background composition)
-   fondo_web.png is the section background, not an <img>.
+   fondo_web.webp is the section background, not an <img>.
    ============================================================ */
 .hero {
   position: relative;
@@ -397,7 +397,7 @@ img { max-width: 100%; height: auto; }
   position: absolute;
   top: -24px; left: 0; right: 0; bottom: -24px;
   z-index: 0;
-  background-image: url("fondo_web.png");
+  background-image: url("fondo_web.webp");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center right;
