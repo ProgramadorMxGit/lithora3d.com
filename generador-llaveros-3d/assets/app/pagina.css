@@ -170,3 +170,42 @@ header h1 {
   .miga { padding: 8px 15px 6px; }
   .bloque-servicio { padding: 22px 18px; }
 }
+
+/* ------------------------------------------------------------------
+   La app se diseño como aplicacion de pantalla completa: #app fija
+   height:100vh y #panel scrollea por dentro. Dentro de una pagina de
+   documento eso crea DOS scrolls anidados: la rueda sobre el panel movia
+   el panel y no la pagina, asi que el contenido de abajo era practicamente
+   inalcanzable, y el panel se veia cortado a la mitad de los pasos.
+   Aqui se rompe el bloqueo de viewport: una sola barra de scroll, el panel
+   fluye completo y la vista 3D se queda pegada mientras ajustas.
+   ------------------------------------------------------------------ */
+@media (min-width: 901px) {
+  #app { height: auto; min-height: 0; }
+  #app > main { align-items: flex-start; min-height: 0; }
+  #panel {
+    height: auto;
+    overflow-y: visible;
+    border-right: 1px solid var(--line);
+  }
+  #viewer-wrap {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: flex-start;
+  }
+}
+
+/* En movil el bloqueo de viewport era el mismo: 2115 px de ajustes encerrados
+   en una caja de 468. Se libera igual, y como la barra de descarga quedaria al
+   final de un panel larguisimo, se ancla abajo para que siempre este a mano. */
+@media (max-width: 900px) {
+  #app { height: auto; min-height: 0; }
+  #app > main { min-height: 0; }
+  #panel { height: auto; overflow-y: visible; }
+  /* Con la altura liberada, el lienzo necesita medida propia. En "Vista 3D"
+     el modelo y los botones de descarga quedan visibles sin hacer scroll; los
+     ajustes viven en la otra pestana, que es el flujo que ya planteaban las
+     pestanas de la app. */
+  main.view-viewer #canvas-holder { height: 62vh; }
+}
