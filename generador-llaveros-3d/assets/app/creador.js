@@ -16,6 +16,7 @@
   ];
 
   const state = {
+    productType: 'keychain',
     names: ['Dafne', 'Hugo'],
     fontKey: null,
     letterHeight: 12,
@@ -28,6 +29,8 @@
     corner: 4,
     holeD: 4.5,
     ringThickness: 2.5,
+    pencilHoleD: 8.6,
+    pencilWall: 1.4,
     columns: 2,
     gap: 6,
     curveSegments: 10,
@@ -65,6 +68,7 @@
   // cualquier emoji tecleado a mano se ignora (se trata como un espacio).
   const emojiFont = null;
   let lastLayoutPieces = [];
+  let lastBaseZ = state.baseThickness;
   let lastValidNames = [];
   // tileIndex -> index into state.names/state.nameColors (skips empty rows)
   let lastValidOrig = [];
@@ -323,7 +327,7 @@
       textEl.value = name;
       main.appendChild(textEl);
 
-      if (state.fixedHeight) {
+      if (state.fixedHeight && state.productType !== 'pencil') {
         const wrap = document.createElement('label');
         wrap.className = 'name-h-wrap';
         wrap.title = 'Alto de este llavero en mm (vacío = usa el alto general)';
@@ -402,6 +406,56 @@
     if (inputs.length) inputs[inputs.length - 1].focus();
   });
 
+  // ---------- product type: keyring or pencil name ----------
+  const productListEl = $('product-list');
+  productListEl.querySelectorAll('.product-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.productType = btn.dataset.product;
+      syncProductUI();
+      scheduleRebuild();
+    });
+  });
+
+  $('pencil-fit-list').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.pencilHoleD = parseFloat(btn.dataset.pencilD);
+      $('in-pencilHoleD').value = state.pencilHoleD;
+      $('val-pencilHoleD').textContent = state.pencilHoleD.toFixed(1) + ' mm';
+      syncPencilPresets();
+      scheduleRebuild();
+    });
+  });
+
+  function syncPencilPresets() {
+    $('pencil-fit-list').querySelectorAll('button').forEach(btn => {
+      const on = Math.abs(parseFloat(btn.dataset.pencilD) - state.pencilHoleD) < 0.01;
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function syncProductUI() {
+    const pencil = state.productType === 'pencil';
+    if (!pencil) lastBaseZ = state.baseThickness;
+    productListEl.querySelectorAll('.product-opt').forEach(btn => {
+      const on = btn.dataset.product === state.productType;
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    $('pencil-settings').hidden = !pencil;
+    $('pencil-style-note').hidden = !pencil;
+    $('style-list').style.display = pencil ? 'none' : 'grid';
+    $('fixed-height-row').style.display = pencil ? 'none' : 'flex';
+    $('fixed-h-note').hidden = pencil || !state.fixedHeight;
+    $('base-thickness-row').style.display = pencil ? 'none' : 'block';
+    $('keyring-hole-row').style.display = pencil ? 'none' : 'block';
+    $('btn-add-name').textContent = pencil ? '+ Añadir otro nombre para lápiz' : '+ Añadir nombre';
+    renderNameRows();
+    syncPencilPresets();
+    syncStyleUI();
+    updatePrintInfo();
+  }
+
   // ---------- style ----------
   const styleListEl = $('style-list');
   styleListEl.querySelectorAll('.style-opt').forEach(btn => {
@@ -413,24 +467,25 @@
   });
 
   function syncStyleUI() {
+    const pencil = state.productType === 'pencil';
     styleListEl.querySelectorAll('.style-opt').forEach(b =>
       b.classList.toggle('selected', b.dataset.style === state.style));
-    const needsOutline = state.style === 'outline' || state.style === 'double';
+    const needsOutline = pencil || state.style === 'outline' || state.style === 'double';
     $('outline-width-row').style.display = needsOutline ? 'block' : 'none';
     if (!needsOutline) $('islands-warn').hidden = true;
-    $('borde-pick').hidden = state.style !== 'double';
+    $('borde-pick').hidden = pencil || state.style !== 'double';
   }
 
   /** Anything above one island means the dilated letters never merged, so the
    * "keychain" would come off the bed as separate loose letters. */
   function updateIslandsWarning(maxIslands) {
     const box = $('islands-warn');
-    const applies = state.style === 'outline' || state.style === 'double';
+    const applies = state.productType === 'pencil' || state.style === 'outline' || state.style === 'double';
     if (!applies || maxIslands <= 1) { box.hidden = true; return; }
     box.hidden = false;
     box.innerHTML =
       '⚠️ Con este borde las letras <b>no se tocan</b>: saldrían ' + maxIslands +
-      ' piezas sueltas en vez de un llavero.' +
+      ' piezas sueltas en vez de una pieza completa.' +
       '<br><small>Sube el <b>grosor del borde</b> hasta que desaparezca este aviso, ' +
       'o elige una letra más redonda y pegada (Pacifico, Caveat, Permanent Marker).</small>';
   }
@@ -569,7 +624,7 @@
 
   function updatePrintInfo() {
     const box = $('print-info');
-    const z = state.baseThickness;
+    const z = lastBaseZ;
     if (state.printMode === 'simple') {
       box.className = 'info-box';
       box.innerHTML = 'Se imprime tal cual, de un color. Los colores de arriba solo sirven para verlo en pantalla.';
@@ -602,6 +657,9 @@
         'El 3MF sale como <b>proyecto de Bambu Studio</b> con <b>' + n + ' piezas</b>, cada una ya asignada a un filamento (1, 2, 3…): solo eliges qué color va en cada ranura.<br>' +
         '<small>Todo va como un único objeto, así que el texto no se puede desalinear de la base. Para otros laminadores (Cura, Prusa), usa el ZIP: trae un STL por color.</small>' +
         aviso;
+      if (state.productType === 'pencil') {
+        box.innerHTML += '<br><small><b>Perfil de calidad para lápiz:</b> 0.16 mm, tres paredes, velocidades High Quality de Bambu, túnel sin soportes y superficies superiores planchadas.</small>';
+      }
     }
   }
 
@@ -623,6 +681,8 @@
   bindSlider('in-padding', 'val-padding', 'padding', v => v.toFixed(1) + ' mm');
   bindSlider('in-corner', 'val-corner', 'corner', v => v.toFixed(1) + ' mm');
   bindSlider('in-holeD', 'val-holeD', 'holeD', v => v.toFixed(1) + ' mm');
+  bindSlider('in-pencilHoleD', 'val-pencilHoleD', 'pencilHoleD', v => v.toFixed(1) + ' mm', syncPencilPresets);
+  bindSlider('in-pencilWall', 'val-pencilWall', 'pencilWall', v => v.toFixed(1) + ' mm');
   bindSlider('in-gap', 'val-gap', 'gap', v => v.toFixed(0) + ' mm');
   bindSlider('in-outlineWidth', 'val-outlineWidth', 'outlineWidth', v => v.toFixed(1) + ' mm');
 
@@ -633,7 +693,7 @@
     fixedHeightChk.checked = state.fixedHeight;
     targetHeightInput.value = state.targetHeight;
     targetHeightInput.disabled = !state.fixedHeight;
-    $('fixed-h-note').hidden = !state.fixedHeight;
+    $('fixed-h-note').hidden = state.productType === 'pencil' || !state.fixedHeight;
   }
   fixedHeightChk.addEventListener('change', () => {
     state.fixedHeight = fixedHeightChk.checked;
@@ -823,6 +883,8 @@
       cornerRadiusMM: state.corner,
       loopHoleDiameterMM: state.holeD,
       loopRingThicknessMM: state.ringThickness,
+      pencilHoleDiameterMM: state.pencilHoleD,
+      pencilWallMM: state.pencilWall,
       curveSegments: state.curveSegments,
       outlineWidthMM: state.outlineWidth,
     };
@@ -840,6 +902,7 @@
   // footprint is exactly `target` mm tall. Keeps proportions, so letters and
   // the eyelet grow together and nothing is distorted.
   function applyTargetHeight(tile, orig) {
+    if (state.productType === 'pencil') return;
     const target = targetHeightFor(orig);
     if (!(target > 0) || !(tile.height > 0)) return;
     const f = target / tile.height;
@@ -884,10 +947,11 @@
 
       for (let i = 0; i < validEntries.length; i++) {
         const e = validEntries[i];
-        const lines = [{text: e.name}];
+        const lines = [{text: state.productType === 'pencil' ? e.name.toLocaleUpperCase('es-MX') : e.name}];
         let tile;
         try {
-          if (state.style === 'outline') tile = buildOutlineTile(font, emojiFont, lines, currentOpts());
+          if (state.productType === 'pencil') tile = buildPencilNameTile(font, emojiFont, lines, currentOpts());
+          else if (state.style === 'outline') tile = buildOutlineTile(font, emojiFont, lines, currentOpts());
           else if (state.style === 'double') tile = buildDoubleOutlineTile(font, emojiFont, lines, currentOpts());
           else tile = buildKeychainTile(font, emojiFont, lines, currentOpts());
           applyTargetHeight(tile, e.orig);
@@ -924,6 +988,9 @@
       // porque de ellas salen los nombres de archivo y los grupos de color.
       lastValidNames = builtEntries.map(e => e.name);
       lastValidOrig = builtEntries.map(e => e.orig);
+      lastBaseZ = state.productType === 'pencil'
+        ? Math.max(...tiles.map(t => t.baseThickness || state.baseThickness))
+        : state.baseThickness;
 
       updateIslandsWarning(Math.max(1, ...tiles.map(t => t.islands || 1)));
       const layout = layoutTiles(tiles, {columns: state.columns, gapXMM: state.gap, gapYMM: state.gap * 1.3});
@@ -938,7 +1005,9 @@
       // completa, y así el HUD y el aviso de cama no dan dos cifras distintas.
       // El recuento debe ser el de piezas realmente construidas, no el de nombres
       // escritos: con una fila descartada el HUD anunciaba una pieza de mas.
-      plateLabel = tiles.length + ' llavero' + (tiles.length > 1 ? 's' : '');
+      plateLabel = tiles.length + (state.productType === 'pencil'
+        ? ' nombre' + (tiles.length > 1 ? 's' : '') + ' para lápiz'
+        : ' llavero' + (tiles.length > 1 ? 's' : ''));
     }
 
     if (!lastLayoutPieces.length) {
@@ -1049,20 +1118,32 @@
 
   $('btn-stl').addEventListener('click', () => runExport('Preparando STL…', () => ({
     bytes: buildBinarySTL(lastLayoutPieces.map(p => p.geometry)),
-    filename: 'llaveros.stl', mime: 'model/stl',
+    filename: state.productType === 'pencil' ? 'nombres-para-lapiz.stl' : 'llaveros.stl', mime: 'model/stl',
   })));
-  $('btn-3mf').addEventListener('click', () => runExport('Preparando 3MF…', () => ({
-    // Multicolour goes out in Bambu Studio's own project flavour: Bambu ignores
-    // the standard basematerials, its filament mapping lives in
-    // Metadata/model_settings.config. Other modes keep the standards 3MF.
-    bytes: state.printMode === 'multi'
-      ? buildBambu3MF(buildGroups(), window.__BAMBU_PROJECT__)
-      : build3MF(buildGroups()),
-    filename: 'llaveros.3mf', mime: 'model/3mf',
-  })));
+  $('btn-3mf').addEventListener('click', () => runExport('Preparando 3MF…', () => {
+    // Multicolour and every pencil-name export use Bambu Studio's project
+    // flavour so the calibrated process arrives with the geometry. In simple
+    // and manual-change pencil modes all shells are deliberately merged into
+    // one filament slot; in AMS mode the normal colour grouping is preserved.
+    const regularGroups = buildGroups();
+    const pencilGroups = state.printMode === 'multi' ? regularGroups : [{
+      label: 'Nombre para lapiz',
+      color: state.baseColor,
+      geometries: lastLayoutPieces.map(p => p.geometry),
+    }];
+    const useBambuProject = state.printMode === 'multi' || state.productType === 'pencil';
+    return {
+      bytes: useBambuProject
+        ? buildBambu3MF(state.productType === 'pencil' ? pencilGroups : regularGroups,
+          window.__BAMBU_PROJECT__, {productType: state.productType})
+        : build3MF(regularGroups),
+      filename: state.productType === 'pencil' ? 'nombres-para-lapiz.3mf' : 'llaveros.3mf',
+      mime: 'model/3mf',
+    };
+  }));
   $('btn-zip').addEventListener('click', () => runExport('Preparando ZIP…', () => ({
     bytes: buildSTLZip(buildGroups()),
-    filename: 'llaveros-por-colores.zip', mime: 'application/zip',
+    filename: state.productType === 'pencil' ? 'nombres-para-lapiz-por-colores.zip' : 'llaveros-por-colores.zip', mime: 'application/zip',
   })));
 
   // ---------- impresora ----------
@@ -1085,8 +1166,9 @@
      de que hay que abrirlos otra vez. */
   const SAVE_KEY = 'lithora.llaveros.v1';
   const SAVED_KEYS = [
-    'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
+    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
+    'pencilHoleD', 'pencilWall',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
     'textColor', 'rainbow', 'printMode', 'layerHeight', 'printer',
   ];
@@ -1150,6 +1232,7 @@
     if (!state.fontKey || !fonts[state.fontKey]) state.fontKey = Object.keys(fonts)[0] || null;
     // Una impresora que ya no existe apagaba el aviso de cama en silencio.
     if (!PRINTERS.some(p => p.id === state.printer)) state.printer = DEFAULT_STATE.printer;
+    if (!['keychain', 'pencil'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
 
     refreshAllControls();
   }
@@ -1158,7 +1241,8 @@
   function refreshAllControls() {
     [['in-letterHeight', 'letterHeight', 1], ['in-baseThickness', 'baseThickness', 1],
      ['in-raisedHeight', 'raisedHeight', 1], ['in-padding', 'padding', 1],
-     ['in-corner', 'corner', 1], ['in-holeD', 'holeD', 1], ['in-gap', 'gap', 0],
+     ['in-corner', 'corner', 1], ['in-holeD', 'holeD', 1],
+     ['in-pencilHoleD', 'pencilHoleD', 1], ['in-pencilWall', 'pencilWall', 1], ['in-gap', 'gap', 0],
      ['in-outlineWidth', 'outlineWidth', 1]].forEach(([id, key, dec]) => {
       $(id).value = state[key];
       const val = $('val-' + key.replace(/^in-/, ''));
@@ -1173,6 +1257,7 @@
     if (state.fontKey) selectFontCard(state.fontKey);
     renderNameRows();
     syncColorInputs();
+    syncProductUI();
     syncStyleUI();
     syncModeUI();
     updateNameCapHint();
@@ -1308,6 +1393,7 @@
   // ---------- init ----------
   renderNameRows();
   syncColorInputs();
+  syncProductUI();
   syncStyleUI();
   syncModeUI();
   $('in-layerHeight').value = String(state.layerHeight);

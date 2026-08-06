@@ -20,6 +20,63 @@ if not _m:
     raise SystemExit('No se pudo aislar el cuerpo de la app en el portable')
 CUERPO = _m.group(1).strip()
 
+# La versión web ofrece un segundo producto que no existe en el portable. Se
+# incorpora durante la composición para que regenerar index.html nunca borre
+# los controles del túnel longitudinal para lápiz.
+PRODUCTO_LAPIZ = '''      <section class="card product-card">
+        <h2>🧩 ¿Qué quieres crear?</h2>
+        <div class="product-list" id="product-list" role="group" aria-label="Tipo de pieza">
+          <button type="button" class="product-opt" data-product="keychain" aria-pressed="true">
+            <span class="product-emoji" aria-hidden="true">🔑</span>
+            <span><b>Llavero</b><small>Con argolla para aro metálico</small></span>
+          </button>
+          <button type="button" class="product-opt" data-product="pencil" aria-pressed="false">
+            <span class="product-emoji" aria-hidden="true">✏️</span>
+            <span><b>Nombre para lápiz</b><small>Agujero longitudinal, sin argolla</small></span>
+          </button>
+        </div>
+        <div id="pencil-settings" hidden>
+          <div class="pencil-fit-list" id="pencil-fit-list" role="group" aria-label="Ajuste para lápiz">
+            <button type="button" data-pencil-d="8.6"><b>Universal</b><small>8.6 mm · recomendado</small></button>
+            <button type="button" data-pencil-d="8.3"><b>Ajustado</b><small>8.3 mm</small></button>
+            <button type="button" data-pencil-d="10.6"><b>Jumbo</b><small>10.6 mm</small></button>
+          </div>
+          <div class="slider-row">
+            <label>Diámetro interior <span class="val" id="val-pencilHoleD"></span></label>
+            <input type="range" id="in-pencilHoleD" min="7.8" max="11.2" step="0.1" aria-label="Diámetro interior del túnel para lápiz en milímetros">
+          </div>
+          <div class="slider-row">
+            <label>Pared alrededor del lápiz <span class="val" id="val-pencilWall"></span></label>
+            <input type="range" id="in-pencilWall" min="1.2" max="2.2" step="0.1" aria-label="Pared estructural alrededor del lápiz en milímetros">
+          </div>
+          <div class="info-box pencil-spec">
+            El ajuste universal contempla lápices tradicionales de hasta <b>8.2 mm</b> y añade holgura de impresión.
+            <small>El túnel usa un techo interior a 45° para imprimirse acostado y sin soportes. La entrada es 0.35 mm más amplia para guiar el lápiz.</small>
+          </div>
+        </div>
+      </section>
+
+'''
+MARCA_NOMBRES = '      <section class="card">\n        <h2>✏️ Nombres</h2>'
+assert CUERPO.count(MARCA_NOMBRES) == 1, 'no se encontró la tarjeta Nombres del portable'
+CUERPO = CUERPO.replace(MARCA_NOMBRES, PRODUCTO_LAPIZ + MARCA_NOMBRES)
+CUERPO = CUERPO.replace(
+    '      <section class="card">\n        <h2>✨ Estilo</h2>',
+    '      <section class="card" id="style-card">\n'
+    '        <h2>✨ Estilo</h2>\n'
+    '        <div class="info-box" id="pencil-style-note" hidden>\n'
+    '          Se usa un contorno reforzado y mayúsculas para mantener unido cualquier nombre alrededor del túnel.\n'
+    '        </div>', 1)
+CUERPO = CUERPO.replace(
+    '<div class="slider-row fixed-h-row">',
+    '<div class="slider-row fixed-h-row" id="fixed-height-row">', 1)
+CUERPO = CUERPO.replace(
+    '<div class="slider-row">\n          <label>Grosor del llavero ',
+    '<div class="slider-row" id="base-thickness-row">\n          <label>Grosor del llavero ', 1)
+CUERPO = CUERPO.replace(
+    '<div class="slider-row">\n            <label>Agujero del aro ',
+    '<div class="slider-row" id="keyring-hole-row">\n            <label>Agujero del aro ', 1)
+
 # El logo iba embebido en base64 (19 KB x2). En web se reutiliza el del sitio.
 CUERPO = re.sub(r'src="data:image/png;base64,[^"]+"', 'src="/assets/logo.png"', CUERPO)
 # La cabecera de la app duplicaba el H1 de la pagina. Dos H1 es justo el defecto

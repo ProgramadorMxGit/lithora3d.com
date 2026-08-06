@@ -484,6 +484,176 @@ function buildOutlineTile(font, emojiFont, lines, opts) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Pencil name: text silhouette built around a longitudinal pencil tunnel.
+ *
+ * The tunnel is not a round horizontal bridge. Its lower 270 degrees follow
+ * the requested circle and its roof uses the two 45-degree tangents to that
+ * circle. A round or hexagonal pencil therefore still fits, while every roof
+ * line remains printable without support when the name lies flat on the bed.
+ * ------------------------------------------------------------------ */
+
+function teardropProfile(radius, centerZ, segments) {
+  const pts = [];
+  const tangent = radius / Math.sqrt(2);
+  pts.push([0, centerZ + Math.SQRT2 * radius]);
+  pts.push([-tangent, centerZ + tangent]);
+  const arcSteps = Math.max(12, segments || 36);
+  for (let i = 0; i <= arcSteps; i++) {
+    const a = Math.PI * 0.75 + (Math.PI * 1.5 * i / arcSteps);
+    pts.push([Math.cos(a) * radius, centerZ + Math.sin(a) * radius]);
+  }
+  return pts;
+}
+
+function orientedCrossSection(points, clockwise) {
+  // ExtrudeGeometry advances on local Z. After rotateY(PI/2), local Z becomes
+  // world X and local -X becomes world Z, so [worldY, worldZ] -> [-Z, Y].
+  const out = points.map(([y, z]) => new THREE.Vector2(-z, y));
+  let area = 0;
+  for (let i = 0; i < out.length; i++) {
+    const a = out[i], b = out[(i + 1) % out.length];
+    area += a.x * b.y - b.x * a.y;
+  }
+  const isClockwise = area < 0;
+  if (isClockwise !== clockwise) out.reverse();
+  return out;
+}
+
+function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegments) {
+  const outer = orientedCrossSection(
+    teardropProfile(outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
+  const inner = orientedCrossSection(
+    teardropProfile(innerRadius, centerZ, Math.max(28, curveSegments * 4)), true);
+  const shape = new THREE.Shape(outer);
+  shape.holes.push(new THREE.Path(inner));
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: length,
+    steps: 1,
+    bevelEnabled: false,
+    curveSegments,
+  });
+  geo.rotateY(Math.PI / 2);
+  return geo;
+}
+
+function rectClipperPath(minX, minY, maxX, maxY) {
+  return [
+    {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(minY * CLIPPER_SCALE)},
+    {X: Math.round(maxX * CLIPPER_SCALE), Y: Math.round(minY * CLIPPER_SCALE)},
+    {X: Math.round(maxX * CLIPPER_SCALE), Y: Math.round(maxY * CLIPPER_SCALE)},
+    {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(maxY * CLIPPER_SCALE)},
+  ];
+}
+
+/**
+ * Build an uppercase name threaded lengthwise by a supportless pencil tunnel.
+ * The returned base is a set of overlapping closed solids on purpose: Bambu,
+ * Cura and PrusaSlicer union them at slice time, just like the existing raised
+ * text pieces, while the tunnel remains a real uninterrupted void.
+ */
+function buildPencilNameTile(font, emojiFont, lines, opts) {
+  const curveSegments = opts.curveSegments || 10;
+  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  if (!polys.length) {
+    const err = new Error('sin contornos para lápiz');
+    err.missingChars = polys.missing || [];
+    throw err;
+  }
+
+  const textShapes = polygonsToShapes(polys);
+  let basePaths = ClipperLib.Clipper.PolyTreeToPaths(
+    offsetPolygonsOutward(polys, Math.max(1.2, opts.outlineWidthMM)));
+  const baseTree = clipperBoolean(basePaths, null, ClipperLib.ClipType.ctUnion);
+  const {shapes: baseShapes, islands} = polyTreeToShapes(baseTree);
+  if (!baseShapes.length) throw new Error('contorno para lápiz vacío');
+  basePaths = ClipperLib.Clipper.PolyTreeToPaths(baseTree);
+
+  const bb = shapesBounds(baseShapes);
+  const dx = -bb.minX, dy = -bb.minY;
+  const width = bb.maxX - bb.minX;
+  const height = bb.maxY - bb.minY;
+  const centerY = (bb.minY + bb.maxY) / 2;
+
+  const holeD = Math.max(7.6, opts.pencilHoleDiameterMM || 8.6);
+  const wall = Math.max(1.2, opts.pencilWallMM || 1.4);
+  const innerR = holeD / 2;
+  const outerR = innerR + wall;
+  const centerZ = outerR;
+  const totalZ = centerZ + Math.SQRT2 * outerR;
+  const skin = Math.min(wall, Math.max(0.9, totalZ * 0.12));
+
+  // Full back/front skins keep accents and counters attached to the core. They
+  // end exactly outside the tunnel envelope, so neither one closes the hole.
+  const movedBase = baseShapes.map(s => translateShape(s, dx, dy));
+  const backGeo = new THREE.ExtrudeGeometry(movedBase, {
+    depth: skin, bevelEnabled: false, curveSegments,
+  });
+  const frontGeo = new THREE.ExtrudeGeometry(movedBase, {
+    depth: skin, bevelEnabled: false, curveSegments,
+  });
+  frontGeo.translate(0, 0, totalZ - skin);
+
+  // Keep the parts of the letters above and below the tube solid through the
+  // whole depth. A small overlap prevents coincident/tangent-only contacts.
+  const overlap = 0.25;
+  const band = rectClipperPath(
+    bb.minX - 2, centerY - outerR + overlap,
+    bb.maxX + 2, centerY + outerR - overlap);
+  const wingTree = clipperBoolean(basePaths, [band], ClipperLib.ClipType.ctDifference);
+  const {shapes: wingShapes} = polyTreeToShapes(wingTree);
+  const pieces = [
+    {geometry: backGeo, part: 'base'},
+    {geometry: frontGeo, part: 'base'},
+  ];
+  if (wingShapes.length) {
+    const wingGeo = new THREE.ExtrudeGeometry(
+      wingShapes.map(s => translateShape(s, dx, dy)),
+      {depth: totalZ, bevelEnabled: false, curveSegments});
+    pieces.push({geometry: wingGeo, part: 'base'});
+  }
+
+  // A stepped 0.35 mm lead-in at both ends makes insertion forgiving without
+  // loosening the calibrated diameter through the useful length of the name.
+  const lead = Math.min(1.2, width * 0.12);
+  const leadR = Math.min(innerR + 0.35, outerR - 0.8);
+  if (width > lead * 2 + 1) {
+    const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+    entryGeo.translate(0, centerY + dy, 0);
+    const coreGeo = buildPencilTube(width - lead * 2, innerR, outerR, centerZ, curveSegments);
+    coreGeo.translate(lead, centerY + dy, 0);
+    const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+    exitGeo.translate(width - lead, centerY + dy, 0);
+    pieces.push(
+      {geometry: entryGeo, part: 'base'},
+      {geometry: coreGeo, part: 'base'},
+      {geometry: exitGeo, part: 'base'});
+  } else {
+    const tubeGeo = buildPencilTube(width, innerR, outerR, centerZ, curveSegments);
+    tubeGeo.translate(0, centerY + dy, 0);
+    pieces.push({geometry: tubeGeo, part: 'base'});
+  }
+
+  // Optional raised face keeps the existing two-colour/AMS workflow. In the
+  // one-colour mode it simply fuses into the same STL.
+  const textGeo = new THREE.ExtrudeGeometry(
+    textShapes.map(s => translateShape(s, dx, dy)),
+    {depth: opts.textRaisedHeightMM, bevelEnabled: false, curveSegments});
+  textGeo.translate(0, 0, totalZ);
+  pieces.push({geometry: textGeo, part: 'text'});
+
+  return {
+    pieces,
+    width,
+    height,
+    islands,
+    holeDiameter: holeD,
+    baseThickness: totalZ,
+    thickness: totalZ + opts.textRaisedHeightMM,
+    missingChars: polys.missing || [],
+  };
+}
+
+/* ------------------------------------------------------------------ *
  * Text with emoji fallback + multi-line layout.
  * ------------------------------------------------------------------ */
 
@@ -1114,6 +1284,6 @@ if (typeof module !== 'undefined' && module.exports) {
     buildOutlineTile, offsetPolygonsOutward, polyTreeToShapes, shapesBounds,
     textRunToPolygons, linesToPolygons, polysBounds, translatePolys,
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
-    traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile,
+    traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
   };
 }

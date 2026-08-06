@@ -470,6 +470,59 @@ button.big:hover::after { transform: translateX(120%); }
 button.big:active { transform: translateY(0) scale(.985); }
 
 /* ============================================================
+   Tipo de pieza y ajuste para lápiz
+   ============================================================ */
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.product-opt {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  padding: 11px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+.product-opt:hover { border-color: var(--accent-sky); transform: translateY(-2px); }
+.product-opt.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-ring);
+}
+.product-emoji { font-size: 25px; flex: 0 0 auto; }
+.product-opt > span:last-child { display: flex; flex-direction: column; gap: 3px; }
+.product-opt b { font-size: var(--fs-label); font-weight: 700; }
+.product-opt small { color: var(--ink-small); font-size: var(--fs-micro); line-height: 1.35; }
+#pencil-settings { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.pencil-fit-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 15px; }
+.pencil-fit-list button {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ink-muted);
+  padding: 8px 5px;
+  font: inherit;
+  cursor: pointer;
+}
+.pencil-fit-list button:hover { border-color: var(--accent-sky); }
+.pencil-fit-list button.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.pencil-fit-list b { font-size: 12px; }
+.pencil-fit-list small { font-size: 10px; color: var(--ink-small); }
+.pencil-spec { margin-bottom: 0; }
+
+/* ============================================================
    Selector de estilo
    ============================================================ */
 .style-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -1236,6 +1289,7 @@ details.advanced > section.card {
   .brand-logo { width: 32px; height: 32px; }
   .brand-link { padding: 7px 14px; font-size: 13px; }
   .brand-link span.hide-sm { display: none; }
+  .product-list { grid-template-columns: 1fr; }
   #download-bar { padding: 10px 12px 8px; gap: 8px; }
   #download-bar button { padding: 13px 8px; font-size: 14px; }
   /* El bloque de contacto se mantiene visible en movil, solo mas compacto:

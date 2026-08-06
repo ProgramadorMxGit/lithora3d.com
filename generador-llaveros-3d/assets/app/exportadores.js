@@ -275,6 +275,39 @@ const QUALITY_OVERRIDES = {
   sparse_infill_density: '25%', // was 15%
 };
 
+/**
+ * Pencil-name process: start from Bambu's installed
+ * `0.16mm High Quality @BBL A1` process and add only the structural settings
+ * that this horizontal, support-free tunnel needs. The official preset uses
+ * 60 mm/s outer walls, 150 mm/s inner walls, 4k/2k acceleration and gyroid.
+ * The bridge/overhang limits below protect the two 45-degree roof facets and
+ * three walls give the pencil tunnel useful wear resistance.
+ *
+ * Calibration reference (hole compensation and chamfer sensitivity):
+ * https://wiki.bambulab.com/en/software/bambu-studio/xy-hole-contour-compensation
+ */
+const PENCIL_QUALITY_OVERRIDES = {
+  layer_height: '0.16',
+  initial_layer_print_height: '0.2',
+  default_acceleration: '4000',
+  outer_wall_acceleration: '2000',
+  outer_wall_speed: '60',
+  inner_wall_speed: '150',
+  internal_solid_infill_speed: '200',
+  sparse_infill_pattern: 'gyroid',
+  sparse_infill_speed: '200',
+  top_surface_speed: '150',
+  gap_infill_speed: '250',
+  bridge_speed: '25',
+  wall_loops: '3',
+  top_shell_layers: '6',
+  bottom_shell_layers: '5',
+  enable_support: '0',
+  overhang_2_4_speed: '35',
+  overhang_3_4_speed: '25',
+  overhang_4_4_speed: '15',
+};
+
 /** Set cfg[key] to `val`, preserving the template's shape: per-extruder arrays
  * stay arrays (every slot gets the value), scalars stay scalar strings. */
 function setCfgValue(cfg, key, val) {
@@ -283,7 +316,7 @@ function setCfgValue(cfg, key, val) {
   else cfg[key] = String(val);
 }
 
-function patchProjectSettings(template, groups) {
+function patchProjectSettings(template, groups, options = {}) {
   const cfg = JSON.parse(JSON.stringify(template));
   const origN = Array.isArray(cfg.filament_colour) ? cfg.filament_colour.length : 0;
   if (!origN) return null;
@@ -298,8 +331,16 @@ function patchProjectSettings(template, groups) {
   }
   groups.forEach((g, i) => { cfg.filament_colour[i] = toHex6(g.color); });
 
+  const pencilMode = options.productType === 'pencil';
+  const overrides = pencilMode
+    ? {...QUALITY_OVERRIDES, ...PENCIL_QUALITY_OVERRIDES}
+    : QUALITY_OVERRIDES;
+
+  // Name the official preset that actually underpins the embedded values.
+  if (pencilMode) cfg.print_settings_id = '0.16mm High Quality @BBL A1';
+
   // Force the finish-quality tuning last, so it always wins over the template.
-  for (const [k, v] of Object.entries(QUALITY_OVERRIDES)) setCfgValue(cfg, k, v);
+  for (const [k, v] of Object.entries(overrides)) setCfgValue(cfg, k, v);
 
   // Declare those overrides as "modified vs the system preset". WITHOUT this,
   // Bambu Studio's loader (update_non_diff_values_to_base_config in Preset.cpp)
@@ -310,14 +351,14 @@ function patchProjectSettings(template, groups) {
   // a print/process key, so all go in slot 0 (semicolon-separated); the filament
   // and printer slots stay empty. Array length (num_filaments + 2) and slot layout
   // mirror what a real Bambu "modified system preset" project export writes.
-  const changedKeys = Object.keys(QUALITY_OVERRIDES).join(';');
+  const changedKeys = Object.keys(overrides).join(';');
   const numFil = cfg.filament_colour.length;
   cfg.different_settings_to_system = [changedKeys].concat(new Array(numFil + 1).fill(''));
 
   return JSON.stringify(cfg);
 }
 
-function buildBambu3MF(groups, projectTemplate) {
+function buildBambu3MF(groups, projectTemplate, options = {}) {
   const PROD_NS = 'http://schemas.microsoft.com/3dmanufacturing/production/2015/06';
 
   // deterministic pseudo-UUIDs (no randomness needed, only uniqueness in-file)
@@ -403,7 +444,10 @@ function buildBambu3MF(groups, projectTemplate) {
   // announcing a BambuStudio Application are treated as full BBL projects
   // (otherwise it imports geometry + object config but skips the presets).
   const rootXml = header +
-    ' <metadata name="Application">BambuStudio-02.08.01.55</metadata>\n' +
+    // Keep this at a released version accepted by the current stable loader.
+    // Advertising a future/beta version makes Bambu Studio reject the whole
+    // project with return_code -24 before it even inspects the geometry.
+    ' <metadata name="Application">BambuStudio-02.07.01.62</metadata>\n' +
     ' <resources>\n' +
     '  <object id="' + containerId + '" p:UUID="' + uuid(containerId) + '" type="model">\n' +
     '   <components>\n' + componentsXml + '\n   </components>\n' +
@@ -425,11 +469,12 @@ function buildBambu3MF(groups, projectTemplate) {
     '" edges_fixed="0" degenerate_facets="0" facets_removed="0" facets_reversed="0" backwards_edges="0"/>\n' +
     '    </part>').join('\n');
 
+  const objectName = options.productType === 'pencil' ? 'Nombres para lapiz' : 'Llaveros';
   const modelSettings =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<config>\n' +
     '  <object id="' + containerId + '">\n' +
-    '    <metadata key="name" value="Llaveros"/>\n' +
+    '    <metadata key="name" value="' + objectName + '"/>\n' +
     '    <metadata key="extruder" value="1"/>\n' +
     '    <metadata face_count="' + faceCounts.reduce((a, b) => a + b, 0) + '"/>\n' +
     partsXml + '\n' +
@@ -478,7 +523,7 @@ function buildBambu3MF(groups, projectTemplate) {
     'Metadata/model_settings.config': fflate.strToU8(modelSettings),
   };
   if (projectTemplate) {
-    const patched = patchProjectSettings(projectTemplate, groups);
+    const patched = patchProjectSettings(projectTemplate, groups, options);
     if (patched) pkg['Metadata/project_settings.config'] = fflate.strToU8(patched);
   }
   return fflate.zipSync(pkg, {level: 6});

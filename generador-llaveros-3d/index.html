@@ -265,6 +265,39 @@
       </div>
       <div class="info-box warn" id="save-error" role="alert" hidden></div>
 
+      <section class="card product-card">
+        <h2>🧩 ¿Qué quieres crear?</h2>
+        <div class="product-list" id="product-list" role="group" aria-label="Tipo de pieza">
+          <button type="button" class="product-opt" data-product="keychain" aria-pressed="true">
+            <span class="product-emoji" aria-hidden="true">🔑</span>
+            <span><b>Llavero</b><small>Con argolla para aro metálico</small></span>
+          </button>
+          <button type="button" class="product-opt" data-product="pencil" aria-pressed="false">
+            <span class="product-emoji" aria-hidden="true">✏️</span>
+            <span><b>Nombre para lápiz</b><small>Agujero longitudinal, sin argolla</small></span>
+          </button>
+        </div>
+        <div id="pencil-settings" hidden>
+          <div class="pencil-fit-list" id="pencil-fit-list" role="group" aria-label="Ajuste para lápiz">
+            <button type="button" data-pencil-d="8.6"><b>Universal</b><small>8.6 mm · recomendado</small></button>
+            <button type="button" data-pencil-d="8.3"><b>Ajustado</b><small>8.3 mm</small></button>
+            <button type="button" data-pencil-d="10.6"><b>Jumbo</b><small>10.6 mm</small></button>
+          </div>
+          <div class="slider-row">
+            <label>Diámetro interior <span class="val" id="val-pencilHoleD"></span></label>
+            <input type="range" id="in-pencilHoleD" min="7.8" max="11.2" step="0.1" aria-label="Diámetro interior del túnel para lápiz en milímetros">
+          </div>
+          <div class="slider-row">
+            <label>Pared alrededor del lápiz <span class="val" id="val-pencilWall"></span></label>
+            <input type="range" id="in-pencilWall" min="1.2" max="2.2" step="0.1" aria-label="Pared estructural alrededor del lápiz en milímetros">
+          </div>
+          <div class="info-box pencil-spec">
+            El ajuste universal contempla lápices tradicionales de hasta <b>8.2 mm</b> y añade holgura de impresión.
+            <small>El túnel usa un techo interior a 45° para imprimirse acostado y sin soportes. La entrada es 0.35 mm más amplia para guiar el lápiz.</small>
+          </div>
+        </div>
+      </section>
+
       <section class="card">
         <h2>✏️ Nombres</h2>
         <div id="name-rows"></div>
@@ -273,8 +306,11 @@
         <div class="info-box warn" id="text-warn" role="alert" hidden></div>
       </section>
 
-      <section class="card">
+      <section class="card" id="style-card">
         <h2>✨ Estilo</h2>
+        <div class="info-box" id="pencil-style-note" hidden>
+          Se usa un contorno reforzado y mayúsculas para mantener unido cualquier nombre alrededor del túnel.
+        </div>
         <div class="style-list" id="style-list">
           <button class="style-opt" data-style="plate">
             <span aria-hidden="true" class="style-art plate"><span>Ana</span></span>
@@ -332,7 +368,7 @@
           <label for="in-letterHeight">Tamaño de las letras <span class="val" id="val-letterHeight"></span></label>
           <input type="range" id="in-letterHeight" min="6" max="30" step="0.5" aria-label="Tamaño de las letras en milímetros">
         </div>
-        <div class="slider-row fixed-h-row">
+        <div class="slider-row fixed-h-row" id="fixed-height-row">
           <label><input type="checkbox" id="in-fixedHeight"> 📐 Fijar alto (Y)</label>
           <span class="fixed-h-input"><input type="number" id="in-targetHeight" class="mm-input" min="8" max="120" step="0.5" disabled aria-label="Alto fijo del llavero en milímetros"> mm</span>
         </div>
@@ -340,7 +376,7 @@
           Todos los llaveros medirán ese alto. El ancho lo pone cada nombre.
           <small>Puedes dar un alto distinto a cada nombre en la casilla de su fila ↑</small>
         </div>
-        <div class="slider-row">
+        <div class="slider-row" id="base-thickness-row">
           <label>Grosor del llavero <span class="val" id="val-baseThickness"></span></label>
           <input type="range" id="in-baseThickness" min="1.6" max="5" step="0.1" aria-label="Grosor del llavero en milímetros">
         </div>
@@ -405,7 +441,7 @@
             <label>Redondez de las esquinas <span class="val" id="val-corner"></span></label>
             <input type="range" id="in-corner" min="0" max="8" step="0.5" aria-label="Redondez de las esquinas en milímetros">
           </div>
-          <div class="slider-row">
+          <div class="slider-row" id="keyring-hole-row">
             <label>Agujero del aro <span class="val" id="val-holeD"></span></label>
             <input type="range" id="in-holeD" min="2.5" max="7" step="0.1" aria-label="Diámetro del agujero del aro en milímetros">
           </div>
