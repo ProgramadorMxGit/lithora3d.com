@@ -772,9 +772,9 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
      hacia adentro (máximo 35 % del túnel) hasta donde las letras vuelven a
      envolver el tubo, para que el tope quede escondido dentro del nombre. */
   const tunnelLenU = tubeEndU - tubeStartU;
+  const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const place = pencilCapPlacement(capMode, tubeStartU, tubeEndU, outerR);
   if (place.capX0 !== null) {
-    const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
     if (capMode === 'end') {
       const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
         place.capX1, place.capX0 - 0.35 * tunnelLenU, 0.4);
@@ -797,12 +797,39 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   /* Lomo: la franja del envolvente unida a las letras, SOLO a lo largo del
      hueco. Garantiza que el túnel viaje siempre escondido (sin bultos donde
      una letra baja) y une todas las letras; más allá del hueco mandan las
-     letras solas — sin bloques cuadrados asomando en los extremos tapados. */
-  const spineRect = rectClipperPath(voidStartU, centerY - outerR, voidEndU, centerY + outerR);
+     letras solas — sin bloques cuadrados asomando en los extremos tapados.
+     En los extremos ABIERTOS el lomo además se retrae hasta donde las letras
+     ya envuelven el tubo: la boca la lleva solo el forro REDONDO, que emerge
+     de la propia letra como en las piezas clásicas, en vez de la cara plana
+     del lomo asomando junto a una primera letra delgada. */
+  let spineStartU = voidStartU;
+  let spineEndU = voidEndU;
+  if (capMode !== 'start') {
+    const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+      voidStartU, voidStartU + 0.35 * tunnelLenU, 0.4);
+    if (covered !== null) spineStartU = Math.max(spineStartU, covered + 0.3);
+  }
+  if (capMode !== 'end') {
+    const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+      voidEndU, voidEndU - 0.35 * tunnelLenU, 0.4);
+    if (covered !== null) spineEndU = Math.min(spineEndU, covered - 0.3);
+  }
+  if (spineEndU - spineStartU < 2.0) {
+    // Retracciones que se cruzan (nombres cortísimos): lomo completo.
+    spineStartU = voidStartU;
+    spineEndU = voidEndU;
+  }
+  const spineRect = rectClipperPath(spineStartU, centerY - outerR, spineEndU, centerY + outerR);
   const bodyTree = clipperBoolean(basePaths.concat([spineRect]), null, ClipperLib.ClipType.ctUnion);
-  const {shapes: bodyShapes, islands} = polyTreeToShapes(bodyTree);
+  const {shapes: bodyShapes} = polyTreeToShapes(bodyTree);
   if (!bodyShapes.length) throw new Error('contorno para lápiz vacío');
   const bodyPaths = ClipperLib.Clipper.PolyTreeToPaths(bodyTree);
+
+  // Para el aviso de piezas sueltas cuenta el tubo completo: aunque el lomo
+  // esté retraído en la boca, el forro conecta ese tramo en el sólido real.
+  const fullSpineRect = rectClipperPath(voidStartU, centerY - outerR, voidEndU, centerY + outerR);
+  const {islands} = polyTreeToShapes(
+    clipperBoolean(basePaths.concat([fullSpineRect]), null, ClipperLib.ClipType.ctUnion));
 
   const bb = shapesBounds(bodyShapes);
   const dx = -bb.minX, dy = -bb.minY;

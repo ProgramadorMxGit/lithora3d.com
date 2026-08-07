@@ -5574,3 +5574,10 @@
 * Motivo: el usuario comparó contra su 3MF clásico (Ø7.69 medido, dispersión 0.005) y el default de 8.6 quedaba ~0.9 mm más flojo: el lápiz bailaría. El 7.7 reproduce el agarre firme de la pieza que vende.
 * Relación: sexta iteración del modo lápiz; con 7.7 el aviso de tamaño de letra deja de dispararse con letras de 12 mm (envolvente 10.5) y la prueba de ajuste imprime 7.4/7.7/8.0, que encierra el 7.69 de referencia.
 * Resultado: ✅ suite completa en verde; verificado en Chrome con almacenamiento limpio: preset Clásico seleccionado, slider 7.7 (mín. 7.6), tope al final + hueco redondo, HUD y WhatsApp reflejando 7.7 mm
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js (`buildPencilNameTile`, lomo en bocas abiertas)
+* Cambio: en los extremos ABIERTOS el lomo se retrae hasta donde las letras ya envuelven el tubo (marcha de cobertura sobre las letras, tope 35 % del túnel, +0.3 mm de entierro); el tramo de la boca lo lleva únicamente el forro redondo, que emerge de la propia letra. El aviso de piezas sueltas cuenta el tubo completo (unión con el lomo íntegro) porque el forro conecta ese tramo en el sólido real; si las retracciones se cruzan en nombres cortísimos, se vuelve al lomo completo.
+* Motivo: el usuario mostró su pieza impresa real: la entrada no se nota, el lápiz sale de la letra. En la web, con una primera letra delgada (la i de su fuente Disney), la cara plana del lomo asomaba como un bloque "cuadradillo" en la boca.
+* Relación: séptima iteración del modo lápiz; complementa el recorte del lomo del extremo tapado (300d09d) con el tratamiento simétrico de las bocas abiertas.
+* Resultado: ✅ suite completa en verde; verificado en Chrome con Caveat + "isabel" (primera letra delgada): el lápiz emerge de la I sin cara cuadrada (audits/lapiz-boca-redonda-2026-08-07.png)
