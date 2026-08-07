@@ -551,6 +551,22 @@ function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegment
   return geo;
 }
 
+/** Tramo macizo con el mismo perfil exterior del forro: es el tapón que
+ *  cierra el extremo elegido del túnel. */
+function buildSolidPencilTube(length, outerRadius, centerZ, curveSegments, tunnelStyle) {
+  const outer = orientedCrossSection(
+    pencilTubeProfile(tunnelStyle, outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
+  const shape = new THREE.Shape(outer);
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: length,
+    steps: 1,
+    bevelEnabled: false,
+    curveSegments,
+  });
+  geo.rotateY(Math.PI / 2);
+  return geo;
+}
+
 function rectClipperPath(minX, minY, maxX, maxY) {
   return [
     {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(minY * CLIPPER_SCALE)},
@@ -767,30 +783,16 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   }
 
   /* Tope elegible: 'start' maciza junto a la PRIMERA letra y 'end' junto a la
-     última, como los toppers clásicos. Se decide ANTES de unir el lomo y con
-     la silueta de las LETRAS: en las puntas que se estrechan la tapa crece
-     hacia adentro (máximo 35 % del túnel) hasta donde las letras vuelven a
-     envolver el tubo, para que el tope quede escondido dentro del nombre. */
+     última, como los toppers clásicos. El tope NO depende de que las letras
+     envuelvan el tubo: el forro redondo continúa CERRADO (tapón macizo) hasta
+     el final del tramo. Con letras gordas el tapón queda enterrado e
+     invisible; con letras delgadas o script se ve un remate redondo — nunca
+     una pared plana ni una ventana. (La estrategia anterior corría la tapa
+     hacia adentro buscando cobertura de letras y con fuentes script acababa a
+     media palabra, dejando una cueva entre los trazos.) */
   const tunnelLenU = tubeEndU - tubeStartU;
   const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const place = pencilCapPlacement(capMode, tubeStartU, tubeEndU, outerR);
-  if (place.capX0 !== null) {
-    if (capMode === 'end') {
-      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
-        place.capX1, place.capX0 - 0.35 * tunnelLenU, 0.4);
-      if (covered !== null) {
-        place.capX0 = Math.max(tubeStartU + 1.0, Math.min(place.capX0, covered - 0.5));
-      }
-      place.tubeEnd = Math.min(tubeEndU, place.capX0 + place.capOverlap);
-    } else {
-      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
-        place.capX0, place.capX1 + 0.35 * tunnelLenU, 0.4);
-      if (covered !== null) {
-        place.capX1 = Math.min(tubeEndU - 1.0, Math.max(place.capX1, covered + 0.5));
-      }
-      place.tubeStart = Math.max(tubeStartU, place.capX1 - place.capOverlap);
-    }
-  }
   const voidStartU = place.tubeStart;
   const voidEndU = place.tubeEnd;
 
@@ -900,6 +902,21 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   });
   topGeo.translate(0, 0, voidHi - 0.02);
   pieces.push({geometry: topGeo, part: 'base'});
+
+  // Tapón macizo del extremo tapado: cubre SIEMPRE el envolvente completo, así
+  // el tope jamás queda con ventanas aunque las letras sean delgadas. Con
+  // letras gordas queda enterrado; con script se ve como remate redondo.
+  if (capMode !== 'open' && tubeLen > 0.2) {
+    const plugLen = (capMode === 'end' ? tubeEndU - voidEndU : voidStartU - tubeStartU) + 0.35;
+    if (plugLen > 0.4) {
+      const plugGeo = buildSolidPencilTube(plugLen, outerR, centerZ, curveSegments, tunnelStyle);
+      plugGeo.translate(capMode === 'end' ? tubeEnd - 0.35 : tubeStartU + dx, centerY + dy, 0);
+      pieces.push({geometry: plugGeo, part: 'base'});
+      // Aproximación consciente: parte del tapón se solapa con las letras.
+      volumeMM3 += (tunnelStyle === 'round'
+        ? Math.PI * outerR * outerR : teardropAreaMM2(outerR)) * plugLen * 0.6;
+    }
+  }
 
   const zones = [];
   if (tubeLen > 0.2) {
