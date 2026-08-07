@@ -31,6 +31,7 @@
     ringThickness: 2.5,
     pencilHoleD: 8.6,
     pencilWall: 1.4,
+    pencilClosedEnd: false,
     columns: 2,
     gap: 6,
     curveSegments: 10,
@@ -683,6 +684,10 @@
   bindSlider('in-holeD', 'val-holeD', 'holeD', v => v.toFixed(1) + ' mm');
   bindSlider('in-pencilHoleD', 'val-pencilHoleD', 'pencilHoleD', v => v.toFixed(1) + ' mm', syncPencilPresets);
   bindSlider('in-pencilWall', 'val-pencilWall', 'pencilWall', v => v.toFixed(1) + ' mm');
+  $('in-pencilClosedEnd').addEventListener('change', () => {
+    state.pencilClosedEnd = $('in-pencilClosedEnd').checked;
+    scheduleRebuild();
+  });
   bindSlider('in-gap', 'val-gap', 'gap', v => v.toFixed(0) + ' mm');
   bindSlider('in-outlineWidth', 'val-outlineWidth', 'outlineWidth', v => v.toFixed(1) + ' mm');
 
@@ -885,6 +890,7 @@
       loopRingThicknessMM: state.ringThickness,
       pencilHoleDiameterMM: state.pencilHoleD,
       pencilWallMM: state.pencilWall,
+      pencilClosedEnd: state.pencilClosedEnd,
       curveSegments: state.curveSegments,
       outlineWidthMM: state.outlineWidth,
     };
@@ -1168,7 +1174,7 @@
   const SAVED_KEYS = [
     'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
-    'pencilHoleD', 'pencilWall',
+    'pencilHoleD', 'pencilWall', 'pencilClosedEnd',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
     'textColor', 'rainbow', 'printMode', 'layerHeight', 'printer',
   ];
@@ -1250,6 +1256,7 @@
     });
     $('val-columns').textContent = state.columns;
     $('in-rainbow').checked = state.rainbow;
+    $('in-pencilClosedEnd').checked = state.pencilClosedEnd;
     $('in-layerHeight').value = String(state.layerHeight);
     $('in-bordeColor').value = state.bordeColor;
     printerSel.value = state.printer;

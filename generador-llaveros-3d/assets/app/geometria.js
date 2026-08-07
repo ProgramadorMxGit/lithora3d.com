@@ -447,8 +447,14 @@ function buildOutlineTile(font, emojiFont, lines, opts) {
   // 2. fuse an eyelet on the left, overlapping the first letter so it holds
   const holeR = Math.max(0.6, opts.loopHoleDiameterMM / 2);
   const ringR = holeR + Math.max(opts.loopRingThicknessMM, opts.outlineWidthMM);
-  const ringCx = tb.minX - opts.outlineWidthMM - ringR * 0.45;
-  const ringCy = (tb.minY + tb.maxY) / 2;
+  const preferredRingY = (tb.minY + tb.maxY) / 2;
+  const outlinedPolys = basePaths.map(path =>
+    path.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+  const anchor = leftFilledAnchor(outlinedPolys, preferredRingY);
+  const ringWall = ringR - holeR;
+  const overlap = Math.max(1.0, Math.min(1.8, ringWall * 0.65));
+  const ringCx = anchor.x - ringR + overlap;
+  const ringCy = anchor.y;
   basePaths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
     basePaths, [circleClipperPath(ringCx, ringCy, ringR, 56, false)],
     ClipperLib.ClipType.ctUnion));
@@ -536,6 +542,20 @@ function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegment
   return geo;
 }
 
+function buildSolidPencilTube(length, outerRadius, centerZ, curveSegments) {
+  const outer = orientedCrossSection(
+    teardropProfile(outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
+  const shape = new THREE.Shape(outer);
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: length,
+    steps: 1,
+    bevelEnabled: false,
+    curveSegments,
+  });
+  geo.rotateY(Math.PI / 2);
+  return geo;
+}
+
 function rectClipperPath(minX, minY, maxX, maxY) {
   return [
     {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(minY * CLIPPER_SCALE)},
@@ -581,6 +601,7 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const centerZ = outerR;
   const totalZ = centerZ + Math.SQRT2 * outerR;
   const skin = Math.min(wall, Math.max(0.9, totalZ * 0.12));
+  const closedEnd = !!opts.pencilClosedEnd;
 
   // Full back/front skins keep accents and counters attached to the core. They
   // end exactly outside the tunnel envelope, so neither one closes the hole.
@@ -601,6 +622,8 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     bb.maxX + 2, centerY + outerR - overlap);
   const wingTree = clipperBoolean(basePaths, [band], ClipperLib.ClipType.ctDifference);
   const {shapes: wingShapes} = polyTreeToShapes(wingTree);
+  const bandTree = clipperBoolean(basePaths, [band], ClipperLib.ClipType.ctIntersection);
+  const {shapes: bandShapes} = polyTreeToShapes(bandTree);
   const pieces = [
     {geometry: backGeo, part: 'base'},
     {geometry: frontGeo, part: 'base'},
@@ -612,25 +635,85 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     pieces.push({geometry: wingGeo, part: 'base'});
   }
 
+  // The tube should only be visible where the silhouette actually crosses the
+  // centre band. Using the whole name bounding box made the tunnel stick out
+  // beyond narrow end letters (for example the i in Isabel), leaving a long
+  // visible cylinder at the sides. Clamp the tunnel to the band intersection.
+  let tubeStart = 0;
+  let tubeEnd = width;
+  if (bandShapes.length) {
+    const tubeBB = shapesBounds(bandShapes);
+    tubeStart = Math.max(0, tubeBB.minX + dx);
+    tubeEnd = Math.min(width, tubeBB.maxX + dx);
+  }
+  let tubeLen = Math.max(0, tubeEnd - tubeStart);
+  // Keep at least one practical opening if the band reduces to a tiny sliver.
+  if (tubeLen < Math.max(innerR * 1.2, 2.0)) {
+    tubeStart = 0;
+    tubeEnd = width;
+    tubeLen = width;
+  }
+
+  /* Cierre oculto: el lado CERRADO es el del arranque del nombre (junto a la
+     primera letra), no el de salida del lápiz. Por eso macizamos el PRIMER
+     tramo real de la silueta y hacemos que el túnel comience después de él. */
+  let closedCapShapes = [];
+  let fallbackPlugLen = 0;
+  if (closedEnd && tubeLen > 0.2) {
+    const capLen = Math.min(
+      Math.max(2.2, outerR * 0.55),
+      Math.max(2.2, tubeLen * 0.28));
+    const capEnd = Math.min(tubeEnd - 1.0, tubeStart + capLen);
+    const capOverlap = 0.35;
+    const capRect = rectClipperPath(
+      tubeStart - dx - capOverlap,
+      centerY - outerR - capOverlap,
+      capEnd - dx + capOverlap,
+      centerY + outerR + capOverlap);
+    const capTree = clipperBoolean(basePaths, [capRect], ClipperLib.ClipType.ctIntersection);
+    closedCapShapes = polyTreeToShapes(capTree).shapes;
+
+    if (closedCapShapes.length) {
+      // El tubo se mete unas décimas dentro del macizo para que el laminador
+      // fusione ambas zonas sin dejar una pared abierta ni una línea débil.
+      tubeStart = Math.max(tubeStart, capEnd - capOverlap);
+      tubeLen = Math.max(0, tubeEnd - tubeStart);
+    } else {
+      // Respaldo para siluetas extremadamente finas o fuentes defectuosas.
+      fallbackPlugLen = Math.max(1.4, Math.min(2.4, wall + 0.6, tubeLen * 0.2));
+    }
+  }
+
   // A stepped 0.35 mm lead-in at both ends makes insertion forgiving without
   // loosening the calibrated diameter through the useful length of the name.
-  const lead = Math.min(1.2, width * 0.12);
+  const lead = Math.min(1.2, tubeLen * 0.12);
   const leadR = Math.min(innerR + 0.35, outerR - 0.8);
-  if (width > lead * 2 + 1) {
+  if (tubeLen > lead * 2 + 1) {
     const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
-    entryGeo.translate(0, centerY + dy, 0);
-    const coreGeo = buildPencilTube(width - lead * 2, innerR, outerR, centerZ, curveSegments);
-    coreGeo.translate(lead, centerY + dy, 0);
+    entryGeo.translate(tubeStart, centerY + dy, 0);
+    const coreGeo = buildPencilTube(tubeLen - lead * 2, innerR, outerR, centerZ, curveSegments);
+    coreGeo.translate(tubeStart + lead, centerY + dy, 0);
     const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
-    exitGeo.translate(width - lead, centerY + dy, 0);
+    exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
     pieces.push(
       {geometry: entryGeo, part: 'base'},
       {geometry: coreGeo, part: 'base'},
       {geometry: exitGeo, part: 'base'});
-  } else {
-    const tubeGeo = buildPencilTube(width, innerR, outerR, centerZ, curveSegments);
-    tubeGeo.translate(0, centerY + dy, 0);
+  } else if (tubeLen > 0.2) {
+    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments);
+    tubeGeo.translate(tubeStart, centerY + dy, 0);
     pieces.push({geometry: tubeGeo, part: 'base'});
+  }
+
+  if (closedCapShapes.length) {
+    const capGeo = new THREE.ExtrudeGeometry(
+      closedCapShapes.map(s => translateShape(s, dx, dy)),
+      {depth: totalZ, bevelEnabled: false, curveSegments});
+    pieces.push({geometry: capGeo, part: 'base'});
+  } else if (closedEnd && fallbackPlugLen > 0 && tubeLen > 0.2) {
+    const endPlugGeo = buildSolidPencilTube(fallbackPlugLen, innerR + 0.35, centerZ, curveSegments);
+    endPlugGeo.translate(tubeStart, centerY + dy, 0);
+    pieces.push({geometry: endPlugGeo, part: 'base'});
   }
 
   // Optional raised face keeps the existing two-colour/AMS workflow. In the
@@ -770,6 +853,36 @@ function topFilledY(polys, x, yMax, yMin) {
     if (inside % 2 === 1) return y;
   }
   return null;
+}
+
+/** Punto lleno más a la izquierda cerca de una altura preferida. A diferencia
+ * del mínimo global del bounding box, este punto sí pertenece a material real
+ * en la misma zona donde se colocará el aro; es esencial para letras cursivas
+ * con remates que sobresalen sólo arriba o abajo. */
+function leftFilledAnchor(polys, preferredY) {
+  const b = polysBounds(polys);
+  const sample = 0.12;
+  const atY = y => {
+    for (let x = b.minX - sample; x <= b.maxX + sample; x += sample) {
+      let inside = 0;
+      for (const p of polys) if (pointInPolygon([x, y], p)) inside++;
+      if (inside % 2 === 1) return x;
+    }
+    return null;
+  };
+  const yStep = 0.24;
+  const maxSteps = Math.ceil(b.height / yStep);
+  for (let i = 0; i <= maxSteps; i++) {
+    const candidates = i === 0
+      ? [preferredY]
+      : [preferredY + i * yStep, preferredY - i * yStep];
+    for (const y of candidates) {
+      if (y < b.minY || y > b.maxY) continue;
+      const x = atY(y);
+      if (x !== null) return {x, y};
+    }
+  }
+  return {x: b.minX, y: Math.max(b.minY, Math.min(b.maxY, preferredY))};
 }
 
 /* ------------------------------------------------------------------ *
@@ -993,8 +1106,14 @@ function buildDoubleOutlineTile(font, emojiFont, lines, opts) {
   // eyelet on the outer plate, left side
   const holeR = Math.max(0.6, opts.loopHoleDiameterMM / 2);
   const ringR = holeR + Math.max(opts.loopRingThicknessMM, w2);
-  const ringCx = tb.minX - (w1 + w2) - ringR * 0.45;
-  const ringCy = (tb.minY + tb.maxY) / 2;
+  const preferredRingY = (tb.minY + tb.maxY) / 2;
+  const outlinedPolys = outerPaths.map(path =>
+    path.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+  const anchor = leftFilledAnchor(outlinedPolys, preferredRingY);
+  const ringWall = ringR - holeR;
+  const overlap = Math.max(1.0, Math.min(1.8, ringWall * 0.65));
+  const ringCx = anchor.x - ringR + overlap;
+  const ringCy = anchor.y;
   outerPaths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
     outerPaths, [circleClipperPath(ringCx, ringCy, ringR, 56, false)], ClipperLib.ClipType.ctUnion));
   const outerTree = clipperBoolean(
@@ -1281,7 +1400,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     pathToPolygons, signedArea, pointInPolygon, polygonsToShapes, textToShapes,
     getCapHeight, roundedRectShape, ringShape, buildKeychainTile, layoutTiles, translateShape,
-    buildOutlineTile, offsetPolygonsOutward, polyTreeToShapes, shapesBounds,
+    buildOutlineTile, offsetPolygonsOutward, polyTreeToShapes, shapesBounds, leftFilledAnchor,
     textRunToPolygons, linesToPolygons, polysBounds, translatePolys,
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
