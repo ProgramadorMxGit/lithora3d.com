@@ -521,6 +521,27 @@ button.big:active { transform: translateY(0) scale(.985); }
 .pencil-fit-list b { font-size: 12px; }
 .pencil-fit-list small { font-size: 10px; color: var(--ink-small); }
 .pencil-spec { margin-bottom: 0; }
+.pencil-group-label { margin: 0 0 7px; font-size: 12px; font-weight: 700; color: var(--ink-muted); }
+.fit-test-btn {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fit-test-btn small { font-weight: 500; font-size: 10px; color: var(--ink-small); line-height: 1.35; }
+.fit-test-btn:hover:not(:disabled) { background: #E0F2FE; border-style: solid; }
+.fit-test-btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* ============================================================
    Selector de estilo

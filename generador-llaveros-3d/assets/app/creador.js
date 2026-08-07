@@ -31,7 +31,8 @@
     ringThickness: 2.5,
     pencilHoleD: 8.6,
     pencilWall: 1.4,
-    pencilClosedEnd: false,
+    pencilCapEnd: 'open',   // 'open' | 'start' (tapa junto a la 1a letra) | 'end'
+    showPencilGhost: true,  // lápiz de ejemplo en el visor; nunca se exporta
     columns: 2,
     gap: 6,
     curveSegments: 10,
@@ -435,6 +436,47 @@
     });
   }
 
+  // ---------- pencil tunnel cap: open / capped at name start / at name end ----
+  const pencilCapListEl = $('pencil-cap-list');
+  if (pencilCapListEl) {
+    pencilCapListEl.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.pencilCapEnd = btn.dataset.cap;
+        syncPencilCapUI();
+        scheduleRebuild();
+      });
+    });
+  }
+
+  function syncPencilCapUI() {
+    if (!pencilCapListEl) return;
+    pencilCapListEl.querySelectorAll('button').forEach(btn => {
+      const on = btn.dataset.cap === state.pencilCapEnd;
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    const ghostChk = $('in-showPencilGhost');
+    if (ghostChk) ghostChk.checked = state.showPencilGhost;
+  }
+
+  /** El clásico esconde el túnel DENTRO de las letras. Si las letras son más
+   *  bajas que el túnel con su pared, el tubo se asoma entre ellas: avisamos y
+   *  sugerimos el tamaño que lo esconde, en vez de dejar que el usuario
+   *  descubra la diferencia comparando contra una pieza comprada. */
+  function updatePencilHint() {
+    const box = $('pencil-size-hint');
+    if (!box) return;
+    const envelope = state.pencilHoleD + 2 * state.pencilWall;
+    const show = state.productType === 'pencil' && state.letterHeight < envelope + 0.6;
+    box.hidden = !show;
+    if (show) {
+      const sugerida = Math.round(envelope * 1.3);
+      box.innerHTML = '🔍 Con letras de <b>' + state.letterHeight.toFixed(0) + ' mm</b> el túnel (' +
+        envelope.toFixed(1) + ' mm con su pared) se asoma entre las letras. ' +
+        'Sube el <b>tamaño de las letras a ' + sugerida + ' mm o más</b> para esconderlo dentro del nombre, como en los clásicos.';
+    }
+  }
+
   function syncProductUI() {
     const pencil = state.productType === 'pencil';
     if (!pencil) lastBaseZ = state.baseThickness;
@@ -453,8 +495,12 @@
     $('btn-add-name').textContent = pencil ? '+ Añadir otro nombre para lápiz' : '+ Añadir nombre';
     renderNameRows();
     syncPencilPresets();
+    syncPencilCapUI();
     syncStyleUI();
     updatePrintInfo();
+    updatePencilHint();
+    updateFitTestButton();
+    updateWhatsAppCta();
   }
 
   // ---------- style ----------
@@ -504,7 +550,8 @@
     }
     const parts = [];
     if (failedNames && failedNames.length) {
-      parts.push('⚠️ No se pudo crear el llavero de: <b>' + failedNames.map(escapeHtml).join('</b>, <b>') +
+      const noun = state.productType === 'pencil' ? 'el nombre para lápiz' : 'el llavero';
+      parts.push('⚠️ No se pudo crear ' + noun + ' de: <b>' + failedNames.map(escapeHtml).join('</b>, <b>') +
         '</b>. El resto sí se generó.');
     }
     if (missingChars && missingChars.length) {
@@ -626,9 +673,14 @@
   function updatePrintInfo() {
     const box = $('print-info');
     const z = lastBaseZ;
+    // El perfil calibrado viaja en el 3MF en LOS TRES modos, no solo en multi:
+    // antes la nota solo salia en multicolor y parecia que los otros no lo usaban.
+    const pencilNote = state.productType === 'pencil'
+      ? '<br><small><b>Perfil de calidad para lápiz:</b> 0.16 mm, tres paredes, velocidades High Quality de Bambu, túnel sin soportes y superficies superiores planchadas.</small>'
+      : '';
     if (state.printMode === 'simple') {
       box.className = 'info-box';
-      box.innerHTML = 'Se imprime tal cual, de un color. Los colores de arriba solo sirven para verlo en pantalla.';
+      box.innerHTML = 'Se imprime tal cual, de un color. Los colores de arriba solo sirven para verlo en pantalla.' + pencilNote;
     } else if (state.printMode === 'swap') {
       // +1e-6 guards against float error: 2.4 / 0.2 === 11.999999999999998,
       // which would otherwise report the colour change one layer too early.
@@ -638,7 +690,8 @@
         'Pon el <b>cambio de color a ' + z.toFixed(2) + ' mm</b> de altura ' +
         '(aprox. capa <b>' + layer + '</b> con capas de ' + state.layerHeight.toFixed(2) + ' mm).<br>' +
         '<small>La altura en mm es lo exacto. El número de capa es orientativo porque muchos laminadores usan una primera capa más gruesa — compruébalo en la vista previa.</small>' +
-        (state.rainbow ? '<br><small>⚠️ Con un color por nombre no puedes usar este modo: solo hay una pausa para todos. Usa multicolor.</small>' : '');
+        (state.rainbow ? '<br><small>⚠️ Con un color por nombre no puedes usar este modo: solo hay una pausa para todos. Usa multicolor.</small>' : '') +
+        pencilNote;
     } else {
       const n = lastLayoutPieces.length
         ? buildGroups().length
@@ -657,10 +710,7 @@
       box.innerHTML =
         'El 3MF sale como <b>proyecto de Bambu Studio</b> con <b>' + n + ' piezas</b>, cada una ya asignada a un filamento (1, 2, 3…): solo eliges qué color va en cada ranura.<br>' +
         '<small>Todo va como un único objeto, así que el texto no se puede desalinear de la base. Para otros laminadores (Cura, Prusa), usa el ZIP: trae un STL por color.</small>' +
-        aviso;
-      if (state.productType === 'pencil') {
-        box.innerHTML += '<br><small><b>Perfil de calidad para lápiz:</b> 0.16 mm, tres paredes, velocidades High Quality de Bambu, túnel sin soportes y superficies superiores planchadas.</small>';
-      }
+        aviso + pencilNote;
     }
   }
 
@@ -676,18 +726,22 @@
       scheduleRebuild();
     });
   }
-  bindSlider('in-letterHeight', 'val-letterHeight', 'letterHeight', v => v.toFixed(1) + ' mm');
+  bindSlider('in-letterHeight', 'val-letterHeight', 'letterHeight', v => v.toFixed(1) + ' mm', updatePencilHint);
   bindSlider('in-baseThickness', 'val-baseThickness', 'baseThickness', v => v.toFixed(1) + ' mm', updatePrintInfo);
   bindSlider('in-raisedHeight', 'val-raisedHeight', 'raisedHeight', v => v.toFixed(1) + ' mm');
   bindSlider('in-padding', 'val-padding', 'padding', v => v.toFixed(1) + ' mm');
   bindSlider('in-corner', 'val-corner', 'corner', v => v.toFixed(1) + ' mm');
   bindSlider('in-holeD', 'val-holeD', 'holeD', v => v.toFixed(1) + ' mm');
-  bindSlider('in-pencilHoleD', 'val-pencilHoleD', 'pencilHoleD', v => v.toFixed(1) + ' mm', syncPencilPresets);
-  bindSlider('in-pencilWall', 'val-pencilWall', 'pencilWall', v => v.toFixed(1) + ' mm');
-  $('in-pencilClosedEnd').addEventListener('change', () => {
-    state.pencilClosedEnd = $('in-pencilClosedEnd').checked;
-    scheduleRebuild();
-  });
+  bindSlider('in-pencilHoleD', 'val-pencilHoleD', 'pencilHoleD', v => v.toFixed(1) + ' mm',
+    () => { syncPencilPresets(); updatePencilHint(); });
+  bindSlider('in-pencilWall', 'val-pencilWall', 'pencilWall', v => v.toFixed(1) + ' mm', updatePencilHint);
+  const ghostChk = $('in-showPencilGhost');
+  if (ghostChk) {
+    ghostChk.addEventListener('change', () => {
+      state.showPencilGhost = ghostChk.checked;
+      scheduleRebuild();
+    });
+  }
   bindSlider('in-gap', 'val-gap', 'gap', v => v.toFixed(0) + ' mm');
   bindSlider('in-outlineWidth', 'val-outlineWidth', 'outlineWidth', v => v.toFixed(1) + ' mm');
 
@@ -772,6 +826,62 @@
           ? nameMaterialFor(lastValidOrig[m.userData.tileIndex] ?? m.userData.tileIndex)
           : textMaterialSolid;
       }
+    });
+  }
+
+  /* Lápiz de ejemplo del modo lápiz. Materiales compartidos, nunca disposed.
+     depthTest activo: el tramo que va dentro del túnel queda oculto por la
+     pieza, como un lápiz real; solo se ve lo que asoma por los extremos.
+     (La primera versión usaba rayos-X con depthTest:false y el lápiz se
+     dibujaba ENCIMA de la pieza desde cualquier ángulo: confundía en vez de
+     explicar.) */
+  const ghostBodyMaterial = new THREE.MeshStandardMaterial({
+    color: 0xf6b73c, transparent: true, opacity: 0.6, depthWrite: false, roughness: 0.6, metalness: 0});
+  const ghostWoodMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe9d0a8, transparent: true, opacity: 0.6, depthWrite: false, roughness: 0.6, metalness: 0});
+  const ghostLeadMaterial = new THREE.MeshStandardMaterial({
+    color: 0x3c3c3c, transparent: true, opacity: 0.7, depthWrite: false, roughness: 0.6, metalness: 0});
+
+  /** Un lápiz hexagonal semitransparente atravesando el túnel de cada pieza:
+   *  entra por el lado abierto y su punta se detiene en la tapa si la hay.
+   *  userData.part 'ghost' lo excluye de exports y colores; owned:true deja
+   *  que el propio rebuild libere sus geometrías en la siguiente pasada. */
+  function addGhostPencils(tiles, offsets) {
+    if (!state.showPencilGhost) return;
+    tiles.forEach((tile, i) => {
+      const info = tile.pencil;
+      if (!info || !offsets[i]) return;
+      const r = Math.max(1.6, info.innerR - 0.15);
+      const tipLen = 4, coneLen = 14;
+      // dirSign: sentido hacia el que apunta la MINA (−X salvo tapa al final).
+      const dirSign = info.capEnd === 'end' ? 1 : -1;
+      const tipX = info.capEnd === 'start' ? info.xStart + 0.6
+        : info.capEnd === 'end' ? info.xEnd - 0.6
+        : info.xStart - 8;
+      // Con varias columnas el mango sobresale menos para no pisar al vecino.
+      const protrude = state.columns > 1 ? 14 : 22;
+      const backX = dirSign === -1 ? info.xEnd + protrude : info.xStart - protrude;
+      const leadEnd = tipX - dirSign * tipLen;
+      const woodEnd = leadEnd - dirSign * coneLen;
+      const bodyLen = Math.abs(backX - woodEnd);
+      if (bodyLen < 1) return;
+      const y = offsets[i].y + info.axisY;
+      const z = info.centerZ;
+      const rot = dirSign === -1 ? Math.PI / 2 : -Math.PI / 2; // eje Y -> eje X
+
+      const mk = (geo, material, cx) => {
+        geo.rotateZ(rot);
+        const mesh = new THREE.Mesh(geo, material);
+        mesh.position.set(offsets[i].x + cx, y, z);
+        mesh.renderOrder = 10;
+        mesh.userData = {part: 'ghost', tileIndex: i, owned: true};
+        group.add(mesh);
+      };
+      mk(new THREE.ConeGeometry(1.1, tipLen, 12), ghostLeadMaterial, tipX - dirSign * tipLen / 2);
+      mk(new THREE.CylinderGeometry(1.1, r, coneLen, 6, 1, false, Math.PI / 6), ghostWoodMaterial,
+        leadEnd - dirSign * coneLen / 2);
+      mk(new THREE.CylinderGeometry(r, r, bodyLen, 6, 1, false, Math.PI / 6), ghostBodyMaterial,
+        (woodEnd + backX) / 2);
     });
   }
 
@@ -890,7 +1000,7 @@
       loopRingThicknessMM: state.ringThickness,
       pencilHoleDiameterMM: state.pencilHoleD,
       pencilWallMM: state.pencilWall,
-      pencilClosedEnd: state.pencilClosedEnd,
+      pencilCapEnd: state.pencilCapEnd,
       curveSegments: state.curveSegments,
       outlineWidthMM: state.outlineWidth,
     };
@@ -927,6 +1037,7 @@
     group.children.forEach(m => { if (m.userData.owned && m.geometry) m.geometry.dispose(); });
     group.clear();
     lastLayoutPieces = [];
+    let pencilLayout = null; // {tiles, offsets} solo en modo lápiz, para fantasma y gramos
 
     const validEntries = state.names
       .map((n, i) => ({name: n.trim(), orig: i}))
@@ -1007,6 +1118,7 @@
         lastLayoutPieces.push(piece);
       });
       bedH = layout.bedHeight;
+      if (state.productType === 'pencil') pencilLayout = {tiles, offsets: layout.offsets};
       // Sin medidas aquí: la huella de verdad se mide al final sobre la escena
       // completa, y así el HUD y el aviso de cama no dan dos cifras distintas.
       // El recuento debe ser el de piezas realmente construidas, no el de nombres
@@ -1023,6 +1135,7 @@
       setDownloadEnabled(false);
       updateBedWarning(0, 0);
       updatePrintInfo();
+      updateWhatsAppCta();
       return;
     }
     emptyHint.style.display = 'none';
@@ -1045,11 +1158,23 @@
     orbit.radius = Math.max(50, Math.max(fitH, fitW) * 1.55 + size.z * 2);
     updateCamera();
 
-    hud.textContent = plateLabel +
+    // El fantasma entra DESPUÉS de medir y encuadrar: no altera Box3 ni HUD
+    // (no se imprime), pero hereda el recentrado del grupo.
+    if (pencilLayout) addGhostPencils(pencilLayout.tiles, pencilLayout.offsets);
+
+    let hudText = plateLabel +
       ' · ' + size.x.toFixed(0) + '×' + size.y.toFixed(0) + ' mm';
+    if (pencilLayout) {
+      // Densidad del perfil real si ya cargó; PLA genérico si no.
+      const dens = parseFloat(((window.__BAMBU_PROJECT__ || {}).filament_density || [])[0]) || 1.24;
+      const grams = pencilLayout.tiles.reduce((s, t) => s + (t.volumeMM3 || 0), 0) / 1000 * dens;
+      if (grams > 0) hudText += ' · ≈ ' + grams.toFixed(1) + ' g';
+    }
+    hud.textContent = hudText;
     setDownloadEnabled(true);
     updateBedWarning(size.x, size.y);
     updatePrintInfo();
+    updateWhatsAppCta();
     hideBusy();
   }
 
@@ -1057,6 +1182,34 @@
     $('btn-stl').disabled = !on;
     $('btn-3mf').disabled = !on;
     $('btn-zip').disabled = !on;
+    updateFitTestButton();
+  }
+
+  /** La prueba de ajuste no depende de que haya nombres escritos: solo de
+   *  estar en modo lápiz y de no haber otra exportación en curso. */
+  function updateFitTestButton() {
+    const fit = $('btn-fit-test');
+    if (!fit) return;
+    fit.disabled = exporting || state.productType !== 'pencil';
+  }
+
+  /** El CTA de WhatsApp lleva puesto el diseño actual: producto, nombres y
+   *  medida del túnel. El href estático del HTML queda como respaldo. */
+  function updateWhatsAppCta() {
+    const a = $('btn-whatsapp');
+    if (!a) return;
+    const n = lastValidNames.length;
+    const names = lastValidNames.slice(0, 6).join(', ') + (n > 6 ? '…' : '');
+    let msg;
+    if (state.productType === 'pencil') {
+      msg = 'Hola, diseñé ' + (n || 'unos') + ' nombre' + (n === 1 ? '' : 's') + ' para lápiz' +
+        (n ? ' (' + names + ')' : '') + ' con túnel de ' + state.pencilHoleD.toFixed(1) +
+        ' mm en el generador de Lithora 3D y quiero cotizar la impresión.';
+    } else {
+      msg = 'Hola, diseñé ' + (n || 'unos') + ' llavero' + (n === 1 ? '' : 's') +
+        (n ? ' (' + names + ')' : '') + ' en el Creador de Llaveros y quiero cotizar la impresión.';
+    }
+    a.href = 'https://wa.me/528331080178?text=' + encodeURIComponent(msg);
   }
 
   /** Split the built pieces into one printable group per colour. */
@@ -1103,8 +1256,8 @@
      completas y dos descargas. Se reutiliza el mismo showBusy/setDownloadEnabled
      que ya protege la reconstruccion. */
   let exporting = false;
-  async function runExport(label, produce) {
-    if (exporting || !lastLayoutPieces.length) return;
+  async function runExport(label, produce, requirePieces = true) {
+    if (exporting || (requirePieces && !lastLayoutPieces.length)) return;
     exporting = true;
     setDownloadEnabled(false);
     showBusy(label);
@@ -1151,6 +1304,23 @@
     bytes: buildSTLZip(buildGroups()),
     filename: state.productType === 'pencil' ? 'nombres-para-lapiz-por-colores.zip' : 'llaveros-por-colores.zip', mime: 'application/zip',
   })));
+  const fitTestBtn = $('btn-fit-test');
+  if (fitTestBtn) {
+    fitTestBtn.addEventListener('click', () => runExport('Preparando prueba de ajuste…', () => {
+      // Testigo independiente del modelo principal: no toca lastLayoutPieces.
+      const font = state.fontKey && fonts[state.fontKey] ? fonts[state.fontKey].otFont : null;
+      const tile = buildPencilFitTestTile(font, currentOpts());
+      return {
+        bytes: buildBambu3MF([{
+          label: 'Prueba de ajuste lapiz',
+          color: state.baseColor,
+          geometries: tile.pieces.map(p => p.geometry),
+        }], window.__BAMBU_PROJECT__, {productType: 'pencil'}),
+        filename: 'prueba-de-ajuste-lapiz.3mf',
+        mime: 'model/3mf',
+      };
+    }, false));
+  }
 
   // ---------- impresora ----------
   const printerSel = $('in-printer');
@@ -1174,7 +1344,7 @@
   const SAVED_KEYS = [
     'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
-    'pencilHoleD', 'pencilWall', 'pencilClosedEnd',
+    'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
     'textColor', 'rainbow', 'printMode', 'layerHeight', 'printer',
   ];
@@ -1182,6 +1352,9 @@
   function snapshot() {
     const s = {};
     SAVED_KEYS.forEach(k => { s[k] = Array.isArray(state[k]) ? state[k].slice() : state[k]; });
+    // Compat hacia atrás: una versión anterior del HTML leerá este guardado
+    // buscando la casilla booleana de la tapa.
+    s.pencilClosedEnd = state.pencilCapEnd !== 'open';
     return {state: s};
   }
 
@@ -1228,6 +1401,11 @@
 
   function applySnapshot(snap) {
     if (!snap || !snap.state) return;
+    // Migración de guardados viejos: la tapa era una casilla booleana. Se hace
+    // ANTES de sanear porque el saneador descartaría el boolean por su tipo.
+    if (snap.state.pencilCapEnd === undefined && typeof snap.state.pencilClosedEnd === 'boolean') {
+      snap.state.pencilCapEnd = snap.state.pencilClosedEnd ? 'start' : 'open';
+    }
     const safe = sanitizeSnapshotState(snap.state);
     SAVED_KEYS.forEach(k => {
       if (safe[k] === undefined) return;
@@ -1239,6 +1417,7 @@
     // Una impresora que ya no existe apagaba el aviso de cama en silencio.
     if (!PRINTERS.some(p => p.id === state.printer)) state.printer = DEFAULT_STATE.printer;
     if (!['keychain', 'pencil'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
+    if (!['open', 'start', 'end'].includes(state.pencilCapEnd)) state.pencilCapEnd = DEFAULT_STATE.pencilCapEnd;
 
     refreshAllControls();
   }
@@ -1256,7 +1435,7 @@
     });
     $('val-columns').textContent = state.columns;
     $('in-rainbow').checked = state.rainbow;
-    $('in-pencilClosedEnd').checked = state.pencilClosedEnd;
+    syncPencilCapUI();
     $('in-layerHeight').value = String(state.layerHeight);
     $('in-bordeColor').value = state.bordeColor;
     printerSel.value = state.printer;

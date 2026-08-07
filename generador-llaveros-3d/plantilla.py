@@ -36,10 +36,11 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
           </button>
         </div>
         <div id="pencil-settings" hidden>
+          <p class="pencil-group-label">¿Qué lápiz es?</p>
           <div class="pencil-fit-list" id="pencil-fit-list" role="group" aria-label="Ajuste para lápiz">
-            <button type="button" data-pencil-d="8.6"><b>Universal</b><small>8.6 mm · recomendado</small></button>
-            <button type="button" data-pencil-d="8.3"><b>Ajustado</b><small>8.3 mm</small></button>
-            <button type="button" data-pencil-d="10.6"><b>Jumbo</b><small>10.6 mm</small></button>
+            <button type="button" data-pencil-d="8.6"><b>Lápiz de escuela</b><small>8.6 mm · recomendado</small></button>
+            <button type="button" data-pencil-d="8.3"><b>Más apretado</b><small>8.3 mm</small></button>
+            <button type="button" data-pencil-d="10.6"><b>Jumbo grueso</b><small>10.6 mm</small></button>
           </div>
           <div class="slider-row">
             <label>Diámetro interior <span class="val" id="val-pencilHoleD"></span></label>
@@ -49,13 +50,21 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
             <label>Pared alrededor del lápiz <span class="val" id="val-pencilWall"></span></label>
             <input type="range" id="in-pencilWall" min="1.2" max="2.2" step="0.1" aria-label="Pared estructural alrededor del lápiz en milímetros">
           </div>
-          <label class="check-row" style="margin-top:6px">
-            <input type="checkbox" id="in-pencilClosedEnd">
-            <span>Tapar el final del túnel</span>
+          <div class="info-box warn" id="pencil-size-hint" role="alert" hidden></div>
+          <p class="pencil-group-label">¿Abierto o con tope?</p>
+          <div class="pencil-fit-list" id="pencil-cap-list" role="group" aria-label="Extremo tapado del túnel">
+            <button type="button" data-cap="open" aria-pressed="true"><b>Abierto</b><small>Asoma por los dos lados</small></button>
+            <button type="button" data-cap="start" aria-pressed="false"><b>Tope al inicio</b><small>Junto a la primera letra</small></button>
+            <button type="button" data-cap="end" aria-pressed="false"><b>Tope al final</b><small>Como los clásicos</small></button>
+          </div>
+          <label class="check-row" style="margin-top:2px;margin-bottom:13px">
+            <input type="checkbox" id="in-showPencilGhost" checked>
+            <span>Mostrar un lápiz de ejemplo en la vista 3D (no se imprime)</span>
           </label>
+          <button type="button" class="fit-test-btn" id="btn-fit-test">🎯 Imprimir prueba de ajuste<small>3 medidas en una pieza chiquita: pruebas tu lápiz real antes de imprimir todo</small></button>
           <div class="info-box pencil-spec">
-            El ajuste universal contempla lápices tradicionales de hasta <b>8.2 mm</b> y añade holgura de impresión.
-            <small>El túnel usa un techo interior a 45° para imprimirse acostado y sin soportes. La entrada es 0.35 mm más amplia para guiar el lápiz. Si activas <b>Tapar el final</b>, se añade un tope cerrado y se ocultan los huecos visibles del extremo.</small>
+            El lápiz de la vista 3D te enseña por dónde entra y dónde se detiene.
+            <small>El túnel usa un techo interior a 45° para imprimirse acostado y sin soportes, y la boca es 0.35 mm más amplia para guiar el lápiz. ¿Dudas con la medida? Imprime la <b>prueba de ajuste</b>: tres túneles cortos (apretado, exacto y holgado) con sus marcas, y te quedas con el que entre mejor.</small>
           </div>
         </div>
       </section>
@@ -120,6 +129,10 @@ FAQ = [
   "Sí. Arrastra un archivo .ttf o .otf a la ventana y se añade a la lista. El archivo no se sube a ningún servidor: se procesa en tu propio navegador."),
  ("¿Puedo hacer varios nombres a la vez?",
   "Sí, y es lo más útil para un grupo escolar, una boda o un equipo. Añade un nombre por fila y la herramienta los acomoda en una sola placa lista para imprimir de una pasada."),
+ ("¿También hace nombres para lápices?",
+  "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de ejemplo que muestra por dónde entra."),
+ ("¿Qué diámetro de túnel elijo para el lápiz?",
+  "El ajuste de 8.6 mm entra en los lápices escolares tradicionales; hay presets para lápiz apretado y jumbo. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."),
  ("¿Puedo venderlos?",
   "Los archivos que generas son tuyos. Ten en cuenta que la tipografía que elijas tiene su propia licencia: las incluidas aquí son de uso libre, pero si subes una tuya debes revisar sus condiciones."),
  ("¿Se guardan mis datos?",
@@ -129,7 +142,7 @@ FAQ = [
 ]
 
 PASOS = [
- ("Escribe los nombres", "Uno por fila. Puedes añadir tantos como necesites para hacerlos todos de una sola impresión."),
+ ("Escribe los nombres", "Uno por fila, para llavero o para nombre de lápiz. Puedes añadir tantos como necesites para hacerlos todos de una sola impresión."),
  ("Elige estilo, letra y colores", "Placa, contorno o doble contorno, con quince tipografías incluidas o la tuya propia."),
  ("Descarga el archivo", "STL para cualquier laminador, o 3MF listo para Bambu Studio con los colores ya asignados."),
 ]
@@ -162,11 +175,13 @@ jsonld = {
    "applicationSubCategory": "Generador de modelos para impresion 3D",
    "operatingSystem": "Cualquier navegador moderno (Chrome, Edge, Firefox, Safari)",
    "inLanguage": "es-MX",
-   "description": "Herramienta web gratuita para crear llaveros 3D con nombres y descargarlos en STL o en 3MF multicolor listo para Bambu Studio. Sin registro y sin limite de descargas.",
+   "description": "Herramienta web gratuita para crear llaveros 3D con nombres y nombres para lapiz, y descargarlos en STL o en 3MF multicolor listo para Bambu Studio. Sin registro y sin limite de descargas.",
    "featureList": ["Exportacion a STL", "Exportacion a 3MF multicolor para Bambu Studio",
                    "Quince tipografias incluidas", "Carga de tipografias propias en TTF u OTF",
                    "Varios nombres en una sola placa", "Aviso si la placa no cabe en la cama de impresion",
-                   "Compatible con enes, tildes y dieresis", "Funciona sin conexion una vez cargada"],
+                   "Compatible con enes, tildes y dieresis", "Funciona sin conexion una vez cargada",
+                   "Nombres para lapiz con tunel sin soportes y tope opcional",
+                   "Prueba de ajuste imprimible para el diametro del lapiz"],
    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN",
               "availability": "https://schema.org/InStock"},
    "publisher": {"@id": "https://lithora3d.com/#organization"}},
@@ -188,8 +203,8 @@ PAGINA = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generador de llaveros 3D con nombre: gratis en STL y 3MF | Lithora 3D</title>
-<meta name="description" content="Crea llaveros 3D con nombre y desc&aacute;rgalos gratis en STL o 3MF multicolor para Bambu Studio. Sin registro y sin l&iacute;mite de descargas. Funciona con &ntilde; y tildes.">
+<title>Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF | Lithora 3D</title>
+<meta name="description" content="Crea llaveros 3D con nombre y nombres para l&aacute;piz, y desc&aacute;rgalos gratis en STL o 3MF multicolor para Bambu Studio. Sin registro y sin l&iacute;mite de descargas. Funciona con &ntilde; y tildes.">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta name="theme-color" content="#0F172A">
 <link rel="canonical" href="{url}">
@@ -202,8 +217,8 @@ PAGINA = '''<!DOCTYPE html>
 <meta property="og:locale" content="es_MX">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Lithora 3D">
-<meta property="og:title" content="Generador de llaveros 3D con nombre: gratis en STL y 3MF">
-<meta property="og:description" content="Escribe los nombres, elige el estilo y desc&aacute;rgalo listo para imprimir. Gratis, sin registro y sin l&iacute;mite de descargas.">
+<meta property="og:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
+<meta property="og:description" content="Escribe los nombres, elige llavero o nombre para l&aacute;piz y desc&aacute;rgalo listo para imprimir. Gratis, sin registro y sin l&iacute;mite de descargas.">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="https://lithora3d.com/assets/og-card.jpg">
 <meta property="og:image:type" content="image/jpeg">
@@ -211,7 +226,7 @@ PAGINA = '''<!DOCTYPE html>
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Generador de llaveros 3D de Lithora 3D">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Generador de llaveros 3D con nombre: gratis en STL y 3MF">
+<meta name="twitter:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
 <meta name="twitter:description" content="Crea llaveros con nombre y desc&aacute;rgalos en STL o 3MF multicolor. Sin registro.">
 <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -267,7 +282,7 @@ PAGINA = '''<!DOCTYPE html>
     <h2>Para qu&eacute; se usa</h2>
     <p>El caso m&aacute;s com&uacute;n no es un llavero suelto, sino un lote con varios nombres:</p>
     <ul class="lista-usos">
-      <li><strong>Escuela.</strong> Identificadores para mochilas y loncheras de un grupo completo, o recuerdos de fin de curso.</li>
+      <li><strong>Escuela.</strong> Identificadores para mochilas, loncheras y l&aacute;pices de un grupo completo, o recuerdos de fin de curso.</li>
       <li><strong>Bodas y XV a&ntilde;os.</strong> Recuerdos para invitados con el nombre de cada uno, que adem&aacute;s sirven de se&ntilde;alizaci&oacute;n de mesa.</li>
       <li><strong>Equipos y uniformes.</strong> Llaveros con el nombre de cada integrante de un equipo deportivo o de una plantilla de trabajo.</li>
       <li><strong>Negocios.</strong> Llaveros con la marca para entregar con cada venta o en una feria.</li>

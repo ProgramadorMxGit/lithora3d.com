@@ -313,11 +313,13 @@ function layoutTiles(tiles, opts) {
   const cellHeight = Math.max(...tiles.map(t => t.height)) + gapY;
 
   const placed = [];
+  const offsets = [];
   tiles.forEach((tile, i) => {
     const col = i % columns;
     const row = Math.floor(i / columns);
     const x = col * cellWidth;
     const y = -row * cellHeight; // rows grow downward on the bed
+    offsets.push({x, y});
     for (const piece of tile.pieces) {
       const geo = piece.geometry.clone();
       geo.translate(x, y, 0);
@@ -328,6 +330,7 @@ function layoutTiles(tiles, opts) {
   const rows = Math.ceil(tiles.length / columns);
   return {
     pieces: placed,
+    offsets,
     bedWidth: columns * cellWidth - gapX,
     bedHeight: rows * cellHeight - gapY,
   };
@@ -565,6 +568,82 @@ function rectClipperPath(minX, minY, maxX, maxY) {
   ];
 }
 
+/** Suma de áreas de paths de Clipper en mm² (los agujeros restan solos). */
+function clipperPathsAreaMM2(paths) {
+  let area = 0;
+  for (const path of paths) area += ClipperLib.Clipper.Area(path);
+  return area / (CLIPPER_SCALE * CLIPPER_SCALE);
+}
+
+/* Ayudantes PUROS del túnel para lápiz (sin THREE ni Clipper en el cuerpo):
+   la suite de Node los prueba directamente vía module.exports. */
+
+/** Resuelve el modo de tapa pedido, aceptando la opción booleana heredada. */
+function normalizePencilCapEnd(opts) {
+  const v = opts && opts.pencilCapEnd;
+  if (v === 'open' || v === 'start' || v === 'end') return v;
+  return opts && opts.pencilClosedEnd ? 'start' : 'open';
+}
+
+/**
+ * Decide dónde va la tapa maciza y cómo se recorta el túnel a su alrededor.
+ * Trabaja en el X del tile (ya desplazado por dx). 'start' reproduce el
+ * cálculo validado de la tapa junto a la primera letra; 'end' es su espejo
+ * exacto junto a la última; 'open' devuelve todo intacto.
+ */
+function pencilCapPlacement(capMode, tubeStart, tubeEnd, outerR) {
+  const tubeLen = tubeEnd - tubeStart;
+  const out = {capMode, capX0: null, capX1: null, tubeStart, tubeEnd,
+               entryLead: true, exitLead: true, capOverlap: 0.35};
+  if ((capMode !== 'start' && capMode !== 'end') || tubeLen <= 0.2) return out;
+  const capLen = Math.min(
+    Math.max(2.2, outerR * 0.55),
+    Math.max(2.2, tubeLen * 0.28));
+  if (capMode === 'start') {
+    out.capX0 = tubeStart;
+    out.capX1 = Math.min(tubeEnd - 1.0, tubeStart + capLen);
+    // El tubo se mete unas décimas dentro del macizo para que el laminador
+    // fusione ambas zonas sin dejar una pared abierta ni una línea débil.
+    out.tubeStart = Math.max(tubeStart, out.capX1 - out.capOverlap);
+    out.entryLead = false; // el lado tapado no lleva boca ensanchada
+  } else {
+    out.capX1 = tubeEnd;
+    out.capX0 = Math.max(tubeStart + 1.0, tubeEnd - capLen);
+    out.tubeEnd = Math.min(tubeEnd, out.capX0 + out.capOverlap);
+    out.exitLead = false;
+  }
+  return out;
+}
+
+/** Área exacta del perfil de lágrima: sector de 270° + cometa del techo a 45°. */
+function teardropAreaMM2(radius) {
+  return radius * radius * (1 + Math.PI * 0.75);
+}
+
+/** Área de un segmento circular de sagita h en un círculo de radio R. */
+function circularSegmentAreaMM2(R, h) {
+  const s = Math.max(0, Math.min(h, 2 * R));
+  return R * R * Math.acos(1 - s / R) - (R - s) * Math.sqrt(Math.max(0, 2 * R * s - s * s));
+}
+
+/**
+ * Volumen del nombre para lápiz por regiones 2D × altura. Las pieles ya cubren
+ * el casquete inferior y la cuña del ápice del anillo, así que ese tramo se
+ * descuenta para no contarlo dos veces. Los solapes de diseño de 0.25–0.35 mm
+ * se ignoran a propósito: esto alimenta el "≈ X g" del visor (±10 %), no una
+ * báscula.
+ */
+function estimatePencilVolumeMM3(m) {
+  const ringArea = teardropAreaMM2(m.outerR) - teardropAreaMM2(m.innerR);
+  const skinOverlap = circularSegmentAreaMM2(m.outerR, m.skin) + m.skin * m.skin;
+  return m.wingsArea * m.totalZ
+    + m.bandArea * 2 * m.skin
+    + Math.max(0, ringArea - skinOverlap) * m.tubeLen
+    + m.capArea * Math.max(0, m.totalZ - 2 * m.skin)
+    + teardropAreaMM2(m.innerR) * (m.plugLen || 0)
+    + m.textArea * m.raisedHeight;
+}
+
 /**
  * Build an uppercase name threaded lengthwise by a supportless pencil tunnel.
  * The returned base is a set of overlapping closed solids on purpose: Bambu,
@@ -601,7 +680,7 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const centerZ = outerR;
   const totalZ = centerZ + Math.SQRT2 * outerR;
   const skin = Math.min(wall, Math.max(0.9, totalZ * 0.12));
-  const closedEnd = !!opts.pencilClosedEnd;
+  const capMode = normalizePencilCapEnd(opts);
 
   // Full back/front skins keep accents and counters attached to the core. They
   // end exactly outside the tunnel envelope, so neither one closes the hole.
@@ -654,51 +733,61 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     tubeLen = width;
   }
 
-  /* Cierre oculto: el lado CERRADO es el del arranque del nombre (junto a la
-     primera letra), no el de salida del lápiz. Por eso macizamos el PRIMER
-     tramo real de la silueta y hacemos que el túnel comience después de él. */
+  /* Cierre oculto elegible: 'start' maciza el tramo junto a la PRIMERA letra
+     (el comportamiento original validado) y 'end' hace lo mismo junto a la
+     última, como los toppers clásicos. pencilCapPlacement decide los tramos;
+     aquí solo se recorta la silueta y se extruye. */
   let closedCapShapes = [];
   let fallbackPlugLen = 0;
-  if (closedEnd && tubeLen > 0.2) {
-    const capLen = Math.min(
-      Math.max(2.2, outerR * 0.55),
-      Math.max(2.2, tubeLen * 0.28));
-    const capEnd = Math.min(tubeEnd - 1.0, tubeStart + capLen);
-    const capOverlap = 0.35;
+  let capArea = 0;
+  const place = pencilCapPlacement(capMode, tubeStart, tubeEnd, outerR);
+  if (place.capX0 !== null) {
     const capRect = rectClipperPath(
-      tubeStart - dx - capOverlap,
-      centerY - outerR - capOverlap,
-      capEnd - dx + capOverlap,
-      centerY + outerR + capOverlap);
+      place.capX0 - dx - place.capOverlap,
+      centerY - outerR - place.capOverlap,
+      place.capX1 - dx + place.capOverlap,
+      centerY + outerR + place.capOverlap);
     const capTree = clipperBoolean(basePaths, [capRect], ClipperLib.ClipType.ctIntersection);
     closedCapShapes = polyTreeToShapes(capTree).shapes;
 
     if (closedCapShapes.length) {
       // El tubo se mete unas décimas dentro del macizo para que el laminador
       // fusione ambas zonas sin dejar una pared abierta ni una línea débil.
-      tubeStart = Math.max(tubeStart, capEnd - capOverlap);
+      tubeStart = place.tubeStart;
+      tubeEnd = place.tubeEnd;
       tubeLen = Math.max(0, tubeEnd - tubeStart);
+      capArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(capTree));
     } else {
       // Respaldo para siluetas extremadamente finas o fuentes defectuosas.
       fallbackPlugLen = Math.max(1.4, Math.min(2.4, wall + 0.6, tubeLen * 0.2));
     }
   }
 
-  // A stepped 0.35 mm lead-in at both ends makes insertion forgiving without
-  // loosening the calibrated diameter through the useful length of the name.
+  // Boca escalonada de 0.35 mm SOLO en los extremos abiertos: guía el lápiz
+  // sin aflojar el diámetro calibrado. El lado tapado (o con tapón) no la
+  // lleva; su tramo lo absorbe el núcleo calibrado, que fusiona mejor.
   const lead = Math.min(1.2, tubeLen * 0.12);
   const leadR = Math.min(innerR + 0.35, outerR - 0.8);
-  if (tubeLen > lead * 2 + 1) {
-    const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
-    entryGeo.translate(tubeStart, centerY + dy, 0);
-    const coreGeo = buildPencilTube(tubeLen - lead * 2, innerR, outerR, centerZ, curveSegments);
-    coreGeo.translate(tubeStart + lead, centerY + dy, 0);
-    const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
-    exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
-    pieces.push(
-      {geometry: entryGeo, part: 'base'},
-      {geometry: coreGeo, part: 'base'},
-      {geometry: exitGeo, part: 'base'});
+  const plugged = fallbackPlugLen > 0;
+  const wantEntry = place.entryLead && !(plugged && capMode === 'start');
+  const wantExit = place.exitLead && !(plugged && capMode === 'end');
+  const nLeads = (wantEntry ? 1 : 0) + (wantExit ? 1 : 0);
+  if (tubeLen > lead * nLeads + 1) {
+    const coreStart = tubeStart + (wantEntry ? lead : 0);
+    const coreEnd = tubeEnd - (wantExit ? lead : 0);
+    if (wantEntry) {
+      const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+      entryGeo.translate(tubeStart, centerY + dy, 0);
+      pieces.push({geometry: entryGeo, part: 'base'});
+    }
+    const coreGeo = buildPencilTube(coreEnd - coreStart, innerR, outerR, centerZ, curveSegments);
+    coreGeo.translate(coreStart, centerY + dy, 0);
+    pieces.push({geometry: coreGeo, part: 'base'});
+    if (wantExit) {
+      const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+      exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
+      pieces.push({geometry: exitGeo, part: 'base'});
+    }
   } else if (tubeLen > 0.2) {
     const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments);
     tubeGeo.translate(tubeStart, centerY + dy, 0);
@@ -710,9 +799,10 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
       closedCapShapes.map(s => translateShape(s, dx, dy)),
       {depth: totalZ, bevelEnabled: false, curveSegments});
     pieces.push({geometry: capGeo, part: 'base'});
-  } else if (closedEnd && fallbackPlugLen > 0 && tubeLen > 0.2) {
+  } else if (plugged && tubeLen > 0.2) {
+    const plugX = capMode === 'end' ? tubeEnd - fallbackPlugLen : tubeStart;
     const endPlugGeo = buildSolidPencilTube(fallbackPlugLen, innerR + 0.35, centerZ, curveSegments);
-    endPlugGeo.translate(tubeStart, centerY + dy, 0);
+    endPlugGeo.translate(plugX, centerY + dy, 0);
     pieces.push({geometry: endPlugGeo, part: 'base'});
   }
 
@@ -724,6 +814,16 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   textGeo.translate(0, 0, totalZ);
   pieces.push({geometry: textGeo, part: 'text'});
 
+  // Volumen aproximado por regiones 2D × altura, para el "≈ g" del visor.
+  const wingsArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(wingTree));
+  const bandArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(bandTree));
+  const textArea = Math.abs(clipperPathsAreaMM2(polysToClipperPaths(polys)));
+  const volumeMM3 = estimatePencilVolumeMM3({
+    wingsArea, bandArea, capArea, textArea,
+    plugLen: fallbackPlugLen, outerR, innerR, skin, totalZ, tubeLen,
+    raisedHeight: opts.textRaisedHeightMM,
+  });
+
   return {
     pieces,
     width,
@@ -733,6 +833,94 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     baseThickness: totalZ,
     thickness: totalZ + opts.textRaisedHeightMM,
     missingChars: polys.missing || [],
+    volumeMM3,
+    // Datos del hueco real para dibujar el lápiz fantasma del visor.
+    pencil: {
+      axisY: centerY + dy,
+      centerZ,
+      innerR,
+      xStart: tubeStart + (plugged && capMode === 'start' ? fallbackPlugLen : 0),
+      xEnd: tubeEnd - (plugged && capMode === 'end' ? fallbackPlugLen : 0),
+      capEnd: capMode,
+    },
+  };
+}
+
+/**
+ * Testigo de ajuste: tres túneles cortos con el diámetro elegido −0.3 mm,
+ * exacto y +0.3 mm sobre una base común. Se imprime en minutos y evita tirar
+ * un nombre completo por un lápiz fuera de medida. Las barras en relieve
+ * (1 = apretado, 2 = tu ajuste, 3 = holgado) no dependen de la fuente; el
+ * rótulo numérico solo se añade si la tipografía trae todos sus glifos.
+ * Sin bocas escalonadas: el testigo mide el diámetro calibrado real.
+ */
+function buildPencilFitTestTile(font, opts) {
+  const curveSegments = opts.curveSegments || 10;
+  const d = Math.max(7.6, opts.pencilHoleDiameterMM || 8.6);
+  const wall = Math.max(1.2, opts.pencilWallMM || 1.4);
+  const dList = [d - 0.3, d, d + 0.3];
+  const outerRMax = dList[2] / 2 + wall;
+  const pitch = 2 * outerRMax + 5;
+  const tubeLen = 12;
+
+  const labelX0 = tubeLen + 1.5; // pestaña de marcas a la derecha de los túneles
+  const baseX0 = -2, baseX1 = labelX0 + 19;
+  const baseY0 = -(outerRMax + 2), baseY1 = 2 * pitch + outerRMax + 2;
+  const baseThickness = 1.2;
+
+  const pieces = [];
+  const baseShape = roundedRectShape(baseX0, baseY0, baseX1 - baseX0, baseY1 - baseY0, 2);
+  const baseGeo = new THREE.ExtrudeGeometry(baseShape, {
+    depth: baseThickness, bevelEnabled: false, curveSegments,
+  });
+  pieces.push({geometry: baseGeo, part: 'base'});
+
+  let maxTotalZ = baseThickness;
+  dList.forEach((di, i) => {
+    const innerR = di / 2;
+    const outerR = innerR + wall;
+    const centerZ = outerR;
+    maxTotalZ = Math.max(maxTotalZ, centerZ + Math.SQRT2 * outerR);
+    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments);
+    tubeGeo.translate(0, i * pitch, 0);
+    pieces.push({geometry: tubeGeo, part: 'base'});
+
+    // Barras 1/2/3 con rectángulos puros: legibles con cualquier fuente.
+    for (let b = 0; b <= i; b++) {
+      const barShape = roundedRectShape(labelX0 + b * 2.0, i * pitch - 2.0, 1.0, 4.0, 0);
+      const barGeo = new THREE.ExtrudeGeometry(barShape, {
+        depth: 0.8, bevelEnabled: false, curveSegments,
+      });
+      barGeo.translate(0, 0, baseThickness);
+      pieces.push({geometry: barGeo, part: 'text'});
+    }
+
+    // Rótulo numérico opcional; se omite en silencio si faltan glifos.
+    if (font) {
+      const polys = linesToPolygons(font, null, [{text: di.toFixed(1)}], 4.0, curveSegments);
+      if (polys.length && !(polys.missing || []).length) {
+        const pb = polysBounds(polys);
+        const moved = translatePolys(polys,
+          labelX0 + 11.5 - (pb.minX + pb.maxX) / 2,
+          i * pitch - (pb.minY + pb.maxY) / 2);
+        const labelGeo = new THREE.ExtrudeGeometry(polygonsToShapes(moved), {
+          depth: 0.8, bevelEnabled: false, curveSegments,
+        });
+        labelGeo.translate(0, 0, baseThickness);
+        pieces.push({geometry: labelGeo, part: 'text'});
+      }
+    }
+  });
+
+  return {
+    pieces,
+    width: baseX1 - baseX0,
+    height: baseY1 - baseY0,
+    islands: 1,
+    holeDiameter: d,
+    baseThickness: maxTotalZ,
+    thickness: maxTotalZ,
+    missingChars: [],
   };
 }
 
@@ -1404,5 +1592,7 @@ if (typeof module !== 'undefined' && module.exports) {
     textRunToPolygons, linesToPolygons, polysBounds, translatePolys,
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
+    teardropProfile, normalizePencilCapEnd, pencilCapPlacement, teardropAreaMM2,
+    circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
   };
 }
