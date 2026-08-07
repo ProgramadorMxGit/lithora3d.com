@@ -617,6 +617,33 @@ function pencilBodyTopZ(tunnelStyle, centerZ, outerR) {
 }
 
 /**
+ * Primer X muestreado (desde xNear hacia xFar) donde la silueta contiene el
+ * tramo vertical y ∈ [yCenter−half, yCenter+half] completo: a partir de ahí el
+ * tubo viaja escondido dentro de las letras. En las puntas que se estrechan la
+ * silueta deja de envolver el tubo y su anillo asomaría como una ceja en la
+ * cara del extremo; la tapa debe crecer hasta tragarse esa zona, igual que el
+ * macizo final de los toppers clásicos. Paridad par/impar entre polígonos para
+ * respetar agujeros. Devuelve null si ningún X del rango queda cubierto.
+ */
+function capCoverageLimitX(polys, yCenter, half, xNear, xFar, step) {
+  const dir = xFar >= xNear ? 1 : -1;
+  const paso = Math.max(0.05, step || 0.4);
+  const n = Math.max(1, Math.ceil(Math.abs(xFar - xNear) / paso));
+  for (let i = 0; i <= n; i++) {
+    const x = xNear + dir * Math.min(i * paso, Math.abs(xFar - xNear));
+    const cubierto = [yCenter - half, yCenter, yCenter + half].every(y => {
+      let inside = false;
+      for (const poly of polys) {
+        if (pointInPolygon([x, y], poly)) inside = !inside;
+      }
+      return inside;
+    });
+    if (cubierto) return x;
+  }
+  return null;
+}
+
+/**
  * Decide dónde va la tapa maciza y cómo se recorta el túnel a su alrededor.
  * Trabaja en el X del tile (ya desplazado por dx). 'start' reproduce el
  * cálculo validado de la tapa junto a la primera letra; 'end' es su espejo
@@ -779,6 +806,26 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   let capArea = 0;
   const place = pencilCapPlacement(capMode, tubeStart, tubeEnd, outerR);
   if (place.capX0 !== null) {
+    /* En la punta del nombre la silueta se estrecha y deja de envolver el
+       tubo: su anillo asomaría como una ceja en la cara del extremo. La tapa
+       crece hacia adentro hasta la zona donde el tubo vuelve a viajar oculto
+       (máximo 35 % del túnel), igual que el macizo final de los clásicos. */
+    const polysMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+    if (capMode === 'end') {
+      const covered = capCoverageLimitX(polysMM, centerY, outerR + 0.1,
+        place.capX1 - dx, place.capX0 - dx - 0.35 * tubeLen, 0.4);
+      if (covered !== null) {
+        place.capX0 = Math.max(tubeStart + 1.0, Math.min(place.capX0, covered + dx - 0.5));
+        place.tubeEnd = Math.min(tubeEnd, place.capX0 + place.capOverlap);
+      }
+    } else {
+      const covered = capCoverageLimitX(polysMM, centerY, outerR + 0.1,
+        place.capX0 - dx, place.capX1 - dx + 0.35 * tubeLen, 0.4);
+      if (covered !== null) {
+        place.capX1 = Math.min(tubeEnd - 1.0, Math.max(place.capX1, covered + dx + 0.5));
+        place.tubeStart = Math.max(tubeStart, place.capX1 - place.capOverlap);
+      }
+    }
     const capRect = rectClipperPath(
       place.capX0 - dx - place.capOverlap,
       centerY - outerR - place.capOverlap,
@@ -1631,6 +1678,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
     teardropProfile, roundProfile, pencilBodyTopZ, normalizePencilCapEnd, normalizePencilTunnelStyle,
-    pencilCapPlacement, teardropAreaMM2, circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
+    pencilCapPlacement, capCoverageLimitX, teardropAreaMM2, circularSegmentAreaMM2,
+    estimatePencilVolumeMM3, buildPencilFitTestTile,
   };
 }

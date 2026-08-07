@@ -14,7 +14,7 @@ const sandbox = {module: {exports: {}}, exports: {}};
 vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
 const {
   teardropProfile, roundProfile, pencilBodyTopZ, teardropAreaMM2, circularSegmentAreaMM2,
-  normalizePencilCapEnd, normalizePencilTunnelStyle, pencilCapPlacement,
+  normalizePencilCapEnd, normalizePencilTunnelStyle, pencilCapPlacement, capCoverageLimitX,
   estimatePencilVolumeMM3, signedArea,
 } = sandbox.module.exports;
 
@@ -100,6 +100,24 @@ test('con un túnel muy corto la tapa en cualquier extremo deja al menos 1.35 mm
   assert.equal(start.capX1, 2.0);
   assert.ok(Math.abs(start.tubeStart - 1.65) < 1e-9, `tubeStart inesperado: ${start.tubeStart}`);
   assert.ok(start.tubeEnd - start.tubeStart >= 1.35 - 1e-9);
+});
+
+test('la cobertura de la tapa detecta dónde la silueta vuelve a envolver el tubo', () => {
+  // Silueta sintética: rectángulo alto (x 0..30, y ±10) que se estrecha en
+  // triángulo hasta la punta (x 40, y 0), como la última letra de un nombre.
+  const silueta = [[0, -10], [30, -10], [40, 0], [30, 10], [0, 10]];
+  // Tubo de outerR 5.7 centrado en y=0: queda envuelto cuando la media
+  // altura del triángulo supera 5.8 → x ≤ 34.2.
+  const covered = capCoverageLimitX([silueta], 0, 5.8, 40, 20, 0.4);
+  assert.ok(covered !== null, 'debería encontrar cobertura');
+  assert.ok(covered <= 34.21 && covered >= 33.4, `cobertura inesperada: ${covered}`);
+  // En la punta misma nunca hay cobertura: el rango corto devuelve null.
+  assert.equal(capCoverageLimitX([silueta], 0, 5.8, 40, 36, 0.4), null);
+  // Un agujero (paridad par) anula la cobertura aunque el contorno la dé.
+  const agujero = [[24, -6], [28, -6], [28, 6], [24, 6]];
+  const conAgujero = capCoverageLimitX([silueta, agujero], 0, 5.8, 40, 20, 0.4);
+  assert.ok(conAgujero === null || conAgujero < 24 || conAgujero > 28.1,
+    `la cobertura cayó dentro del agujero: ${conAgujero}`);
 });
 
 test('el volumen estimado de un caso sintético cae en el rango esperado en gramos', () => {

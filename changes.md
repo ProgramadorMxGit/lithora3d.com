@@ -5546,3 +5546,10 @@
 * Motivo: el usuario comparó contra su 3MF de referencia: el hueco debía ser redondo y el tope al final del nombre; la lágrima queda como opción para impresoras que sufran los puentes.
 * Relación: cierra la paridad con la referencia de MakerWorld analizada en specs/lapiz-configurable/informe-y-propuesta.md; segunda iteración de la entrega del modo lápiz.
 * Resultado: ✅ 99 de 99 pruebas (2 nuevas de perfil redondo y normalización); verificado en Chrome real: con almacenamiento limpio el default es Tope al final + Redondo, ISABELA 16 mm muestra el lápiz entrando por la boca redonda del inicio y deteniéndose en el final tapado; captura en audits/lapiz-hueco-redondo-tope-final-2026-08-07.png
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js (`capCoverageLimitX` + extensión de tapa en `buildPencilNameTile`)
+* Cambio: en los extremos tapados, la tapa maciza ahora crece hacia adentro (hasta 35 % del túnel) hasta la zona donde la silueta vuelve a envolver por completo el tubo, detectada con `capCoverageLimitX` (muestreo par/impar de tres puntos del alto del tubo sobre los polígonos dilatados). El tubo se recorta en consecuencia.
+* Motivo: el usuario reportó con captura una "ceja" en la cara del final: la última letra se estrecha en la punta, la silueta deja de cubrir el envolvente de Ø11.4 y el anillo cortado del tubo quedaba expuesto. Los clásicos no lo sufren porque macizan el tramo final completo; ahora nosotros también.
+* Relación: tercera iteración del modo lápiz tras retroalimentación; verificado numéricamente con la fuente real (ISABELA 16 mm, tope al final: la tapa pasó de 3.1 a 5.5 mm y el tubo muere en x=89.1 con cobertura confirmada; en tope al inicio la I cubre de inmediato y la tapa no crece; en abierto las bocas quedan intactas).
+* Resultado: ✅ 100 de 100 pruebas (regresión nueva de cobertura con silueta sintética, punta sin cobertura y agujero por paridad); capturas frontales limpias en audits/lapiz-final-macizo-2026-08-07.png
