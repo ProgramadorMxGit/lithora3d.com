@@ -29,7 +29,7 @@
     corner: 4,
     holeD: 4.5,
     ringThickness: 2.5,
-    pencilHoleD: 8.6,
+    pencilHoleD: 7.7,   // paridad con el topper clásico de referencia (Ø7.69 medido)
     pencilWall: 1.4,
     pencilCapEnd: 'end',    // 'end' (tope donde termina el nombre, como el clásico) | 'start' | 'open'
     pencilTunnelStyle: 'round', // 'round' (hueco redondo, como el clásico) | 'teardrop' (techo 45° sin soportes)

@@ -5567,3 +5567,10 @@
 * Motivo: el usuario mostró que en el extremo tapado el lomo asomaba como un bloque cuadrado después de la última letra: el lomo se extendía por todo el alcance de la banda, pisando la zona que la iteración anterior ya había arreglado; y la comprobación de cobertura, al medir contra el cuerpo (que incluía al propio lomo), se volvía un no-op.
 * Relación: quinta iteración del modo lápiz; restituye el comportamiento validado de la tapa-que-crece (d1dde2e) dentro de la arquitectura de cuerpo rebanado (ac1e1c7).
 * Resultado: ✅ 101 de 101 pruebas; extents verificados con la fuente real (tope al final: hueco 0..89.1 y ancho del tile igual al de las letras, 94.4); extremo limpio verificado en Chrome (audits/lapiz-final-sin-bloque-2026-08-07.png)
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/plantilla.py, assets/app/creador.js e index.html (regenerado)
+* Cambio: paridad exacta de diámetro con el topper clásico de referencia: preset "Clásico firme · 7.7 mm" como recomendado y nuevo valor por defecto de `pencilHoleD` (antes 8.6), slider de diámetro interior desde 7.6 mm (antes 7.8), preset 8.6 renombrado a "Holgado fácil" y el de 8.3 retirado (el slider lo cubre); FAQ del diámetro actualizada. El piso geométrico de 7.6 ya existía en `buildPencilNameTile`.
+* Motivo: el usuario comparó contra su 3MF clásico (Ø7.69 medido, dispersión 0.005) y el default de 8.6 quedaba ~0.9 mm más flojo: el lápiz bailaría. El 7.7 reproduce el agarre firme de la pieza que vende.
+* Relación: sexta iteración del modo lápiz; con 7.7 el aviso de tamaño de letra deja de dispararse con letras de 12 mm (envolvente 10.5) y la prueba de ajuste imprime 7.4/7.7/8.0, que encierra el 7.69 de referencia.
+* Resultado: ✅ suite completa en verde; verificado en Chrome con almacenamiento limpio: preset Clásico seleccionado, slider 7.7 (mín. 7.6), tope al final + hueco redondo, HUD y WhatsApp reflejando 7.7 mm
