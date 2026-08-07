@@ -5588,3 +5588,10 @@
 * Motivo: el usuario reportó con captura un hueco tipo cueva junto a la última letra con su fuente script; el análisis numérico confirmó cobertura hallada en x≈17 de ~40 (tope a media palabra).
 * Relación: octava iteración del modo lápiz; unifica el lenguaje de diseño: donde las letras no esconden el túnel, siempre se ve el forro REDONDO (abierto en la boca, cerrado en el tope). `capCoverageLimitX` sigue en uso para retraer el lomo en bocas abiertas.
 * Resultado: ✅ suite completa en verde; harness con Caveat y Poppins en los tres modos de tapa: hueco profundo (0.2..57.3 de 59.8 en Caveat/end), tapón presente, sin ventanas por construcción; visor verificado con Caveat (audits/lapiz-tope-tapon-redondo-2026-08-07.png)
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js (`capCoverageLimitX` + tope, estrategia definitiva)
+* Cambio: la comprobación de cobertura ahora muestrea DENSO toda la altura del envolvente (paso ≤0.5 mm en vez de 3 puntos sueltos) y exige una racha continua de muestras cubiertas (`runLength`), devolviendo el extremo profundo de la racha para poder enterrar la pared dentro de un trazo real. Con eso se restituyó la tapa-que-crece hasta cobertura verdadera (nada sobresale de las letras) y el tapón redondo quedó SOLO como último recurso cuando ninguna letra puede envolver el tubo. Las retracciones del lomo en bocas abiertas usan la misma racha.
+* Motivo: los 3 puntos sueltos daban falsos positivos con letras script (tres trazos separados contaban como "cubierto"), lo que provocó la cueva; el tapón que la sustituyó sobresalía como la ceja original. El muestreo denso resuelve ambas quejas del usuario a la vez.
+* Relación: novena iteración; converge con lo aprobado en d1dde2e (final = puras letras) y mantiene la garantía anti-ventanas para letras diminutas.
+* Resultado: ✅ suite completa en verde; harness con Caveat, Poppins y Pacifico en ambos topes: cobertura real encontrada cerca del extremo (sin tapón, 15 piezas), hueco profundo; visor verificado con Caveat: extremo limpio de puras letras (audits/lapiz-tope-enterrado-2026-08-07.png)

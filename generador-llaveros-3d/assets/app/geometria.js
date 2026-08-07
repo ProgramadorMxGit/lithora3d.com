@@ -639,20 +639,31 @@ function pencilVoidHalfWidth(tunnelStyle, radius, centerZ, z) {
  * macizo final de los toppers clásicos. Paridad par/impar entre polígonos para
  * respetar agujeros. Devuelve null si ningún X del rango queda cubierto.
  */
-function capCoverageLimitX(polys, yCenter, half, xNear, xFar, step) {
+function capCoverageLimitX(polys, yCenter, half, xNear, xFar, step, runLength) {
   const dir = xFar >= xNear ? 1 : -1;
   const paso = Math.max(0.05, step || 0.4);
   const n = Math.max(1, Math.ceil(Math.abs(xFar - xNear) / paso));
+  // Muestreo DENSO de toda la altura: con 3 puntos sueltos, tres trazos de una
+  // letra script contaban como "cubierto" aunque hubiera huecos entre ellos, y
+  // la pared del tope quedaba visible como cueva entre los trazos.
+  const ys = [];
+  const nY = Math.max(2, Math.ceil((2 * half) / 0.5));
+  for (let j = 0; j <= nY; j++) ys.push(yCenter - half + (2 * half * j) / nY);
+  const largoRacha = Math.max(1, runLength || 1);
+  let racha = 0;
   for (let i = 0; i <= n; i++) {
     const x = xNear + dir * Math.min(i * paso, Math.abs(xFar - xNear));
-    const cubierto = [yCenter - half, yCenter, yCenter + half].every(y => {
+    const cubierto = ys.every(y => {
       let inside = false;
       for (const poly of polys) {
         if (pointInPolygon([x, y], poly)) inside = !inside;
       }
       return inside;
     });
-    if (cubierto) return x;
+    racha = cubierto ? racha + 1 : 0;
+    // Se exige una racha continua para poder ENTERRAR una pared dentro de
+    // ella; se devuelve el extremo más profundo de la racha.
+    if (racha >= largoRacha) return x;
   }
   return null;
 }
@@ -783,16 +794,37 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   }
 
   /* Tope elegible: 'start' maciza junto a la PRIMERA letra y 'end' junto a la
-     última, como los toppers clásicos. El tope NO depende de que las letras
-     envuelvan el tubo: el forro redondo continúa CERRADO (tapón macizo) hasta
-     el final del tramo. Con letras gordas el tapón queda enterrado e
-     invisible; con letras delgadas o script se ve un remate redondo — nunca
-     una pared plana ni una ventana. (La estrategia anterior corría la tapa
-     hacia adentro buscando cobertura de letras y con fuentes script acababa a
-     media palabra, dejando una cueva entre los trazos.) */
+     última, como los toppers clásicos. La tapa crece hacia adentro hasta un
+     tramo donde las letras envuelven DE VERDAD el tubo (muestreo denso de
+     toda la altura + racha continua donde enterrar la pared): así nada
+     sobresale de las letras y la pared del tope queda escondida dentro de un
+     trazo, sin cuevas. Solo si ninguna letra puede envolver el tubo (letras
+     muy pequeñas) se recurre al tapón redondo como último recurso. */
   const tunnelLenU = tubeEndU - tubeStartU;
   const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const place = pencilCapPlacement(capMode, tubeStartU, tubeEndU, outerR);
+  let plugNeeded = false;
+  if (place.capX0 !== null) {
+    if (capMode === 'end') {
+      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+        place.capX1, place.capX0 - 0.35 * tunnelLenU, 0.4, 2);
+      if (covered !== null) {
+        place.capX0 = Math.max(tubeStartU + 1.0, Math.min(place.capX0, covered - 0.15));
+      } else {
+        plugNeeded = true;
+      }
+      place.tubeEnd = Math.min(tubeEndU, place.capX0 + place.capOverlap);
+    } else {
+      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+        place.capX0, place.capX1 + 0.35 * tunnelLenU, 0.4, 2);
+      if (covered !== null) {
+        place.capX1 = Math.min(tubeEndU - 1.0, Math.max(place.capX1, covered + 0.15));
+      } else {
+        plugNeeded = true;
+      }
+      place.tubeStart = Math.max(tubeStartU, place.capX1 - place.capOverlap);
+    }
+  }
   const voidStartU = place.tubeStart;
   const voidEndU = place.tubeEnd;
 
@@ -808,13 +840,13 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   let spineEndU = voidEndU;
   if (capMode !== 'start') {
     const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
-      voidStartU, voidStartU + 0.35 * tunnelLenU, 0.4);
-    if (covered !== null) spineStartU = Math.max(spineStartU, covered + 0.3);
+      voidStartU, voidStartU + 0.35 * tunnelLenU, 0.4, 2);
+    if (covered !== null) spineStartU = Math.max(spineStartU, covered - 0.15);
   }
   if (capMode !== 'end') {
     const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
-      voidEndU, voidEndU - 0.35 * tunnelLenU, 0.4);
-    if (covered !== null) spineEndU = Math.min(spineEndU, covered - 0.3);
+      voidEndU, voidEndU - 0.35 * tunnelLenU, 0.4, 2);
+    if (covered !== null) spineEndU = Math.min(spineEndU, covered + 0.15);
   }
   if (spineEndU - spineStartU < 2.0) {
     // Retracciones que se cruzan (nombres cortísimos): lomo completo.
@@ -903,10 +935,11 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   topGeo.translate(0, 0, voidHi - 0.02);
   pieces.push({geometry: topGeo, part: 'base'});
 
-  // Tapón macizo del extremo tapado: cubre SIEMPRE el envolvente completo, así
-  // el tope jamás queda con ventanas aunque las letras sean delgadas. Con
-  // letras gordas queda enterrado; con script se ve como remate redondo.
-  if (capMode !== 'open' && tubeLen > 0.2) {
+  // Último recurso: si NINGUNA letra puede envolver el tubo (letras muy
+  // pequeñas frente al envolvente), el forro continúa cerrado como tapón
+  // redondo. Es preferible un remate redondo visible a una ventana al vacío;
+  // el aviso de tamaño ya sugiere agrandar las letras.
+  if (plugNeeded && tubeLen > 0.2) {
     const plugLen = (capMode === 'end' ? tubeEndU - voidEndU : voidStartU - tubeStartU) + 0.35;
     if (plugLen > 0.4) {
       const plugGeo = buildSolidPencilTube(plugLen, outerR, centerZ, curveSegments, tunnelStyle);
