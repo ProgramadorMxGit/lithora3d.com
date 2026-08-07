@@ -5468,3 +5468,74 @@
 * Motivo: descartar errores sintácticos, de espacios o regresiones fuera del generador.
 * Relación: cierre técnico de la corrección de la agarradera.
 * Resultado: ✅ 91 de 91 pruebas aprobadas; consola del navegador sin errores (sólo advertencia heredada de deprecación del build clásico de Three.js)
+
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js
+* Cambio: la tapa oculta del túnel pasó de casilla booleana a extremo elegible (`open`/`start`/`end`) mediante dos funciones puras nuevas: `normalizePencilCapEnd` (migra la opción heredada) y `pencilCapPlacement` (coloca la tapa y recorta el túnel; `end` es el espejo exacto de `start`). Las bocas escalonadas de 0.35 mm ahora solo se generan en extremos abiertos; el lado tapado las pierde y su tramo lo absorbe el núcleo calibrado.
+* Motivo: la referencia clásica de MakerWorld tapa el FINAL del nombre; nuestro código solo sabía tapar el arranque, y enterrar una boca ensanchada bajo la tapa debilitaba la fusión tubo-tapa.
+* Relación: implementa A2 del plan aprobado en specs/lapiz-configurable/informe-y-propuesta.md; el caso `open` produce el contrato geométrico intacto (verificado por regresión).
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js
+* Cambio: `buildPencilNameTile` devuelve `volumeMM3` (volumen por regiones 2D de Clipper × altura, con `teardropAreaMM2`, `circularSegmentAreaMM2` y `estimatePencilVolumeMM3` descontando el tramo del anillo ya cubierto por las pieles) y `pencil{axisY, centerZ, innerR, xStart, xEnd, capEnd}` con el hueco real del túnel. `layoutTiles` expone `offsets` por pieza.
+* Motivo: alimentar el "≈ X g" del visor sin integrar la sopa de triángulos (los sólidos se solapan a propósito y sobrecontarían) y dar al visor las coordenadas exactas para dibujar el lápiz de ejemplo.
+* Relación: D1 del plan; los solapes de diseño de 0.25–0.35 mm se ignoran documentadamente (±10 %).
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js (`buildPencilFitTestTile`)
+* Cambio: builder nuevo del testigo de ajuste: tres túneles de 12 mm con el diámetro elegido −0.3/exacto/+0.3 sobre base común de 1.2 mm, sin bocas escalonadas, con barras en relieve 1/2/3 hechas con rectángulos puros y rótulo numérico opcional si la fuente trae todos los glifos.
+* Motivo: la causa número uno de piezas tiradas es un lápiz fuera de medida; una prueba de minutos elimina el riesgo antes de imprimir la placa completa.
+* Relación: B2 del plan; sin bocas para que el testigo mida el diámetro calibrado real.
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/creador.js
+* Cambio: estado `pencilCapEnd` (con migración del boolean heredado ANTES de `sanitizeSnapshotState`, validación de dominio y escritura del boolean para compatibilidad hacia atrás), selector de tapa de tres botones, lápiz de ejemplo semitransparente por pieza (hexagonal, con cono de madera y mina; entra por el lado abierto y se detiene en la tapa; `part:'ghost'` lo excluye de exports y colores; se inserta DESPUÉS del encuadre para no alterar Box3 ni HUD), gramos estimados en el HUD con la densidad del perfil, CTA de WhatsApp dinámico con producto/nombres/medida, aviso de texto consciente del producto y nota del perfil de lápiz en los tres modos de impresión.
+* Motivo: hacer el modo lápiz configurable y comprensible a golpe de vista, sin tocar la geometría imprimible.
+* Relación: A2, C1, C4, D1 y D2 del plan aprobado.
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/creador.js (lápiz de ejemplo, segunda pasada)
+* Cambio: el lápiz de ejemplo dejó el modo rayos-X (`depthTest:false` dibujaba el lápiz ENCIMA de la pieza desde cualquier ángulo) y ahora se ocluye como un lápiz real; sobresale menos (22 mm, 14 mm con varias columnas), se puede ocultar con la casilla `showPencilGhost` y `updatePencilHint` avisa cuando las letras son más bajas que el túnel con su pared y sugiere el tamaño que lo esconde.
+* Motivo: el usuario comparó contra la pieza clásica de referencia y el visor comunicaba otra cosa: un tubo gigante flotando sobre el modelo y el túnel asomando entre letras de 12 mm.
+* Relación: corrección inmediata sobre C1 tras la retroalimentación con captura; la sugerencia de tamaño reproduce la proporción de la referencia (letras ≥ 1.3× el envolvente del túnel).
+* Resultado: ✅ verificado en Chrome real vía CDP: oclusión correcta, tope al final con letras de 16 mm replica la lectura del clásico; captura en audits/lapiz-tope-final-referencia-2026-08-07.png
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/plantilla.py y generador-llaveros-3d/index.html (regenerado)
+* Cambio: PRODUCTO_LAPIZ ahora trae presets con nombres humanos (Lápiz de escuela/Más apretado/Jumbo grueso), el selector de tapa, la casilla del lápiz de ejemplo, el botón de prueba de ajuste y el aviso de tamaño; FAQ +2 preguntas de lápiz (14 en total), paso 1 y caso Escuela mencionan lápices, featureList +2 y title/description/OG/Twitter incluyen "nombres para lápiz". index.html se regeneró con `python plantilla.py` (40.2 KB, 1204 palabras indexables).
+* Motivo: cada control nuevo del lápiz debe vivir en la plantilla o la siguiente regeneración lo borra; la página no indexaba el producto lápiz que la app ya ofrece.
+* Relación: fases 4 del plan; el portable no se tocó.
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/estilos.css
+* Cambio: estilos de `.pencil-group-label` y `.fit-test-btn` (botón punteado full-width con jerarquía secundaria); `#pencil-cap-list` reutiliza `.pencil-fit-list`.
+* Motivo: los controles nuevos debían leerse como parte del sistema existente, no como parches.
+* Relación: acompaña la UI nueva de plantilla.py.
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: tests/generator-pencil-tunnel.test.mjs, tests/static-audit.test.mjs y sitemap.xml
+* Cambio: seis regresiones nuevas (simetría/extremos del perfil de lágrima, área analítica vs shoelace, migración del boolean, espejo de la tapa en `end` con recorte y boca apagada, cota de 1.35 mm en túneles cortos, volumen sintético ±1 % y 7.2–7.7 g); la auditoría estática valida `<lastmod>` con patrón de fecha genérico en vez de anclar 2026-08-05; lastmod del generador → 2026-08-07.
+* Motivo: proteger el contrato geométrico nuevo y poder actualizar el lastmod de una sola página sin falsear las demás.
+* Relación: fases 5 y 6 del plan.
+* Resultado: ✅ 97 de 97 pruebas aprobadas (91 previas + 6 nuevas)
+## [2026-08-07]
+
+* Archivo: scripts/serve-local.mjs y .claude/launch.json
+* Cambio: el servidor local acepta `PORT` como respaldo de `LITHORA_PORT` y el lanzador usa `autoPort`; se retiró la configuración "llaveros" que apuntaba a un scratchpad de una sesión anterior.
+* Motivo: el puerto 8000 estaba ocupado por otro proceso local y el visor de verificación necesita levantar en un puerto asignado.
+* Relación: infraestructura de validación, sin efecto en producción.
+* Resultado: ✅ éxito
+## [2026-08-07]
+
+* Archivo: validación de la entrega del modo lápiz configurable
+* Cambio: `node --check` de los tres JS de la app, `npm run validate` completo, regeneración de plantilla con diff limpio y verificación en Chrome real vía CDP: tres estados de tapa reconstruyen sin errores de consola (solo la advertencia heredada de three.js), lápiz de ejemplo con oclusión y dirección correctas por tapa, HUD con gramos (2 nombres ≈ 18.3 g; ISABELA 16 mm ≈ 21.3 g), presets y botón de prueba habilitados, WhatsApp dinámico con nombres y medida, y migración real de un guardado sembrado con `pencilClosedEnd:true` que cargó como "Tope al inicio" con preset 8.3.
+* Motivo: cierre técnico de la entrega conforme al plan aprobado.
+* Relación: evidencia en audits/lapiz-tope-final-referencia-2026-08-07.png.
+* Resultado: ✅ 97 de 97 pruebas y verificación en navegador aprobadas

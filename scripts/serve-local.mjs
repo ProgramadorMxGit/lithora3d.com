@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const port = Number.parseInt(process.env.LITHORA_PORT || '8000', 10);
+const port = Number.parseInt(process.env.LITHORA_PORT || process.env.PORT || '8000', 10);
 const host = '127.0.0.1';
 const mimeTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
