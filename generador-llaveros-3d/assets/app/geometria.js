@@ -528,11 +528,17 @@ function orientedCrossSection(points, clockwise) {
   return out;
 }
 
-function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegments) {
+function pencilTubeProfile(tunnelStyle, radius, centerZ, segments) {
+  return tunnelStyle === 'round'
+    ? roundProfile(radius, centerZ, segments)
+    : teardropProfile(radius, centerZ, segments);
+}
+
+function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegments, tunnelStyle) {
   const outer = orientedCrossSection(
-    teardropProfile(outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
+    pencilTubeProfile(tunnelStyle, outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
   const inner = orientedCrossSection(
-    teardropProfile(innerRadius, centerZ, Math.max(28, curveSegments * 4)), true);
+    pencilTubeProfile(tunnelStyle, innerRadius, centerZ, Math.max(28, curveSegments * 4)), true);
   const shape = new THREE.Shape(outer);
   shape.holes.push(new THREE.Path(inner));
   const geo = new THREE.ExtrudeGeometry(shape, {
@@ -545,9 +551,9 @@ function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegment
   return geo;
 }
 
-function buildSolidPencilTube(length, outerRadius, centerZ, curveSegments) {
+function buildSolidPencilTube(length, outerRadius, centerZ, curveSegments, tunnelStyle) {
   const outer = orientedCrossSection(
-    teardropProfile(outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
+    pencilTubeProfile(tunnelStyle, outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
   const shape = new THREE.Shape(outer);
   const geo = new THREE.ExtrudeGeometry(shape, {
     depth: length,
@@ -578,11 +584,36 @@ function clipperPathsAreaMM2(paths) {
 /* Ayudantes PUROS del túnel para lápiz (sin THREE ni Clipper en el cuerpo):
    la suite de Node los prueba directamente vía module.exports. */
 
-/** Resuelve el modo de tapa pedido, aceptando la opción booleana heredada. */
+/** Resuelve el modo de tapa pedido, aceptando la opción booleana heredada.
+ *  La casilla vieja decía "Tapar el FINAL del túnel", así que un guardado con
+ *  true migra a 'end': se honra lo que el usuario leyó, no lo que el código
+ *  viejo hacía por dentro (macizar el arranque). */
 function normalizePencilCapEnd(opts) {
   const v = opts && opts.pencilCapEnd;
   if (v === 'open' || v === 'start' || v === 'end') return v;
-  return opts && opts.pencilClosedEnd ? 'start' : 'open';
+  return opts && opts.pencilClosedEnd ? 'end' : 'open';
+}
+
+/** Forma del hueco: lágrima con techo a 45° (sin soportes) o círculo puro
+ *  como los toppers clásicos (el techo se imprime con puentes). */
+function normalizePencilTunnelStyle(opts) {
+  return opts && opts.pencilTunnelStyle === 'round' ? 'round' : 'teardrop';
+}
+
+/** Perfil circular completo en [y, z], mismo contrato que teardropProfile. */
+function roundProfile(radius, centerZ, segments) {
+  const pts = [];
+  const steps = Math.max(24, segments || 36);
+  for (let i = 0; i < steps; i++) {
+    const a = Math.PI * 0.5 + (Math.PI * 2 * i / steps);
+    pts.push([Math.cos(a) * radius, centerZ + Math.sin(a) * radius]);
+  }
+  return pts;
+}
+
+/** Altura del cuerpo según la forma del hueco: el círculo ahorra el pico. */
+function pencilBodyTopZ(tunnelStyle, centerZ, outerR) {
+  return tunnelStyle === 'round' ? centerZ + outerR : centerZ + Math.SQRT2 * outerR;
 }
 
 /**
@@ -634,13 +665,18 @@ function circularSegmentAreaMM2(R, h) {
  * báscula.
  */
 function estimatePencilVolumeMM3(m) {
-  const ringArea = teardropAreaMM2(m.outerR) - teardropAreaMM2(m.innerR);
-  const skinOverlap = circularSegmentAreaMM2(m.outerR, m.skin) + m.skin * m.skin;
+  const round = m.tunnelStyle === 'round';
+  const profileArea = r => (round ? Math.PI * r * r : teardropAreaMM2(r));
+  const ringArea = profileArea(m.outerR) - profileArea(m.innerR);
+  // Piel inferior: casquete del círculo. Piel superior: cuña de 45° en la
+  // lágrima; en el círculo es otro casquete simétrico.
+  const skinOverlap = circularSegmentAreaMM2(m.outerR, m.skin) +
+    (round ? circularSegmentAreaMM2(m.outerR, m.skin) : m.skin * m.skin);
   return m.wingsArea * m.totalZ
     + m.bandArea * 2 * m.skin
     + Math.max(0, ringArea - skinOverlap) * m.tubeLen
     + m.capArea * Math.max(0, m.totalZ - 2 * m.skin)
-    + teardropAreaMM2(m.innerR) * (m.plugLen || 0)
+    + profileArea(m.innerR) * (m.plugLen || 0)
     + m.textArea * m.raisedHeight;
 }
 
@@ -678,7 +714,8 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const innerR = holeD / 2;
   const outerR = innerR + wall;
   const centerZ = outerR;
-  const totalZ = centerZ + Math.SQRT2 * outerR;
+  const tunnelStyle = normalizePencilTunnelStyle(opts);
+  const totalZ = pencilBodyTopZ(tunnelStyle, centerZ, outerR);
   const skin = Math.min(wall, Math.max(0.9, totalZ * 0.12));
   const capMode = normalizePencilCapEnd(opts);
 
@@ -776,20 +813,20 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     const coreStart = tubeStart + (wantEntry ? lead : 0);
     const coreEnd = tubeEnd - (wantExit ? lead : 0);
     if (wantEntry) {
-      const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+      const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
       entryGeo.translate(tubeStart, centerY + dy, 0);
       pieces.push({geometry: entryGeo, part: 'base'});
     }
-    const coreGeo = buildPencilTube(coreEnd - coreStart, innerR, outerR, centerZ, curveSegments);
+    const coreGeo = buildPencilTube(coreEnd - coreStart, innerR, outerR, centerZ, curveSegments, tunnelStyle);
     coreGeo.translate(coreStart, centerY + dy, 0);
     pieces.push({geometry: coreGeo, part: 'base'});
     if (wantExit) {
-      const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments);
+      const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
       exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
       pieces.push({geometry: exitGeo, part: 'base'});
     }
   } else if (tubeLen > 0.2) {
-    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments);
+    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments, tunnelStyle);
     tubeGeo.translate(tubeStart, centerY + dy, 0);
     pieces.push({geometry: tubeGeo, part: 'base'});
   }
@@ -801,7 +838,7 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     pieces.push({geometry: capGeo, part: 'base'});
   } else if (plugged && tubeLen > 0.2) {
     const plugX = capMode === 'end' ? tubeEnd - fallbackPlugLen : tubeStart;
-    const endPlugGeo = buildSolidPencilTube(fallbackPlugLen, innerR + 0.35, centerZ, curveSegments);
+    const endPlugGeo = buildSolidPencilTube(fallbackPlugLen, innerR + 0.35, centerZ, curveSegments, tunnelStyle);
     endPlugGeo.translate(plugX, centerY + dy, 0);
     pieces.push({geometry: endPlugGeo, part: 'base'});
   }
@@ -820,7 +857,7 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const textArea = Math.abs(clipperPathsAreaMM2(polysToClipperPaths(polys)));
   const volumeMM3 = estimatePencilVolumeMM3({
     wingsArea, bandArea, capArea, textArea,
-    plugLen: fallbackPlugLen, outerR, innerR, skin, totalZ, tubeLen,
+    plugLen: fallbackPlugLen, outerR, innerR, skin, totalZ, tubeLen, tunnelStyle,
     raisedHeight: opts.textRaisedHeightMM,
   });
 
@@ -858,6 +895,7 @@ function buildPencilFitTestTile(font, opts) {
   const curveSegments = opts.curveSegments || 10;
   const d = Math.max(7.6, opts.pencilHoleDiameterMM || 8.6);
   const wall = Math.max(1.2, opts.pencilWallMM || 1.4);
+  const tunnelStyle = normalizePencilTunnelStyle(opts);
   const dList = [d - 0.3, d, d + 0.3];
   const outerRMax = dList[2] / 2 + wall;
   const pitch = 2 * outerRMax + 5;
@@ -880,8 +918,8 @@ function buildPencilFitTestTile(font, opts) {
     const innerR = di / 2;
     const outerR = innerR + wall;
     const centerZ = outerR;
-    maxTotalZ = Math.max(maxTotalZ, centerZ + Math.SQRT2 * outerR);
-    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments);
+    maxTotalZ = Math.max(maxTotalZ, pencilBodyTopZ(tunnelStyle, centerZ, outerR));
+    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments, tunnelStyle);
     tubeGeo.translate(0, i * pitch, 0);
     pieces.push({geometry: tubeGeo, part: 'base'});
 
@@ -1592,7 +1630,7 @@ if (typeof module !== 'undefined' && module.exports) {
     textRunToPolygons, linesToPolygons, polysBounds, translatePolys,
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
-    teardropProfile, normalizePencilCapEnd, pencilCapPlacement, teardropAreaMM2,
-    circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
+    teardropProfile, roundProfile, pencilBodyTopZ, normalizePencilCapEnd, normalizePencilTunnelStyle,
+    pencilCapPlacement, teardropAreaMM2, circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
   };
 }

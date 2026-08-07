@@ -31,7 +31,8 @@
     ringThickness: 2.5,
     pencilHoleD: 8.6,
     pencilWall: 1.4,
-    pencilCapEnd: 'open',   // 'open' | 'start' (tapa junto a la 1a letra) | 'end'
+    pencilCapEnd: 'end',    // 'end' (tope donde termina el nombre, como el clásico) | 'start' | 'open'
+    pencilTunnelStyle: 'round', // 'round' (hueco redondo, como el clásico) | 'teardrop' (techo 45° sin soportes)
     showPencilGhost: true,  // lápiz de ejemplo en el visor; nunca se exporta
     columns: 2,
     gap: 6,
@@ -448,13 +449,33 @@
     });
   }
 
-  function syncPencilCapUI() {
-    if (!pencilCapListEl) return;
-    pencilCapListEl.querySelectorAll('button').forEach(btn => {
-      const on = btn.dataset.cap === state.pencilCapEnd;
-      btn.classList.toggle('selected', on);
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  // ---------- pencil tunnel shape: round like the classic / 45° roof ----------
+  const pencilTunnelListEl = $('pencil-tunnel-list');
+  if (pencilTunnelListEl) {
+    pencilTunnelListEl.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.pencilTunnelStyle = btn.dataset.tunnel;
+        syncPencilCapUI();
+        scheduleRebuild();
+      });
     });
+  }
+
+  function syncPencilCapUI() {
+    if (pencilCapListEl) {
+      pencilCapListEl.querySelectorAll('button').forEach(btn => {
+        const on = btn.dataset.cap === state.pencilCapEnd;
+        btn.classList.toggle('selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    if (pencilTunnelListEl) {
+      pencilTunnelListEl.querySelectorAll('button').forEach(btn => {
+        const on = btn.dataset.tunnel === state.pencilTunnelStyle;
+        btn.classList.toggle('selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
     const ghostChk = $('in-showPencilGhost');
     if (ghostChk) ghostChk.checked = state.showPencilGhost;
   }
@@ -1001,6 +1022,7 @@
       pencilHoleDiameterMM: state.pencilHoleD,
       pencilWallMM: state.pencilWall,
       pencilCapEnd: state.pencilCapEnd,
+      pencilTunnelStyle: state.pencilTunnelStyle,
       curveSegments: state.curveSegments,
       outlineWidthMM: state.outlineWidth,
     };
@@ -1344,7 +1366,7 @@
   const SAVED_KEYS = [
     'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
-    'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'showPencilGhost',
+    'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
     'textColor', 'rainbow', 'printMode', 'layerHeight', 'printer',
   ];
@@ -1401,10 +1423,11 @@
 
   function applySnapshot(snap) {
     if (!snap || !snap.state) return;
-    // Migración de guardados viejos: la tapa era una casilla booleana. Se hace
-    // ANTES de sanear porque el saneador descartaría el boolean por su tipo.
+    // Migración de guardados viejos: la tapa era una casilla booleana que
+    // decía "Tapar el FINAL del túnel" — se honra esa etiqueta (→ 'end').
+    // Se hace ANTES de sanear porque el saneador descartaría el boolean.
     if (snap.state.pencilCapEnd === undefined && typeof snap.state.pencilClosedEnd === 'boolean') {
-      snap.state.pencilCapEnd = snap.state.pencilClosedEnd ? 'start' : 'open';
+      snap.state.pencilCapEnd = snap.state.pencilClosedEnd ? 'end' : 'open';
     }
     const safe = sanitizeSnapshotState(snap.state);
     SAVED_KEYS.forEach(k => {
@@ -1418,6 +1441,7 @@
     if (!PRINTERS.some(p => p.id === state.printer)) state.printer = DEFAULT_STATE.printer;
     if (!['keychain', 'pencil'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
     if (!['open', 'start', 'end'].includes(state.pencilCapEnd)) state.pencilCapEnd = DEFAULT_STATE.pencilCapEnd;
+    if (!['round', 'teardrop'].includes(state.pencilTunnelStyle)) state.pencilTunnelStyle = DEFAULT_STATE.pencilTunnelStyle;
 
     refreshAllControls();
   }

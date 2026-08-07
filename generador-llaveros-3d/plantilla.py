@@ -53,9 +53,14 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
           <div class="info-box warn" id="pencil-size-hint" role="alert" hidden></div>
           <p class="pencil-group-label">¿Abierto o con tope?</p>
           <div class="pencil-fit-list" id="pencil-cap-list" role="group" aria-label="Extremo tapado del túnel">
-            <button type="button" data-cap="open" aria-pressed="true"><b>Abierto</b><small>Asoma por los dos lados</small></button>
+            <button type="button" data-cap="end" aria-pressed="true"><b>Tope al final</b><small>Donde termina el nombre · como los clásicos</small></button>
+            <button type="button" data-cap="open" aria-pressed="false"><b>Abierto</b><small>Asoma por los dos lados</small></button>
             <button type="button" data-cap="start" aria-pressed="false"><b>Tope al inicio</b><small>Junto a la primera letra</small></button>
-            <button type="button" data-cap="end" aria-pressed="false"><b>Tope al final</b><small>Como los clásicos</small></button>
+          </div>
+          <p class="pencil-group-label">¿Cómo es el hueco?</p>
+          <div class="pencil-fit-list" id="pencil-tunnel-list" role="group" aria-label="Forma del túnel">
+            <button type="button" data-tunnel="round" aria-pressed="true"><b>Redondo</b><small>Como los clásicos</small></button>
+            <button type="button" data-tunnel="teardrop" aria-pressed="false"><b>Techo 45°</b><small>Extra firme, sin soportes</small></button>
           </div>
           <label class="check-row" style="margin-top:2px;margin-bottom:13px">
             <input type="checkbox" id="in-showPencilGhost" checked>
@@ -64,7 +69,7 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
           <button type="button" class="fit-test-btn" id="btn-fit-test">🎯 Imprimir prueba de ajuste<small>3 medidas en una pieza chiquita: pruebas tu lápiz real antes de imprimir todo</small></button>
           <div class="info-box pencil-spec">
             El lápiz de la vista 3D te enseña por dónde entra y dónde se detiene.
-            <small>El túnel usa un techo interior a 45° para imprimirse acostado y sin soportes, y la boca es 0.35 mm más amplia para guiar el lápiz. ¿Dudas con la medida? Imprime la <b>prueba de ajuste</b>: tres túneles cortos (apretado, exacto y holgado) con sus marcas, y te quedas con el que entre mejor.</small>
+            <small>El hueco <b>redondo</b> es el de los toppers clásicos: se imprime acostado y el techo del túnel sale con pequeños puentes que quedan ocultos. El <b>techo 45°</b> evita hasta esos puentes, por si tu impresora los sufre. La boca es 0.35 mm más amplia para guiar el lápiz. ¿Dudas con la medida? Imprime la <b>prueba de ajuste</b>: tres túneles cortos (apretado, exacto y holgado) con sus marcas, y te quedas con el que entre mejor.</small>
           </div>
         </div>
       </section>

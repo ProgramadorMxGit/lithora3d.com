@@ -13,8 +13,9 @@ const source = fs.readFileSync(
 const sandbox = {module: {exports: {}}, exports: {}};
 vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
 const {
-  teardropProfile, teardropAreaMM2, circularSegmentAreaMM2,
-  normalizePencilCapEnd, pencilCapPlacement, estimatePencilVolumeMM3, signedArea,
+  teardropProfile, roundProfile, pencilBodyTopZ, teardropAreaMM2, circularSegmentAreaMM2,
+  normalizePencilCapEnd, normalizePencilTunnelStyle, pencilCapPlacement,
+  estimatePencilVolumeMM3, signedArea,
 } = sandbox.module.exports;
 
 test('el perfil de lágrima es simétrico y sus extremos son los teóricos', () => {
@@ -40,12 +41,35 @@ test('el área analítica de la lágrima coincide con el shoelace del perfil', (
   assert.ok(relError < 0.006, `error relativo ${relError} demasiado alto`);
 });
 
-test('la migración de la casilla booleana heredada respeta el comportamiento validado', () => {
-  assert.equal(normalizePencilCapEnd({pencilClosedEnd: true}), 'start');
+test('la migración de la casilla booleana heredada honra su etiqueta: "tapar el FINAL"', () => {
+  // La casilla vieja decía "Tapar el final del túnel" aunque el código de
+  // entonces macizara el arranque; el usuario definió que tapado = donde
+  // TERMINA el nombre, así que true migra a 'end'.
+  assert.equal(normalizePencilCapEnd({pencilClosedEnd: true}), 'end');
   assert.equal(normalizePencilCapEnd({pencilClosedEnd: false}), 'open');
-  assert.equal(normalizePencilCapEnd({pencilCapEnd: 'end'}), 'end');
+  assert.equal(normalizePencilCapEnd({pencilCapEnd: 'start'}), 'start');
   assert.equal(normalizePencilCapEnd({pencilCapEnd: 'banana'}), 'open');
   assert.equal(normalizePencilCapEnd({}), 'open');
+});
+
+test('la forma del hueco se normaliza y el círculo rebaja la altura del cuerpo', () => {
+  assert.equal(normalizePencilTunnelStyle({pencilTunnelStyle: 'round'}), 'round');
+  assert.equal(normalizePencilTunnelStyle({pencilTunnelStyle: 'otra'}), 'teardrop');
+  assert.equal(normalizePencilTunnelStyle({}), 'teardrop');
+  // Con outerR 5.7: lágrima llega a centerZ + √2·r; el círculo solo a centerZ + r.
+  assert.ok(Math.abs(pencilBodyTopZ('teardrop', 5.7, 5.7) - 5.7 * (1 + Math.SQRT2)) < 1e-9);
+  assert.ok(Math.abs(pencilBodyTopZ('round', 5.7, 5.7) - 11.4) < 1e-9);
+});
+
+test('el perfil redondo es un círculo cerrado del radio pedido', () => {
+  const prof = roundProfile(4.3, 5.7, 48);
+  for (const [y, z] of prof) {
+    const r = Math.hypot(y, z - 5.7);
+    assert.ok(Math.abs(r - 4.3) < 1e-9, `radio inesperado: ${r}`);
+  }
+  const area = Math.abs(signedArea(prof));
+  const relError = Math.abs(area - Math.PI * 4.3 * 4.3) / (Math.PI * 4.3 * 4.3);
+  assert.ok(relError < 0.01, `área del círculo fuera de tolerancia: ${relError}`);
 });
 
 test("la tapa en 'end' es el espejo de 'start': recorta tubeEnd y apaga su boca", () => {

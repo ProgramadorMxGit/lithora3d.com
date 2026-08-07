@@ -5539,3 +5539,10 @@
 * Motivo: cierre técnico de la entrega conforme al plan aprobado.
 * Relación: evidencia en audits/lapiz-tope-final-referencia-2026-08-07.png.
 * Resultado: ✅ 97 de 97 pruebas y verificación en navegador aprobadas
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js, creador.js, plantilla.py, index.html (regenerado), estilos.css y tests
+* Cambio: ajuste tras retroalimentación con captura del usuario. (1) La migración del guardado booleano ahora honra la etiqueta que el usuario leía ("Tapar el FINAL del túnel" → `end`), no lo que el código viejo hacía por dentro; el usuario definió la regla: el lado tapado es donde TERMINA el nombre. (2) `pencilCapEnd` por defecto pasa de `open` a `end` y el botón "Tope al final" encabeza el grupo. (3) Forma del hueco elegible vía `pencilTunnelStyle`: `round` (círculo puro como los toppers clásicos, nuevo DEFAULT; el cuerpo baja de centerZ+√2·outerR a centerZ+outerR) o `teardrop` (techo 45° sin soportes, conservado como alternativa). `roundProfile`, `pencilBodyTopZ` y `normalizePencilTunnelStyle` son puras y exportadas; tubos, tapón, testigo de ajuste y estimación de gramos respetan la forma elegida (el círculo descuenta dos casquetes de piel, la lágrima casquete + cuña).
+* Motivo: el usuario comparó contra su 3MF de referencia: el hueco debía ser redondo y el tope al final del nombre; la lágrima queda como opción para impresoras que sufran los puentes.
+* Relación: cierra la paridad con la referencia de MakerWorld analizada en specs/lapiz-configurable/informe-y-propuesta.md; segunda iteración de la entrega del modo lápiz.
+* Resultado: ✅ 99 de 99 pruebas (2 nuevas de perfil redondo y normalización); verificado en Chrome real: con almacenamiento limpio el default es Tope al final + Redondo, ISABELA 16 mm muestra el lápiz entrando por la boca redonda del inicio y deteniéndose en el final tapado; captura en audits/lapiz-hueco-redondo-tope-final-2026-08-07.png
