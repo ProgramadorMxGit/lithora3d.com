@@ -5595,3 +5595,10 @@
 * Motivo: los 3 puntos sueltos daban falsos positivos con letras script (tres trazos separados contaban como "cubierto"), lo que provocó la cueva; el tapón que la sustituyó sobresalía como la ceja original. El muestreo denso resuelve ambas quejas del usuario a la vez.
 * Relación: novena iteración; converge con lo aprobado en d1dde2e (final = puras letras) y mantiene la garantía anti-ventanas para letras diminutas.
 * Resultado: ✅ suite completa en verde; harness con Caveat, Poppins y Pacifico en ambos topes: cobertura real encontrada cerca del extremo (sin tapón, 15 piezas), hueco profundo; visor verificado con Caveat: extremo limpio de puras letras (audits/lapiz-tope-enterrado-2026-08-07.png)
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/exportadores.js (QUALITY_OVERRIDES y PENCIL_QUALITY_OVERRIDES) y creador.js (nota del perfil)
+* Cambio: perfil anti-pillowing con relleno LIGERO a pedido del usuario: `sparse_infill_density` 25%→10%, compensado con techo reforzado (`top_shell_layers` 5→6, `top_shell_thickness` 1.0→1.2, `bottom_shell_layers` 3→4), tercera pared (`wall_loops` 2→3), cara vista más lenta (`top_surface_speed` 200→120 general, 150→100 en lápiz) y planchado con más flujo (`ironing_flow` 12%→15%). La nota del visor ahora menciona el relleno 10% con techo reforzado.
+* Motivo: el usuario imprimió RUBI y la cara superior salió con hoyuelos (pillowing): con relleno flojo la primera capa del techo cuelga entre líneas y el planchado no puede rellenar hoyos, solo pulir un techo cerrado. Investigado en la wiki de Bambu (Ironing: flujo bajo = superficie picada) y foros/Reddit (consenso: más capas de techo, techo más lento, más paredes).
+* Relación: décima iteración del modo lápiz; el peso estimado del visor baja acorde (menos relleno) y las piezas quedan "livianitas" sin sacrificar la cara del producto.
+* Resultado: ✅ suite en verde; verificación directa del project_settings parchado: lápiz → 10% relleno, 6×1.2mm techo, 3 paredes, plancha top 15%, techo 100 mm/s; llavero → ídem con techo 120; 30 claves declaradas en different_settings_to_system

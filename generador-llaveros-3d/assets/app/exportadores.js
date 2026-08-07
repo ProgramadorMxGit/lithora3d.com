@@ -253,17 +253,28 @@ function toHex6(hex) {
 const QUALITY_OVERRIDES = {
   // ---- Ironing: the single biggest win for the flat top (base was "no ironing") ----
   ironing_type: 'top',          // iron every top face: base plane AND letter tops (enum: no ironing|top|topmost|solid)
-  ironing_flow: '12%',          // was 10% — fills the gaps between iron lines without over-extruding into blobs
+  ironing_flow: '15%',          // was 12% — per the Bambu wiki, too little flow leaves the ironed face pitted; 15% fills the pits without blobs
   ironing_spacing: '0.1',       // was 0.15 — passes overlap below nozzle width, re-ironing the same area = glossier
 
   // ---- Top surface: cleaner, no infill telegraphing through the show face ----
   top_surface_pattern: 'monotonic',  // was monotonicline — propagates monotonic order to sub-layers (BambuStudio #1953)
   top_one_wall_type: 'not apply',    // was 'all top' — keep 2 walls on thin letter tops so they stay solid (no pinholes)
+  top_surface_speed: '120',          // was 200 — a calmer show-face pass fuses lines before ironing (community consensus vs pillowing)
+
+  /* ---- Anti-pillowing roof over LIGHT (10%) infill ----
+     Los hoyuelos del techo (pillowing) nacen cuando la primera capa del techo
+     cuelga entre líneas de relleno flojo y las siguientes no alcanzan a cerrar
+     los valles; el planchado no puede rellenar hoyos, solo pulir un techo ya
+     cerrado. Con relleno al 10% el techo necesita más cuerpo propio: */
+  top_shell_layers: '6',        // was 5 — dos capas extra de cierre sobre los puentes del relleno
+  top_shell_thickness: '1.2',   // was 1.0 — garantiza el grosor aunque cambie la altura de capa
+  bottom_shell_layers: '4',     // was 3 — misma protección en la cara de la cama
 
   // ---- Walls / thin script strokes ----
   wall_generator: 'arachne',    // was classic — variable-width beads render thin script strokes classic would drop
   min_bead_width: '65%',        // was 85% — let thin strokes print near their true width instead of being fattened
   precise_outer_wall: '1',      // was 0 — exact one-nozzle outer wall = sharper letters + more consistent layers
+  wall_loops: '3',              // was 2 — en piezas chicas la tercera pared casi maciza el borde y el relleno flojo no se asoma
 
   // ---- Speed: crisp curved letters (the A1 whips small loops at 200 mm/s) ----
   outer_wall_speed: '80',       // was 200 — slow the visible outer walls so curves stay clean and round
@@ -271,8 +282,9 @@ const QUALITY_OVERRIDES = {
   // ---- Seam: hide the scar the user can see on the curved letters ----
   seam_slope_type: 'external',  // was none — smart scarf (conditional stays on) ramps the seam on long smooth outlines
 
-  // ---- Structure: sturdier keyring loop + firmer base under the ironed top ----
-  sparse_infill_density: '25%', // was 15%
+  // ---- Structure: piezas LIVIANAS a pedido del usuario; el techo reforzado
+  //      de arriba es lo que compensa la baja densidad ----
+  sparse_infill_density: '10%', // was 25%
 };
 
 /**
@@ -296,7 +308,7 @@ const PENCIL_QUALITY_OVERRIDES = {
   internal_solid_infill_speed: '200',
   sparse_infill_pattern: 'gyroid',
   sparse_infill_speed: '200',
-  top_surface_speed: '150',
+  top_surface_speed: '100', // was 150 — la cara con las letras es LA cara del producto; a 0.16 y 100 mm/s el techo cierra sin hoyuelos
   gap_infill_speed: '250',
   bridge_speed: '25',
   wall_loops: '3',

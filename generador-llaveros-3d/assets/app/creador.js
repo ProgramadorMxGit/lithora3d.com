@@ -697,7 +697,7 @@
     // El perfil calibrado viaja en el 3MF en LOS TRES modos, no solo en multi:
     // antes la nota solo salia en multicolor y parecia que los otros no lo usaban.
     const pencilNote = state.productType === 'pencil'
-      ? '<br><small><b>Perfil de calidad para lápiz:</b> 0.16 mm, tres paredes, velocidades High Quality de Bambu, túnel sin soportes y superficies superiores planchadas.</small>'
+      ? '<br><small><b>Perfil de calidad para lápiz:</b> 0.16 mm, tres paredes, relleno ligero al 10 % con techo reforzado de 6 capas (sin hoyuelos), túnel sin soportes y superficies superiores planchadas.</small>'
       : '';
     if (state.printMode === 'simple') {
       box.className = 'info-box';
