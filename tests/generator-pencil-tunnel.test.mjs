@@ -15,7 +15,7 @@ vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
 const {
   teardropProfile, roundProfile, pencilBodyTopZ, teardropAreaMM2, circularSegmentAreaMM2,
   normalizePencilCapEnd, normalizePencilTunnelStyle, pencilCapPlacement, capCoverageLimitX,
-  estimatePencilVolumeMM3, signedArea,
+  pencilVoidHalfWidth, estimatePencilVolumeMM3, signedArea,
 } = sandbox.module.exports;
 
 test('el perfil de lágrima es simétrico y sus extremos son los teóricos', () => {
@@ -100,6 +100,21 @@ test('con un túnel muy corto la tapa en cualquier extremo deja al menos 1.35 mm
   assert.equal(start.capX1, 2.0);
   assert.ok(Math.abs(start.tubeStart - 1.65) < 1e-9, `tubeStart inesperado: ${start.tubeStart}`);
   assert.ok(start.tubeEnd - start.tubeStart >= 1.35 - 1e-9);
+});
+
+test('la media anchura del hueco sigue el perfil elegido a cada altura', () => {
+  // Círculo: máximo en el centro, cero en los polos, simetría vertical.
+  assert.ok(Math.abs(pencilVoidHalfWidth('round', 4.3, 5.7, 5.7) - 4.3) < 1e-9);
+  assert.equal(pencilVoidHalfWidth('round', 4.3, 5.7, 5.7 + 4.3), 0);
+  assert.equal(pencilVoidHalfWidth('round', 4.3, 5.7, 5.7 - 4.3), 0);
+  assert.ok(Math.abs(pencilVoidHalfWidth('round', 4.3, 5.7, 7.0) -
+    pencilVoidHalfWidth('round', 4.3, 5.7, 4.4)) < 1e-9);
+  // Lágrima: arco hasta la tangente de 45° y recta hasta el ápice en √2·r.
+  const enTangente = pencilVoidHalfWidth('teardrop', 4.3, 5.7, 5.7 + 4.3 / Math.SQRT2);
+  assert.ok(Math.abs(enTangente - 4.3 / Math.SQRT2) < 1e-9, `tangente: ${enTangente}`);
+  assert.ok(Math.abs(pencilVoidHalfWidth('teardrop', 4.3, 5.7, 5.7 + Math.SQRT2 * 4.3)) < 1e-9);
+  const mitadRecta = pencilVoidHalfWidth('teardrop', 4.3, 5.7, 5.7 + 4.3 * 1.2);
+  assert.ok(Math.abs(mitadRecta - (Math.SQRT2 * 4.3 - 4.3 * 1.2)) < 1e-9);
 });
 
 test('la cobertura de la tapa detecta dónde la silueta vuelve a envolver el tubo', () => {

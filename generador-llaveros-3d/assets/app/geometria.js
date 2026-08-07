@@ -551,20 +551,6 @@ function buildPencilTube(length, innerRadius, outerRadius, centerZ, curveSegment
   return geo;
 }
 
-function buildSolidPencilTube(length, outerRadius, centerZ, curveSegments, tunnelStyle) {
-  const outer = orientedCrossSection(
-    pencilTubeProfile(tunnelStyle, outerRadius, centerZ, Math.max(28, curveSegments * 4)), false);
-  const shape = new THREE.Shape(outer);
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: length,
-    steps: 1,
-    bevelEnabled: false,
-    curveSegments,
-  });
-  geo.rotateY(Math.PI / 2);
-  return geo;
-}
-
 function rectClipperPath(minX, minY, maxX, maxY) {
   return [
     {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(minY * CLIPPER_SCALE)},
@@ -614,6 +600,18 @@ function roundProfile(radius, centerZ, segments) {
 /** Altura del cuerpo según la forma del hueco: el círculo ahorra el pico. */
 function pencilBodyTopZ(tunnelStyle, centerZ, outerR) {
   return tunnelStyle === 'round' ? centerZ + outerR : centerZ + Math.SQRT2 * outerR;
+}
+
+/** Media anchura del hueco a la altura z (0 fuera del perfil). El perfil es
+ *  unimodal con máximo en z = centerZ; en la lágrima el arco llega hasta la
+ *  tangente de 45° (z = centerZ + r/√2) y de ahí sube recto hasta el ápice. */
+function pencilVoidHalfWidth(tunnelStyle, radius, centerZ, z) {
+  const dz = z - centerZ;
+  if (tunnelStyle !== 'round' && dz > radius / Math.SQRT2) {
+    return Math.max(0, Math.SQRT2 * radius - dz);
+  }
+  const s = radius * radius - dz * dz;
+  return s <= 0 ? 0 : Math.sqrt(s);
 }
 
 /**
@@ -708,10 +706,14 @@ function estimatePencilVolumeMM3(m) {
 }
 
 /**
- * Build an uppercase name threaded lengthwise by a supportless pencil tunnel.
- * The returned base is a set of overlapping closed solids on purpose: Bambu,
- * Cura and PrusaSlicer union them at slice time, just like the existing raised
- * text pieces, while the tunnel remains a real uninterrupted void.
+ * Nombre en mayúsculas atravesado por un túnel longitudinal, construido como
+ * los toppers clásicos: UNA silueta maciza (letras + lomo del envolvente) con
+ * el hueco excavado por dentro en rebanadas horizontales de Clipper — la misma
+ * discretización que hará el laminador al imprimir la pieza acostada. El forro
+ * liso del tubo va embebido y es lo único que toca el lápiz. La versión
+ * anterior sumaba pieles + alas + tubo exterior: el tubo asomaba como bultos
+ * donde las letras bajan, y las caras coplanares de los sólidos solapados
+ * parpadeaban como huequitos en la vista previa del laminador.
  */
 function buildPencilNameTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
@@ -726,15 +728,14 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   let basePaths = ClipperLib.Clipper.PolyTreeToPaths(
     offsetPolygonsOutward(polys, Math.max(1.2, opts.outlineWidthMM)));
   const baseTree = clipperBoolean(basePaths, null, ClipperLib.ClipType.ctUnion);
-  const {shapes: baseShapes, islands} = polyTreeToShapes(baseTree);
+  const {shapes: baseShapes} = polyTreeToShapes(baseTree);
   if (!baseShapes.length) throw new Error('contorno para lápiz vacío');
   basePaths = ClipperLib.Clipper.PolyTreeToPaths(baseTree);
 
-  const bb = shapesBounds(baseShapes);
-  const dx = -bb.minX, dy = -bb.minY;
-  const width = bb.maxX - bb.minX;
-  const height = bb.maxY - bb.minY;
-  const centerY = (bb.minY + bb.maxY) / 2;
+  // El eje del túnel se centra en las LETRAS; los límites del tile se miden
+  // más abajo, ya con el lomo unido.
+  const bbLetters = shapesBounds(baseShapes);
+  const centerY = (bbLetters.minY + bbLetters.maxY) / 2;
 
   const holeD = Math.max(7.6, opts.pencilHoleDiameterMM || 8.6);
   const wall = Math.max(1.2, opts.pencilWallMM || 1.4);
@@ -743,151 +744,186 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const centerZ = outerR;
   const tunnelStyle = normalizePencilTunnelStyle(opts);
   const totalZ = pencilBodyTopZ(tunnelStyle, centerZ, outerR);
-  const skin = Math.min(wall, Math.max(0.9, totalZ * 0.12));
   const capMode = normalizePencilCapEnd(opts);
 
-  // Full back/front skins keep accents and counters attached to the core. They
-  // end exactly outside the tunnel envelope, so neither one closes the hole.
-  const movedBase = baseShapes.map(s => translateShape(s, dx, dy));
-  const backGeo = new THREE.ExtrudeGeometry(movedBase, {
-    depth: skin, bevelEnabled: false, curveSegments,
-  });
-  const frontGeo = new THREE.ExtrudeGeometry(movedBase, {
-    depth: skin, bevelEnabled: false, curveSegments,
-  });
-  frontGeo.translate(0, 0, totalZ - skin);
-
-  // Keep the parts of the letters above and below the tube solid through the
-  // whole depth. A small overlap prevents coincident/tangent-only contacts.
-  const overlap = 0.25;
-  const band = rectClipperPath(
-    bb.minX - 2, centerY - outerR + overlap,
-    bb.maxX + 2, centerY + outerR - overlap);
-  const wingTree = clipperBoolean(basePaths, [band], ClipperLib.ClipType.ctDifference);
-  const {shapes: wingShapes} = polyTreeToShapes(wingTree);
-  const bandTree = clipperBoolean(basePaths, [band], ClipperLib.ClipType.ctIntersection);
+  // Alcance del túnel: hasta donde las LETRAS cruzan la banda central, para
+  // que nada cuelgue más allá de una letra angosta en los extremos.
+  const bandRect = rectClipperPath(
+    bbLetters.minX - 2, centerY - outerR + 0.25,
+    bbLetters.maxX + 2, centerY + outerR - 0.25);
+  const bandTree = clipperBoolean(basePaths, [bandRect], ClipperLib.ClipType.ctIntersection);
   const {shapes: bandShapes} = polyTreeToShapes(bandTree);
-  const pieces = [
-    {geometry: backGeo, part: 'base'},
-    {geometry: frontGeo, part: 'base'},
-  ];
-  if (wingShapes.length) {
-    const wingGeo = new THREE.ExtrudeGeometry(
-      wingShapes.map(s => translateShape(s, dx, dy)),
-      {depth: totalZ, bevelEnabled: false, curveSegments});
-    pieces.push({geometry: wingGeo, part: 'base'});
-  }
-
-  // The tube should only be visible where the silhouette actually crosses the
-  // centre band. Using the whole name bounding box made the tunnel stick out
-  // beyond narrow end letters (for example the i in Isabel), leaving a long
-  // visible cylinder at the sides. Clamp the tunnel to the band intersection.
-  let tubeStart = 0;
-  let tubeEnd = width;
+  let tubeStartU = bbLetters.minX;
+  let tubeEndU = bbLetters.maxX;
   if (bandShapes.length) {
     const tubeBB = shapesBounds(bandShapes);
-    tubeStart = Math.max(0, tubeBB.minX + dx);
-    tubeEnd = Math.min(width, tubeBB.maxX + dx);
+    tubeStartU = Math.max(bbLetters.minX, tubeBB.minX);
+    tubeEndU = Math.min(bbLetters.maxX, tubeBB.maxX);
   }
-  let tubeLen = Math.max(0, tubeEnd - tubeStart);
-  // Keep at least one practical opening if the band reduces to a tiny sliver.
-  if (tubeLen < Math.max(innerR * 1.2, 2.0)) {
-    tubeStart = 0;
-    tubeEnd = width;
-    tubeLen = width;
+  // Conservar una boca practicable si la banda se reduce a una astilla.
+  if (tubeEndU - tubeStartU < Math.max(innerR * 1.2, 2.0)) {
+    tubeStartU = bbLetters.minX;
+    tubeEndU = bbLetters.maxX;
   }
 
-  /* Cierre oculto elegible: 'start' maciza el tramo junto a la PRIMERA letra
-     (el comportamiento original validado) y 'end' hace lo mismo junto a la
-     última, como los toppers clásicos. pencilCapPlacement decide los tramos;
-     aquí solo se recorta la silueta y se extruye. */
-  let closedCapShapes = [];
-  let fallbackPlugLen = 0;
-  let capArea = 0;
+  /* Lomo: la franja del envolvente unida a las letras. Garantiza que el túnel
+     viaje SIEMPRE escondido (sin bultos donde una letra baja), une todas las
+     letras entre sí y deja el exterior liso como la pieza clásica. */
+  const spineRect = rectClipperPath(tubeStartU, centerY - outerR, tubeEndU, centerY + outerR);
+  const bodyTree = clipperBoolean(basePaths.concat([spineRect]), null, ClipperLib.ClipType.ctUnion);
+  const {shapes: bodyShapes, islands} = polyTreeToShapes(bodyTree);
+  if (!bodyShapes.length) throw new Error('contorno para lápiz vacío');
+  const bodyPaths = ClipperLib.Clipper.PolyTreeToPaths(bodyTree);
+
+  const bb = shapesBounds(bodyShapes);
+  const dx = -bb.minX, dy = -bb.minY;
+  const width = bb.maxX - bb.minX;
+  const height = bb.maxY - bb.minY;
+
+  let tubeStart = tubeStartU + dx;
+  let tubeEnd = tubeEndU + dx;
+  let tubeLen = Math.max(0, tubeEnd - tubeStart);
+
+  /* Tope elegible: 'start' maciza junto a la PRIMERA letra y 'end' junto a la
+     última, como los toppers clásicos. Aquí solo se decide el tramo del hueco:
+     el macizo sale solo, porque las rebanadas no excavan fuera de ese tramo. */
   const place = pencilCapPlacement(capMode, tubeStart, tubeEnd, outerR);
   if (place.capX0 !== null) {
-    /* En la punta del nombre la silueta se estrecha y deja de envolver el
-       tubo: su anillo asomaría como una ceja en la cara del extremo. La tapa
-       crece hacia adentro hasta la zona donde el tubo vuelve a viajar oculto
-       (máximo 35 % del túnel), igual que el macizo final de los clásicos. */
-    const polysMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+    // Con el lomo la silueta siempre envuelve el tubo; la comprobación de
+    // cobertura queda como cinturón de seguridad para siluetas exóticas.
+    const polysMM = bodyPaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
     if (capMode === 'end') {
-      const covered = capCoverageLimitX(polysMM, centerY, outerR + 0.1,
+      const covered = capCoverageLimitX(polysMM, centerY, outerR - 0.05,
         place.capX1 - dx, place.capX0 - dx - 0.35 * tubeLen, 0.4);
       if (covered !== null) {
         place.capX0 = Math.max(tubeStart + 1.0, Math.min(place.capX0, covered + dx - 0.5));
-        place.tubeEnd = Math.min(tubeEnd, place.capX0 + place.capOverlap);
       }
+      place.tubeEnd = Math.min(tubeEnd, place.capX0 + place.capOverlap);
     } else {
-      const covered = capCoverageLimitX(polysMM, centerY, outerR + 0.1,
+      const covered = capCoverageLimitX(polysMM, centerY, outerR - 0.05,
         place.capX0 - dx, place.capX1 - dx + 0.35 * tubeLen, 0.4);
       if (covered !== null) {
         place.capX1 = Math.min(tubeEnd - 1.0, Math.max(place.capX1, covered + dx + 0.5));
-        place.tubeStart = Math.max(tubeStart, place.capX1 - place.capOverlap);
       }
+      place.tubeStart = Math.max(tubeStart, place.capX1 - place.capOverlap);
     }
-    const capRect = rectClipperPath(
-      place.capX0 - dx - place.capOverlap,
-      centerY - outerR - place.capOverlap,
-      place.capX1 - dx + place.capOverlap,
-      centerY + outerR + place.capOverlap);
-    const capTree = clipperBoolean(basePaths, [capRect], ClipperLib.ClipType.ctIntersection);
-    closedCapShapes = polyTreeToShapes(capTree).shapes;
-
-    if (closedCapShapes.length) {
-      // El tubo se mete unas décimas dentro del macizo para que el laminador
-      // fusione ambas zonas sin dejar una pared abierta ni una línea débil.
-      tubeStart = place.tubeStart;
-      tubeEnd = place.tubeEnd;
-      tubeLen = Math.max(0, tubeEnd - tubeStart);
-      capArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(capTree));
-    } else {
-      // Respaldo para siluetas extremadamente finas o fuentes defectuosas.
-      fallbackPlugLen = Math.max(1.4, Math.min(2.4, wall + 0.6, tubeLen * 0.2));
-    }
+    tubeStart = place.tubeStart;
+    tubeEnd = place.tubeEnd;
+    tubeLen = Math.max(0, tubeEnd - tubeStart);
   }
 
   // Boca escalonada de 0.35 mm SOLO en los extremos abiertos: guía el lápiz
-  // sin aflojar el diámetro calibrado. El lado tapado (o con tapón) no la
-  // lleva; su tramo lo absorbe el núcleo calibrado, que fusiona mejor.
+  // sin aflojar el diámetro calibrado a lo largo útil del nombre.
   const lead = Math.min(1.2, tubeLen * 0.12);
   const leadR = Math.min(innerR + 0.35, outerR - 0.8);
-  const plugged = fallbackPlugLen > 0;
-  const wantEntry = place.entryLead && !(plugged && capMode === 'start');
-  const wantExit = place.exitLead && !(plugged && capMode === 'end');
+  const wantEntry = place.entryLead;
+  const wantExit = place.exitLead;
   const nLeads = (wantEntry ? 1 : 0) + (wantExit ? 1 : 0);
-  if (tubeLen > lead * nLeads + 1) {
-    const coreStart = tubeStart + (wantEntry ? lead : 0);
-    const coreEnd = tubeEnd - (wantExit ? lead : 0);
-    if (wantEntry) {
-      const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
-      entryGeo.translate(tubeStart, centerY + dy, 0);
-      pieces.push({geometry: entryGeo, part: 'base'});
+  const useLeads = tubeLen > lead * nLeads + 1;
+
+  const pieces = [];
+
+  // Forro del túnel: tubo liso embebido por completo en el cuerpo. Su cara
+  // interior es la que toca el lápiz y la única visible en la boca.
+  if (tubeLen > 0.2) {
+    if (useLeads) {
+      const coreStart = tubeStart + (wantEntry ? lead : 0);
+      const coreEnd = tubeEnd - (wantExit ? lead : 0);
+      if (wantEntry) {
+        const entryGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
+        entryGeo.translate(tubeStart, centerY + dy, 0);
+        pieces.push({geometry: entryGeo, part: 'base'});
+      }
+      const coreGeo = buildPencilTube(coreEnd - coreStart, innerR, outerR, centerZ, curveSegments, tunnelStyle);
+      coreGeo.translate(coreStart, centerY + dy, 0);
+      pieces.push({geometry: coreGeo, part: 'base'});
+      if (wantExit) {
+        const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
+        exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
+        pieces.push({geometry: exitGeo, part: 'base'});
+      }
+    } else {
+      const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments, tunnelStyle);
+      tubeGeo.translate(tubeStart, centerY + dy, 0);
+      pieces.push({geometry: tubeGeo, part: 'base'});
     }
-    const coreGeo = buildPencilTube(coreEnd - coreStart, innerR, outerR, centerZ, curveSegments, tunnelStyle);
-    coreGeo.translate(coreStart, centerY + dy, 0);
-    pieces.push({geometry: coreGeo, part: 'base'});
-    if (wantExit) {
-      const exitGeo = buildPencilTube(lead, leadR, outerR, centerZ, curveSegments, tunnelStyle);
-      exitGeo.translate(tubeEnd - lead, centerY + dy, 0);
-      pieces.push({geometry: exitGeo, part: 'base'});
-    }
-  } else if (tubeLen > 0.2) {
-    const tubeGeo = buildPencilTube(tubeLen, innerR, outerR, centerZ, curveSegments, tunnelStyle);
-    tubeGeo.translate(tubeStart, centerY + dy, 0);
-    pieces.push({geometry: tubeGeo, part: 'base'});
   }
 
-  if (closedCapShapes.length) {
-    const capGeo = new THREE.ExtrudeGeometry(
-      closedCapShapes.map(s => translateShape(s, dx, dy)),
-      {depth: totalZ, bevelEnabled: false, curveSegments});
-    pieces.push({geometry: capGeo, part: 'base'});
-  } else if (plugged && tubeLen > 0.2) {
-    const plugX = capMode === 'end' ? tubeEnd - fallbackPlugLen : tubeStart;
-    const endPlugGeo = buildSolidPencilTube(fallbackPlugLen, innerR + 0.35, centerZ, curveSegments, tunnelStyle);
-    endPlugGeo.translate(plugX, centerY + dy, 0);
-    pieces.push({geometry: endPlugGeo, part: 'base'});
+  /* Cuerpo por rebanadas horizontales. Fuera del rango del hueco: dos losas
+     macizas de la silueta completa. Dentro: rebanadas con el hueco restado,
+     escalonadas hacia AFUERA (cada una usa su media anchura máxima) para que
+     el vacío contenga siempre al cilindro y sea el forro liso quien reciba el
+     lápiz. Solape de 0.02 mm entre rebanadas: sin caras coplanares. */
+  const rMaxVoid = useLeads && nLeads > 0 ? leadR : innerR;
+  const voidLo = Math.max(0.4, centerZ - rMaxVoid);
+  const voidHi = Math.min(totalZ - 0.4,
+    tunnelStyle === 'round' ? centerZ + rMaxVoid : centerZ + Math.SQRT2 * rMaxVoid);
+  const movedBody = bodyShapes.map(s => translateShape(s, dx, dy));
+  const bodyArea = clipperPathsAreaMM2(bodyPaths);
+  let volumeMM3 = bodyArea * (voidLo + (totalZ - voidHi)) +
+    Math.abs(clipperPathsAreaMM2(polysToClipperPaths(polys))) * opts.textRaisedHeightMM;
+
+  const bottomGeo = new THREE.ExtrudeGeometry(movedBody, {
+    depth: voidLo + 0.02, bevelEnabled: false, curveSegments,
+  });
+  pieces.push({geometry: bottomGeo, part: 'base'});
+  const topGeo = new THREE.ExtrudeGeometry(movedBody, {
+    depth: totalZ - voidHi + 0.02, bevelEnabled: false, curveSegments,
+  });
+  topGeo.translate(0, 0, voidHi - 0.02);
+  pieces.push({geometry: topGeo, part: 'base'});
+
+  const zones = [];
+  if (tubeLen > 0.2) {
+    if (useLeads) {
+      if (wantEntry) zones.push({x0: tubeStart, x1: tubeStart + lead, r: leadR});
+      if (wantExit) zones.push({x0: tubeEnd - lead, x1: tubeEnd, r: leadR});
+      zones.push({
+        x0: tubeStart + (wantEntry ? lead : 0),
+        x1: tubeEnd - (wantExit ? lead : 0),
+        r: innerR,
+      });
+    } else {
+      zones.push({x0: tubeStart, x1: tubeEnd, r: innerR});
+    }
+  }
+  // El escalón puede ser generoso porque las paredes de las rebanadas quedan
+  // enterradas tras el forro del tubo; solo debe caber dentro de su pared
+  // (la esquina de cada caja sobresale como mucho ~un escalón del perfil).
+  const bandStep = Math.min(0.9, wall - 0.25);
+  const nBands = Math.min(28, Math.max(8, Math.ceil((voidHi - voidLo) / bandStep)));
+  const bandH = (voidHi - voidLo) / nBands;
+  for (let i = 0; i < nBands; i++) {
+    const z0 = voidLo + i * bandH;
+    const z1 = z0 + bandH;
+    const rects = [];
+    for (const zone of zones) {
+      const half = Math.max(
+        pencilVoidHalfWidth(tunnelStyle, zone.r, centerZ, z0),
+        pencilVoidHalfWidth(tunnelStyle, zone.r, centerZ, z1),
+        z0 <= centerZ && centerZ <= z1 ? zone.r : 0);
+      if (half > 0.05) {
+        rects.push(rectClipperPath(zone.x0 - dx, centerY - half, zone.x1 - dx, centerY + half));
+      }
+    }
+    if (!rects.length) {
+      const slabGeo = new THREE.ExtrudeGeometry(movedBody, {
+        depth: bandH + 0.02, bevelEnabled: false, curveSegments,
+      });
+      slabGeo.translate(0, 0, z0 - 0.01);
+      pieces.push({geometry: slabGeo, part: 'base'});
+      volumeMM3 += bodyArea * bandH;
+      continue;
+    }
+    const sliceTree = clipperBoolean(bodyPaths, rects, ClipperLib.ClipType.ctDifference);
+    const {shapes: sliceShapes} = polyTreeToShapes(sliceTree);
+    if (!sliceShapes.length) continue;
+    const sliceGeo = new THREE.ExtrudeGeometry(
+      sliceShapes.map(s => translateShape(s, dx, dy)),
+      {depth: bandH + 0.02, bevelEnabled: false, curveSegments});
+    sliceGeo.translate(0, 0, z0 - 0.01);
+    pieces.push({geometry: sliceGeo, part: 'base'});
+    volumeMM3 += clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(sliceTree)) * bandH;
   }
 
   // Optional raised face keeps the existing two-colour/AMS workflow. In the
@@ -897,16 +933,6 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     {depth: opts.textRaisedHeightMM, bevelEnabled: false, curveSegments});
   textGeo.translate(0, 0, totalZ);
   pieces.push({geometry: textGeo, part: 'text'});
-
-  // Volumen aproximado por regiones 2D × altura, para el "≈ g" del visor.
-  const wingsArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(wingTree));
-  const bandArea = clipperPathsAreaMM2(ClipperLib.Clipper.PolyTreeToPaths(bandTree));
-  const textArea = Math.abs(clipperPathsAreaMM2(polysToClipperPaths(polys)));
-  const volumeMM3 = estimatePencilVolumeMM3({
-    wingsArea, bandArea, capArea, textArea,
-    plugLen: fallbackPlugLen, outerR, innerR, skin, totalZ, tubeLen, tunnelStyle,
-    raisedHeight: opts.textRaisedHeightMM,
-  });
 
   return {
     pieces,
@@ -923,8 +949,8 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
       axisY: centerY + dy,
       centerZ,
       innerR,
-      xStart: tubeStart + (plugged && capMode === 'start' ? fallbackPlugLen : 0),
-      xEnd: tubeEnd - (plugged && capMode === 'end' ? fallbackPlugLen : 0),
+      xStart: tubeStart,
+      xEnd: tubeEnd,
       capEnd: capMode,
     },
   };
@@ -1678,7 +1704,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
     teardropProfile, roundProfile, pencilBodyTopZ, normalizePencilCapEnd, normalizePencilTunnelStyle,
-    pencilCapPlacement, capCoverageLimitX, teardropAreaMM2, circularSegmentAreaMM2,
+    pencilCapPlacement, capCoverageLimitX, pencilVoidHalfWidth, teardropAreaMM2, circularSegmentAreaMM2,
     estimatePencilVolumeMM3, buildPencilFitTestTile,
   };
 }
