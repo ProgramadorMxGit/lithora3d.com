@@ -5560,3 +5560,10 @@
 * Motivo: el usuario laminó el 3MF y reportó con capturas dos defectos reales: huequitos parpadeantes en las caras planas (z-fighting de cuatro sólidos compartiendo exactamente los mismos planos en frente y espalda) y bultos redondos del tubo asomando donde las letras bajan. La pieza clásica de referencia es un solo cuerpo con el hueco restado: por eso es lisa.
 * Relación: cuarta iteración del modo lápiz; implementa de facto la parte visible de A5 (malla única) sin CSG ni vendors nuevos, con booleanas 2D por rebanada — la misma discretización que hace el laminador al imprimir la pieza acostada.
 * Resultado: ✅ 101 de 101 pruebas (nueva regresión del perfil de media anchura); verificación numérica con fuente real: cuerpo exacto dentro de la silueta (0..20.3 mm, cero bultos), 16 piezas / 32k triángulos / ~200-320 ms por nombre, una sola pieza tocando cada cara plana; espalda lisa verificada en Chrome (audits/lapiz-espalda-lisa-2026-08-07.png)
+## [2026-08-07]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js (`buildPencilNameTile`, lomo y tapa)
+* Cambio: el lomo del envolvente ahora abarca SOLO el tramo del hueco (voidStart..voidEnd) y la colocación de la tapa con su extensión por cobertura se decide ANTES de unir el lomo, midiendo contra la silueta de las LETRAS en coordenadas sin desplazar; más allá del hueco mandan las letras solas.
+* Motivo: el usuario mostró que en el extremo tapado el lomo asomaba como un bloque cuadrado después de la última letra: el lomo se extendía por todo el alcance de la banda, pisando la zona que la iteración anterior ya había arreglado; y la comprobación de cobertura, al medir contra el cuerpo (que incluía al propio lomo), se volvía un no-op.
+* Relación: quinta iteración del modo lápiz; restituye el comportamiento validado de la tapa-que-crece (d1dde2e) dentro de la arquitectura de cuerpo rebanado (ac1e1c7).
+* Resultado: ✅ 101 de 101 pruebas; extents verificados con la fuente real (tope al final: hueco 0..89.1 y ancho del tile igual al de las letras, 94.4); extremo limpio verificado en Chrome (audits/lapiz-final-sin-bloque-2026-08-07.png)

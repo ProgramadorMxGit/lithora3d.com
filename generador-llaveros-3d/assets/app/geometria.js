@@ -766,10 +766,39 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
     tubeEndU = bbLetters.maxX;
   }
 
-  /* Lomo: la franja del envolvente unida a las letras. Garantiza que el túnel
-     viaje SIEMPRE escondido (sin bultos donde una letra baja), une todas las
-     letras entre sí y deja el exterior liso como la pieza clásica. */
-  const spineRect = rectClipperPath(tubeStartU, centerY - outerR, tubeEndU, centerY + outerR);
+  /* Tope elegible: 'start' maciza junto a la PRIMERA letra y 'end' junto a la
+     última, como los toppers clásicos. Se decide ANTES de unir el lomo y con
+     la silueta de las LETRAS: en las puntas que se estrechan la tapa crece
+     hacia adentro (máximo 35 % del túnel) hasta donde las letras vuelven a
+     envolver el tubo, para que el tope quede escondido dentro del nombre. */
+  const tunnelLenU = tubeEndU - tubeStartU;
+  const place = pencilCapPlacement(capMode, tubeStartU, tubeEndU, outerR);
+  if (place.capX0 !== null) {
+    const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+    if (capMode === 'end') {
+      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+        place.capX1, place.capX0 - 0.35 * tunnelLenU, 0.4);
+      if (covered !== null) {
+        place.capX0 = Math.max(tubeStartU + 1.0, Math.min(place.capX0, covered - 0.5));
+      }
+      place.tubeEnd = Math.min(tubeEndU, place.capX0 + place.capOverlap);
+    } else {
+      const covered = capCoverageLimitX(lettersMM, centerY, outerR + 0.1,
+        place.capX0, place.capX1 + 0.35 * tunnelLenU, 0.4);
+      if (covered !== null) {
+        place.capX1 = Math.min(tubeEndU - 1.0, Math.max(place.capX1, covered + 0.5));
+      }
+      place.tubeStart = Math.max(tubeStartU, place.capX1 - place.capOverlap);
+    }
+  }
+  const voidStartU = place.tubeStart;
+  const voidEndU = place.tubeEnd;
+
+  /* Lomo: la franja del envolvente unida a las letras, SOLO a lo largo del
+     hueco. Garantiza que el túnel viaje siempre escondido (sin bultos donde
+     una letra baja) y une todas las letras; más allá del hueco mandan las
+     letras solas — sin bloques cuadrados asomando en los extremos tapados. */
+  const spineRect = rectClipperPath(voidStartU, centerY - outerR, voidEndU, centerY + outerR);
   const bodyTree = clipperBoolean(basePaths.concat([spineRect]), null, ClipperLib.ClipType.ctUnion);
   const {shapes: bodyShapes, islands} = polyTreeToShapes(bodyTree);
   if (!bodyShapes.length) throw new Error('contorno para lápiz vacío');
@@ -780,37 +809,9 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const width = bb.maxX - bb.minX;
   const height = bb.maxY - bb.minY;
 
-  let tubeStart = tubeStartU + dx;
-  let tubeEnd = tubeEndU + dx;
-  let tubeLen = Math.max(0, tubeEnd - tubeStart);
-
-  /* Tope elegible: 'start' maciza junto a la PRIMERA letra y 'end' junto a la
-     última, como los toppers clásicos. Aquí solo se decide el tramo del hueco:
-     el macizo sale solo, porque las rebanadas no excavan fuera de ese tramo. */
-  const place = pencilCapPlacement(capMode, tubeStart, tubeEnd, outerR);
-  if (place.capX0 !== null) {
-    // Con el lomo la silueta siempre envuelve el tubo; la comprobación de
-    // cobertura queda como cinturón de seguridad para siluetas exóticas.
-    const polysMM = bodyPaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
-    if (capMode === 'end') {
-      const covered = capCoverageLimitX(polysMM, centerY, outerR - 0.05,
-        place.capX1 - dx, place.capX0 - dx - 0.35 * tubeLen, 0.4);
-      if (covered !== null) {
-        place.capX0 = Math.max(tubeStart + 1.0, Math.min(place.capX0, covered + dx - 0.5));
-      }
-      place.tubeEnd = Math.min(tubeEnd, place.capX0 + place.capOverlap);
-    } else {
-      const covered = capCoverageLimitX(polysMM, centerY, outerR - 0.05,
-        place.capX0 - dx, place.capX1 - dx + 0.35 * tubeLen, 0.4);
-      if (covered !== null) {
-        place.capX1 = Math.min(tubeEnd - 1.0, Math.max(place.capX1, covered + dx + 0.5));
-      }
-      place.tubeStart = Math.max(tubeStart, place.capX1 - place.capOverlap);
-    }
-    tubeStart = place.tubeStart;
-    tubeEnd = place.tubeEnd;
-    tubeLen = Math.max(0, tubeEnd - tubeStart);
-  }
+  const tubeStart = voidStartU + dx;
+  const tubeEnd = voidEndU + dx;
+  const tubeLen = Math.max(0, tubeEnd - tubeStart);
 
   // Boca escalonada de 0.35 mm SOLO en los extremos abiertos: guía el lápiz
   // sin aflojar el diámetro calibrado a lo largo útil del nombre.
