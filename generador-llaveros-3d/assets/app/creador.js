@@ -20,6 +20,7 @@
     names: ['Dafne', 'Hugo'],
     fontKey: null,
     letterHeight: 12,
+    textBold: 0,         // negrita sintética en mm por lado; engorda trazos de fuentes script
     fixedHeight: false,  // force every keychain to a target Y height (mm)
     targetHeight: 25,    // the general target Y height when fixedHeight is on
     nameHeights: [],     // per-name Y override (mm), parallel to names; blank = use general
@@ -749,6 +750,7 @@
     });
   }
   bindSlider('in-letterHeight', 'val-letterHeight', 'letterHeight', v => v.toFixed(1) + ' mm', updatePencilHint);
+  bindSlider('in-textBold', 'val-textBold', 'textBold', v => (v > 0 ? '+' : '') + v.toFixed(1) + ' mm');
   bindSlider('in-baseThickness', 'val-baseThickness', 'baseThickness', v => v.toFixed(1) + ' mm', updatePrintInfo);
   bindSlider('in-raisedHeight', 'val-raisedHeight', 'raisedHeight', v => v.toFixed(1) + ' mm');
   bindSlider('in-padding', 'val-padding', 'padding', v => v.toFixed(1) + ' mm');
@@ -1014,6 +1016,7 @@
   function currentOpts() {
     return {
       letterHeightMM: state.letterHeight,
+      textBoldMM: state.textBold,
       baseThicknessMM: state.baseThickness,
       textRaisedHeightMM: state.raisedHeight,
       basePaddingMM: state.padding,
@@ -1365,7 +1368,7 @@
      de que hay que abrirlos otra vez. */
   const SAVE_KEY = 'lithora.llaveros.v1';
   const SAVED_KEYS = [
-    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'fixedHeight',
+    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
     'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
@@ -1449,7 +1452,7 @@
 
   /** Vuelca `state` en todos los controles de la interfaz de una vez. */
   function refreshAllControls() {
-    [['in-letterHeight', 'letterHeight', 1], ['in-baseThickness', 'baseThickness', 1],
+    [['in-letterHeight', 'letterHeight', 1], ['in-textBold', 'textBold', 1], ['in-baseThickness', 'baseThickness', 1],
      ['in-raisedHeight', 'raisedHeight', 1], ['in-padding', 'padding', 1],
      ['in-corner', 'corner', 1], ['in-holeD', 'holeD', 1],
      ['in-pencilHoleD', 'pencilHoleD', 1], ['in-pencilWall', 'pencilWall', 1], ['in-gap', 'gap', 0],

@@ -88,6 +88,16 @@ CUERPO = CUERPO.replace(
 CUERPO = CUERPO.replace(
     '<div class="slider-row fixed-h-row">',
     '<div class="slider-row fixed-h-row" id="fixed-height-row">', 1)
+# Negrita sintética: control exclusivo de la web (el portable no lo tiene),
+# insertado justo después del deslizador de tamaño de letra.
+MARCA_TAMANO = ('<input type="range" id="in-letterHeight" min="6" max="30" step="0.5"'
+                ' aria-label="Tamaño de las letras en milímetros">\n        </div>')
+assert CUERPO.count(MARCA_TAMANO) == 1, 'no se encontró el deslizador de tamaño de letra'
+CUERPO = CUERPO.replace(MARCA_TAMANO, MARCA_TAMANO + '''
+        <div class="slider-row">
+          <label for="in-textBold">Letra más gordita <span class="val" id="val-textBold"></span></label>
+          <input type="range" id="in-textBold" min="0" max="0.8" step="0.1" aria-label="Engrosar el trazo de las letras en milímetros">
+        </div>''', 1)
 CUERPO = CUERPO.replace(
     '<div class="slider-row">\n          <label>Grosor del llavero ',
     '<div class="slider-row" id="base-thickness-row">\n          <label>Grosor del llavero ', 1)
@@ -130,6 +140,8 @@ FAQ = [
   "El PLA es suficiente para uso normal y es el más económico. Si el llavero va a quedarse dentro de un coche al sol o aguantar golpes, el PETG resiste mejor el calor y la fatiga."),
  ("¿Qué grosor aguanta sin romperse?",
   "El grosor por defecto es un punto de partida razonable para un llavero de mochila. Puedes subirlo con el control de grosor si el llavero va a recibir tirones fuertes."),
+ ("¿Puedo hacer la letra más gruesa?",
+  "Sí. El control «Letra más gordita» engorda el trazo en décimas de milímetro, ideal para tipografías cursivas o delgadas que imprimen flaquitas. Con +0.3 o +0.4 mm la mayoría de las letras script quedan llenitas; si te pasas, los huecos internos de letras como la e se cierran (lo ves al instante en la vista 3D)."),
  ("¿Puedo usar mi propia tipografía?",
   "Sí. Arrastra un archivo .ttf o .otf a la ventana y se añade a la lista. El archivo no se sube a ningún servidor: se procesa en tu propio navegador."),
  ("¿Puedo hacer varios nombres a la vez?",

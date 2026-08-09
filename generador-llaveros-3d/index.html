@@ -32,8 +32,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="assets/app/estilos.css?v=2942b6c9">
-<link rel="stylesheet" href="assets/app/pagina.css?v=2942b6c9">
+<link rel="stylesheet" href="assets/app/estilos.css?v=5953a09f">
+<link rel="stylesheet" href="assets/app/pagina.css?v=5953a09f">
 <link rel="preload" as="fetch" href="assets/fuentes/fuentes.json" crossorigin="anonymous">
 <link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf" crossorigin="anonymous">
 <script type="application/ld+json">
@@ -182,6 +182,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "El grosor por defecto es un punto de partida razonable para un llavero de mochila. Puedes subirlo con el control de grosor si el llavero va a recibir tirones fuertes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo hacer la letra más gruesa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. El control «Letra más gordita» engorda el trazo en décimas de milímetro, ideal para tipografías cursivas o delgadas que imprimen flaquitas. Con +0.3 o +0.4 mm la mayoría de las letras script quedan llenitas; si te pasas, los huecos internos de letras como la e se cierran (lo ves al instante en la vista 3D)."
           }
         },
         {
@@ -403,6 +411,10 @@
         <div class="slider-row">
           <label for="in-letterHeight">Tamaño de las letras <span class="val" id="val-letterHeight"></span></label>
           <input type="range" id="in-letterHeight" min="6" max="30" step="0.5" aria-label="Tamaño de las letras en milímetros">
+        </div>
+        <div class="slider-row">
+          <label for="in-textBold">Letra más gordita <span class="val" id="val-textBold"></span></label>
+          <input type="range" id="in-textBold" min="0" max="0.8" step="0.1" aria-label="Engrosar el trazo de las letras en milímetros">
         </div>
         <div class="slider-row fixed-h-row" id="fixed-height-row">
           <label><input type="checkbox" id="in-fixedHeight"> 📐 Fijar alto (Y)</label>
@@ -639,6 +651,10 @@
           <p>El grosor por defecto es un punto de partida razonable para un llavero de mochila. Puedes subirlo con el control de grosor si el llavero va a recibir tirones fuertes.</p>
         </details>
         <details class="faq-item">
+          <summary>¿Puedo hacer la letra más gruesa?</summary>
+          <p>Sí. El control «Letra más gordita» engorda el trazo en décimas de milímetro, ideal para tipografías cursivas o delgadas que imprimen flaquitas. Con +0.3 o +0.4 mm la mayoría de las letras script quedan llenitas; si te pasas, los huecos internos de letras como la e se cierran (lo ves al instante en la vista 3D).</p>
+        </details>
+        <details class="faq-item">
           <summary>¿Puedo usar mi propia tipografía?</summary>
           <p>Sí. Arrastra un archivo .ttf o .otf a la ventana y se añade a la lista. El archivo no se sube a ningún servidor: se procesa en tu propio navegador.</p>
         </details>
@@ -682,7 +698,7 @@
 
 <footer class="pie">
   <p><a href="/">Lithora 3D</a> &middot; Impresi&oacute;n 3D en Tampico, Ciudad Madero y Altamira</p>
-  <p class="pie-version">Generador versi&oacute;n 2942b6c9 &middot; si este c&oacute;digo no coincide con el m&aacute;s reciente, recarga con Ctrl+Shift+R</p>
+  <p class="pie-version">Generador versi&oacute;n 5953a09f &middot; si este c&oacute;digo no coincide con el m&aacute;s reciente, recarga con Ctrl+Shift+R</p>
   <p class="pie-enlaces">
     <a href="/servicio-impresion-3d/">Servicio</a>
     <a href="/prototipado-rapido/">Prototipado</a>
@@ -692,17 +708,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=2942b6c9"></script>
-<script src="assets/vendor/opentype.js?v=2942b6c9"></script>
-<script src="assets/vendor/fflate.js?v=2942b6c9"></script>
-<script src="assets/vendor/clipper.js?v=2942b6c9"></script>
-<script src="assets/app/geometria.js?v=2942b6c9"></script>
-<script src="assets/app/exportadores.js?v=2942b6c9"></script>
+<script src="assets/vendor/three.js?v=5953a09f"></script>
+<script src="assets/vendor/opentype.js?v=5953a09f"></script>
+<script src="assets/vendor/fflate.js?v=5953a09f"></script>
+<script src="assets/vendor/clipper.js?v=5953a09f"></script>
+<script src="assets/app/geometria.js?v=5953a09f"></script>
+<script src="assets/app/exportadores.js?v=5953a09f"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=2942b6c9').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=5953a09f').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=2942b6c9" defer></script>
+<script src="assets/app/creador.js?v=5953a09f" defer></script>
 </body>
 </html>

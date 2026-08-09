@@ -217,7 +217,9 @@ function buildKeychainTile(font, emojiFont, lines, opts) {
   const loopRingThickness = opts.loopRingThicknessMM;
   const curveSegments = opts.curveSegments || 6;
 
-  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  const polys = boldenPolygons(
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
     err.missingChars = polys.missing || [];
@@ -433,7 +435,9 @@ function shapesBounds(shapes) {
  */
 function buildOutlineTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
-  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  const polys = boldenPolygons(
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin contornos');
     err.missingChars = polys.missing || [];
@@ -574,6 +578,22 @@ function rectClipperPath(minX, minY, maxX, maxY) {
     {X: Math.round(maxX * CLIPPER_SCALE), Y: Math.round(maxY * CLIPPER_SCALE)},
     {X: Math.round(minX * CLIPPER_SCALE), Y: Math.round(maxY * CLIPPER_SCALE)},
   ];
+}
+
+/** Negrita sintética: dilata el trazo de las letras `boldMM` por lado con
+ *  esquinas redondeadas. Las tipografías script son flaquitas; unas décimas
+ *  las vuelven legibles e imprimibles sin cambiar de fuente. Conserva la
+ *  lista de caracteres faltantes y devuelve polígonos en mm como los recibió.
+ *  Ojo: también encoge los huecos internos de las letras (el ojo de la e),
+ *  por eso el control de la interfaz se limita a +0.8 mm. */
+function boldenPolygons(polys, boldMM) {
+  const delta = Number(boldMM) || 0;
+  if (delta <= 0 || !polys.length) return polys;
+  const tree = offsetPolygonsOutward(polys, delta);
+  const paths = ClipperLib.Clipper.PolyTreeToPaths(tree);
+  const out = paths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+  out.missing = polys.missing || [];
+  return out;
 }
 
 /** Suma de áreas de paths de Clipper en mm² (los agujeros restan solos). */
@@ -744,7 +764,9 @@ function estimatePencilVolumeMM3(m) {
  */
 function buildPencilNameTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
-  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  const polys = boldenPolygons(
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin contornos para lápiz');
     err.missingChars = polys.missing || [];
@@ -1403,7 +1425,9 @@ const SHAPE_CONTENT = {
  */
 function buildShapeTile(font, emojiFont, lines, shapeKey, opts) {
   const curveSegments = opts.curveSegments || 10;
-  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  const polys = boldenPolygons(
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
     err.missingChars = polys.missing || [];
@@ -1466,7 +1490,9 @@ function buildShapeTile(font, emojiFont, lines, shapeKey, opts) {
 
 function buildDoubleOutlineTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
-  const polys = linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments);
+  const polys = boldenPolygons(
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
     err.missingChars = polys.missing || [];

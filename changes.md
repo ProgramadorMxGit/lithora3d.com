@@ -5644,3 +5644,10 @@
 * Motivo: bisección con pruebas físicas del usuario (7.7 impreso quedó demasiado apretado; 8.6 quedó flojo) más investigación: el lápiz escolar #2 mide ~7.0 mm entre caras pero ~8.1 mm entre esquinas (que son las que deben pasar), los toppers más descargados usan huecos de 7.8–8.0 mm y los agujeros FDM salen ~0.2 mm menores que el modelo → 8.1 modelado ≈ 7.9 real = roce firme.
 * Relación: refina la paridad de diámetro de 291b7ac con datos de impresión reales; la prueba de ajuste en 8.1 imprime 7.8/8.1/8.4, que encierra el rango útil.
 * Resultado: ✅ suite completa en verde; verificado en preview con almacenamiento limpio: preset Escolar al punto seleccionado, slider 8.1, sello de versión 2942b6c9
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js, creador.js, plantilla.py e index.html (regenerado)
+* Cambio: negrita sintética (B6 de la propuesta original): `boldenPolygons` dilata el trazo de las letras hasta +0.8 mm por lado con esquinas redondeadas (Clipper jtRound), aplicada en los cinco constructores tras `linesToPolygons`; el contorno, el túnel, las islas y el volumen se adaptan solos porque todo parte de los polígonos engordados. Control "Letra más gordita" (slider 0–0.8, paso 0.1, default 0) insertado por la plantilla tras el deslizador de tamaño, con persistencia (`textBold` en SAVED_KEYS y refreshAllControls) y FAQ nueva (15 en total).
+* Motivo: el usuario mostró JULIANA con su fuente Disney: el relieve blanco sale flaquito porque las script tienen trazos delgados y no existía control de grosor.
+* Relación: mejora B6 del informe specs/lapiz-configurable; aplica a llaveros y lápices por igual.
+* Resultado: ✅ suite completa en verde; verificado en preview con Caveat: +0.4 mm engorda la pieza de 69×22 a 70×23 mm y de 10.4 a 11.8 g; sello de versión 5953a09f
