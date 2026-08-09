@@ -285,6 +285,15 @@ const QUALITY_OVERRIDES = {
   // ---- Seam: hide the scar the user can see on the curved letters ----
   seam_slope_type: 'external',  // was none — smart scarf (conditional stays on) ramps the seam on long smooth outlines
 
+  /* ---- Viajes limpios sobre la cara vista (rayones y grumitos del color base) ----
+     Mientras imprime las letras, la boquilla viaja sobre la meseta ya planchada
+     del color de fondo. Con el default del sistema, esos viajes van SIN
+     retracción (reduce_infill_retraction=1) — escurriendo material y esquivando
+     el z-hop — y en línea recta por encima de todo. En piezas de dos colores
+     eso se ve como rayones y puntitos del color de arriba sobre el de abajo. */
+  reduce_infill_retraction: '0', // retrae SIEMPRE al viajar → el z-hop de 0.4 sí se ejecuta y la boquilla no arrastra
+  reduce_crossing_wall: '1',     // los viajes rodean las paredes en vez de cruzar por encima de la cara terminada
+
   // ---- Structure: piezas LIVIANAS a pedido del usuario; el techo reforzado
   //      de arriba es lo que compensa la baja densidad ----
   sparse_infill_density: '10%', // was 25%

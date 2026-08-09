@@ -5616,3 +5616,10 @@
 * Motivo: el usuario descargó un 3MF "de producción" con el perfil de la ronda 1 aunque la ronda 2 ya estaba desplegada: su pestaña conservaba exportadores.js viejo y no había forma de notarlo. Se verificó con curl que el servidor y Cloudflare sí servían lo nuevo (Age: 0); el rezago era del navegador. Con el hash en la URL, una recarga normal siempre empareja HTML y JS del mismo despliegue.
 * Relación: la auditoría estática ya ignora query strings en localTarget; mismo patrón ?v= que usa la home con styles.css.
 * Resultado: ✅ suite completa en verde; index regenerado con ?v=647d12f2 en los diez recursos
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/assets/app/exportadores.js (QUALITY_OVERRIDES, ronda 3: viajes limpios)
+* Cambio: `reduce_infill_retraction: 0` (el default del sistema viaja SIN retraer dentro de la pieza, esquivando el z-hop de 0.4 Auto Lift de la plantilla y escurriendo material) y `reduce_crossing_wall: 1` (los viajes rodean las paredes en vez de cruzar por encima de la cara terminada). Aplica a llaveros y lápices; ambas claves quedan declaradas en different_settings_to_system (35 lápiz / 21 llavero, verificado sobre el project_settings parchado).
+* Motivo: con el blanco ya perfecto tras la ronda 2, la meseta rosa del "mia" quedó con rayones y puntitos blancos: la boquilla arrastraba y babeaba al viajar sobre la superficie planchada mientras imprimía las letras. Investigado con dorking en foro Bambu/Reddit: el culpable reportado en A1 es exactamente reduce retractions on infill saltándose los z-hops, más los cruces en línea recta.
+* Relación: tercera ronda del perfil anti-defectos; el HTML versionado por hash (?v=) garantiza que la recarga traiga este exportadores.js.
+* Resultado: ✅ suite en verde; perfil parchado verificado por harness en ambos productos
