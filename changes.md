@@ -5630,3 +5630,10 @@
 * Motivo: en el despliegue de la ronda 3 se editó exportadores.js sin regenerar la plantilla: el HTML siguió apuntando al hash viejo y el candado de versionado quedó desincronizado — la clase exacta de rezago que promete impedir. La prueba lo convierte en fallo de suite en vez de descuido silencioso.
 * Relación: cierra el ciclo del versionado por hash introducido hoy.
 * Resultado: ✅ suite completa en verde con la prueba nueva
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/plantilla.py, assets/app/pagina.css e index.html (regenerado)
+* Cambio: sello de versión visible al pie del generador ("Generador versión <hash> · si este código no coincide con el más reciente, recarga con Ctrl+Shift+R"), estampado por la plantilla con el mismo md5 del versionado ?v= y estilizado discreto (.pie-version).
+* Motivo: el usuario descargó dos veces un 3MF con perfil viejo desde pestañas abiertas de días anteriores, sin forma de notar qué build tenía cargado; ahora lo puede comprobar de un vistazo sin DevTools.
+* Relación: completa el candado de versionado por hash; la prueba de sincronía de la auditoría cubre también este sello (mismo VER).
+* Resultado: ✅ suite completa en verde; index regenerado con v 0b99f18a

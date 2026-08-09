@@ -136,6 +136,7 @@ header h1 {
 .boton-primario { background: #0369A1; color: #FFFFFF; }
 .boton-secundario { background: #FFFFFF; color: #0F172A; }
 
+.pie-version { font-size: 11px; color: #94A3B8; text-align: center; margin: 6px 0; }
 .pie {
   border-top: 1px solid var(--line);
   padding: 22px 20px 34px;

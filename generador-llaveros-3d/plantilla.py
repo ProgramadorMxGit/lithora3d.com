@@ -334,6 +334,7 @@ PAGINA = '''<!DOCTYPE html>
 
 <footer class="pie">
   <p><a href="/">Lithora 3D</a> &middot; Impresi&oacute;n 3D en Tampico, Ciudad Madero y Altamira</p>
+  <p class="pie-version">Generador versi&oacute;n {ver} &middot; si este c&oacute;digo no coincide con el m&aacute;s reciente, recarga con Ctrl+Shift+R</p>
   <p class="pie-enlaces">
     <a href="/servicio-impresion-3d/">Servicio</a>
     <a href="/prototipado-rapido/">Prototipado</a>
@@ -390,6 +391,11 @@ for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
     assert salida.count('"' + _rec + '"') + salida.count("'" + _rec + "'") == 1, _rec
     salida = salida.replace('"' + _rec + '"', '"' + _rec + '?v=' + VER + '"')
     salida = salida.replace("'" + _rec + "'", "'" + _rec + '?v=' + VER + "'")
+
+# Sello visible al pie: el usuario puede comprobar de un vistazo qué build
+# tiene cargado la pestaña, sin abrir DevTools ni adivinar cachés.
+assert salida.count('{ver}') == 1
+salida = salida.replace('{ver}', VER)
 
 open(os.path.join(AQUI, 'index.html'), 'w', encoding='utf-8', newline='\n').write(salida)
 
