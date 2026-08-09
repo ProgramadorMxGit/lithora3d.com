@@ -41,6 +41,28 @@ test('enlaces internos y fragmentos apuntan a destinos existentes', () => {
   }
 });
 
+test('el ?v del generador coincide con el hash real de los recursos de la app', async () => {
+  // plantilla.py estampa md5(contenido de la app) como ?v= en index.html. Si se
+  // edita un recurso sin regenerar la plantilla, los navegadores reutilizarían
+  // caché viejo bajo la misma URL — justo la clase de rezago que el versionado
+  // promete impedir (un usuario generó un 3MF con el perfil anterior así).
+  const {createHash} = await import('node:crypto');
+  const base = path.join(root, 'generador-llaveros-3d');
+  const hash = createHash('md5');
+  for (const rec of ['assets/app/estilos.css', 'assets/app/pagina.css',
+    'assets/app/geometria.js', 'assets/app/exportadores.js',
+    'assets/app/creador.js', 'assets/app/perfil-bambu.json']) {
+    hash.update(fs.readFileSync(path.join(base, rec)));
+  }
+  const esperado = hash.digest('hex').slice(0, 8);
+  const html = read(path.join(base, 'index.html'));
+  const usados = [...html.matchAll(/\?v=([a-f0-9]{8})/g)].map(m => m[1]);
+  assert.ok(usados.length >= 10, 'faltan recursos versionados en el index del generador');
+  for (const v of usados) {
+    assert.equal(v, esperado, 'index.html desincronizado: ejecuta python plantilla.py');
+  }
+});
+
 test('sitemap contiene cada ruta indexable y robots lo declara', () => {
   const sitemap = read(path.join(root, 'sitemap.xml'));
   const robots = read(path.join(root, 'robots.txt'));

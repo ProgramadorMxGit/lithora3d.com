@@ -5623,3 +5623,10 @@
 * Motivo: con el blanco ya perfecto tras la ronda 2, la meseta rosa del "mia" quedó con rayones y puntitos blancos: la boquilla arrastraba y babeaba al viajar sobre la superficie planchada mientras imprimía las letras. Investigado con dorking en foro Bambu/Reddit: el culpable reportado en A1 es exactamente reduce retractions on infill saltándose los z-hops, más los cruces en línea recta.
 * Relación: tercera ronda del perfil anti-defectos; el HTML versionado por hash (?v=) garantiza que la recarga traiga este exportadores.js.
 * Resultado: ✅ suite en verde; perfil parchado verificado por harness en ambos productos
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/index.html (regenerado) y tests/static-audit.test.mjs
+* Cambio: regeneración del index para que el ?v= refleje el exportadores.js de la ronda 3 (647d12f2 → f742fb0c) y prueba nueva que recalcula el md5 de los seis recursos de la app y exige que TODOS los ?v del index coincidan.
+* Motivo: en el despliegue de la ronda 3 se editó exportadores.js sin regenerar la plantilla: el HTML siguió apuntando al hash viejo y el candado de versionado quedó desincronizado — la clase exacta de rezago que promete impedir. La prueba lo convierte en fallo de suite en vez de descuido silencioso.
+* Relación: cierra el ciclo del versionado por hash introducido hoy.
+* Resultado: ✅ suite completa en verde con la prueba nueva
