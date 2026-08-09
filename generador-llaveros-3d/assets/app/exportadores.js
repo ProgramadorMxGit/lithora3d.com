@@ -253,13 +253,16 @@ function toHex6(hex) {
 const QUALITY_OVERRIDES = {
   // ---- Ironing: the single biggest win for the flat top (base was "no ironing") ----
   ironing_type: 'top',          // iron every top face: base plane AND letter tops (enum: no ironing|top|topmost|solid)
-  ironing_flow: '15%',          // was 12% — per the Bambu wiki, too little flow leaves the ironed face pitted; 15% fills the pits without blobs
+  ironing_flow: '20%',          // was 15% — los cráteres residuales piden más material en la pasada de plancha
   ironing_spacing: '0.1',       // was 0.15 — passes overlap below nozzle width, re-ironing the same area = glossier
+  ironing_speed: '20',          // was 30 — más lento = más calor por punto: la plancha refunde y rellena micro-picaduras
 
   // ---- Top surface: cleaner, no infill telegraphing through the show face ----
   top_surface_pattern: 'monotonic',  // was monotonicline — propagates monotonic order to sub-layers (BambuStudio #1953)
-  top_one_wall_type: 'not apply',    // was 'all top' — keep 2 walls on thin letter tops so they stay solid (no pinholes)
+  top_one_wall_type: 'all top',      // default de Bambu: una sola pared en caras superiores deja más ancho al relleno monotónico en trazos delgados (menos costura central picada)
   top_surface_speed: '120',          // was 200 — a calmer show-face pass fuses lines before ironing (community consensus vs pillowing)
+  top_surface_line_width: '0.5',     // was 0.42 — líneas más anchas se traslapan más: menos ranuras que se vuelven picaduras
+  infill_wall_overlap: '25%',        // was 15% — cierra la junta pared↔relleno sólido, donde nacen muchos hoyitos del borde
 
   /* ---- Anti-pillowing roof over LIGHT (10%) infill ----
      Los hoyuelos del techo (pillowing) nacen cuando la primera capa del techo

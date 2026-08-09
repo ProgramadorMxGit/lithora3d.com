@@ -5602,3 +5602,10 @@
 * Motivo: el usuario imprimió RUBI y la cara superior salió con hoyuelos (pillowing): con relleno flojo la primera capa del techo cuelga entre líneas y el planchado no puede rellenar hoyos, solo pulir un techo cerrado. Investigado en la wiki de Bambu (Ironing: flujo bajo = superficie picada) y foros/Reddit (consenso: más capas de techo, techo más lento, más paredes).
 * Relación: décima iteración del modo lápiz; el peso estimado del visor baja acorde (menos relleno) y las piezas quedan "livianitas" sin sacrificar la cara del producto.
 * Resultado: ✅ suite en verde; verificación directa del project_settings parchado: lápiz → 10% relleno, 6×1.2mm techo, 3 paredes, plancha top 15%, techo 100 mm/s; llavero → ídem con techo 120; 30 claves declaradas en different_settings_to_system
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/assets/app/exportadores.js (QUALITY_OVERRIDES, ronda 2 anti-picaduras)
+* Cambio: `ironing_flow` 15%→20% y `ironing_speed` 30→20 (más material y más calor por punto en la pasada de plancha para refundir micro-cráteres), `top_surface_line_width` 0.42→0.5 (líneas más traslapadas, menos ranuras), `infill_wall_overlap` 15%→25% (cierra la junta pared↔relleno sólido donde nacen los hoyitos del borde) y `top_one_wall_type` regresa al default `all top` (una sola pared arriba deja más ancho al relleno monotónico en trazos delgados de script).
+* Motivo: la pieza "mia" impresa con el perfil de la ronda 1 seguía mostrando picaduras dispersas en las caras superiores. El patrón salpicado apunta también a humedad del filamento (se recomendó secado al usuario: zona costera ~80 % HR), pero estas cuatro claves atacan las picaduras de origen mecánico que sí dependen del perfil.
+* Relación: continúa la iteración anti-pillowing de d433c54; mismas garantías de declaración en different_settings_to_system (33 claves lápiz / 19 llavero verificadas sobre el project_settings parchado).
+* Resultado: ✅ suite en verde; perfil parchado verificado por harness en ambos productos
