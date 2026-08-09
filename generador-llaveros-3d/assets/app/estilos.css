@@ -522,6 +522,25 @@ button.big:active { transform: translateY(0) scale(.985); }
 .pencil-fit-list small { font-size: 10px; color: var(--ink-small); }
 .pencil-spec { margin-bottom: 0; }
 .pencil-group-label { margin: 0 0 7px; font-size: 12px; font-weight: 700; color: var(--ink-muted); }
+/* Flechita "volver al valor original", estilo Bambu: solo aparece cuando el
+   control está fuera de su valor de fábrica. */
+.reset-def {
+  display: none;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 1px 5px;
+  border-radius: 7px;
+}
+.reset-def.show { display: inline-flex; align-items: center; }
+.reset-def:hover { background: var(--accent-soft); }
+.slider-row label .reset-def { margin-left: auto; margin-right: 6px; }
+.slider-row label .val { margin-left: 0; }
+.pencil-group-label .reset-def, .check-row .reset-def { margin-left: 4px; }
 .fit-test-btn {
   width: 100%;
   margin-bottom: 15px;

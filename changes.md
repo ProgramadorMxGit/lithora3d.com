@@ -5651,3 +5651,10 @@
 * Motivo: el usuario mostró JULIANA con su fuente Disney: el relieve blanco sale flaquito porque las script tienen trazos delgados y no existía control de grosor.
 * Relación: mejora B6 del informe specs/lapiz-configurable; aplica a llaveros y lápices por igual.
 * Resultado: ✅ suite completa en verde; verificado en preview con Caveat: +0.4 mm engorda la pieza de 69×22 a 70×23 mm y de 10.4 a 11.8 g; sello de versión 5953a09f
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/assets/app/creador.js, estilos.css e index.html (regenerado)
+* Cambio: flechita ↺ "volver al valor original" por control, estilo Bambu Studio: se inyecta por JS (sin tocar el marcado del portable) en los 11 deslizadores (vía bindSlider), los grupos de tapa y forma del hueco, las casillas de arcoíris/alto fijo/lápiz de ejemplo, los tres selectores de color y el contador de columnas — 20 controles. Solo aparece cuando el valor difiere del de fábrica; al tocarla restaura ese control (refreshAllControls + applyColours + rebuild). El refresco vive en scheduleRebuild (embudo de todos los controles), applyColours (los colores no reconstruyen) y refreshAllControls (restauraciones).
+* Motivo: petición del usuario tras varias rondas de calibración: poder regresar cualquier control a su valor por defecto sin reiniciar todo el diseño.
+* Relación: complementa los defaults calibrados de las rondas anteriores (8.1 mm, tope al final, hueco redondo, negrita 0).
+* Resultado: ✅ 102 de 102 pruebas (exit 0 verificado); prueba funcional en preview: 20 iconos inyectados, aparecen al mover tamaño/tapa/colores y el clic restaura y los oculta; versión 05da57a4

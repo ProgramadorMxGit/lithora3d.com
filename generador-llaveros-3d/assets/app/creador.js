@@ -737,11 +737,60 @@
     }
   }
 
+  // ---------- volver al valor de fábrica, control por control ----------
+  /* La flechita ↺ estilo Bambu: aparece junto al control SOLO cuando su valor
+     difiere del de fábrica, y al tocarla regresa ese control (no todo). El
+     botón se inyecta por JS para no tocar el marcado del portable. */
+  const resetIcons = [];
+  function addResetIcon(anchorEl, keys) {
+    if (!anchorEl) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'reset-def';
+    btn.textContent = '↺';
+    btn.title = 'Volver al valor original';
+    btn.setAttribute('aria-label', 'Volver al valor original de este control');
+    btn.addEventListener('click', ev => {
+      // Dentro de un <label>, el clic también activaría el control envuelto.
+      ev.preventDefault();
+      ev.stopPropagation();
+      keys.forEach(k => {
+        state[k] = Array.isArray(DEFAULT_STATE[k]) ? DEFAULT_STATE[k].slice() : DEFAULT_STATE[k];
+      });
+      refreshAllControls();
+      applyColours();
+      syncResetIcons();
+      scheduleRebuild();
+    });
+    const val = anchorEl.querySelector('.val');
+    if (val) anchorEl.insertBefore(btn, val);
+    else anchorEl.appendChild(btn);
+    resetIcons.push({btn, keys});
+  }
+  function syncResetIcons() {
+    resetIcons.forEach(({btn, keys}) => {
+      const changed = keys.some(k => JSON.stringify(state[k]) !== JSON.stringify(DEFAULT_STATE[k]));
+      btn.classList.toggle('show', changed);
+    });
+  }
+
+  // Controles que no pasan por bindSlider (los deslizadores se registran solos):
+  if (pencilCapListEl) addResetIcon(pencilCapListEl.previousElementSibling, ['pencilCapEnd']);
+  if (pencilTunnelListEl) addResetIcon(pencilTunnelListEl.previousElementSibling, ['pencilTunnelStyle']);
+  addResetIcon($('in-rainbow').closest('label'), ['rainbow']);
+  addResetIcon($('in-fixedHeight').closest('label'), ['fixedHeight', 'targetHeight']);
+  if ($('in-showPencilGhost')) addResetIcon($('in-showPencilGhost').closest('label'), ['showPencilGhost']);
+  addResetIcon($('in-baseColor').closest('label'), ['baseColor']);
+  addResetIcon($('in-textColor').closest('label'), ['textColor']);
+  addResetIcon($('in-bordeColor').closest('label'), ['bordeColor']);
+  addResetIcon($('btn-col-minus').parentElement.previousElementSibling, ['columns']);
+
   // ---------- sliders ----------
   function bindSlider(inputId, valId, key, fmt, after) {
     const input = $(inputId);
     input.value = state[key];
     $(valId).textContent = fmt(state[key]);
+    addResetIcon(input.previousElementSibling, [key]);
     input.addEventListener('input', () => {
       state[key] = parseFloat(input.value);
       $(valId).textContent = fmt(state[key]);
@@ -839,6 +888,9 @@
   }
 
   function applyColours() {
+    // Los colores no reconstruyen geometría, así que no pasan por
+    // scheduleRebuild: sus flechitas de reset se refrescan aquí.
+    syncResetIcons();
     baseMaterial.color.set(state.baseColor);
     bordeMaterial.color.set(state.bordeColor);
     textMaterialSolid.color.set(state.textColor);
@@ -957,6 +1009,9 @@
   // ---------- rebuild ----------
   let rebuildTimer = null;
   function scheduleRebuild() {
+    // Todos los controles desembocan aquí: es el punto único donde refrescar
+    // las flechitas de "volver al valor original".
+    syncResetIcons();
     clearTimeout(rebuildTimer);
     rebuildTimer = setTimeout(rebuild, 200);
   }
@@ -1475,6 +1530,7 @@
     syncStyleUI();
     syncModeUI();
     updateNameCapHint();
+    syncResetIcons();
   }
 
   const saveStateEl = $('save-state');
