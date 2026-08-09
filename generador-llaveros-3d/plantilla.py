@@ -38,8 +38,8 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
         <div id="pencil-settings" hidden>
           <p class="pencil-group-label">¿Qué lápiz es?</p>
           <div class="pencil-fit-list" id="pencil-fit-list" role="group" aria-label="Ajuste para lápiz">
-            <button type="button" data-pencil-d="7.7"><b>Clásico firme</b><small>7.7 mm · recomendado</small></button>
-            <button type="button" data-pencil-d="8.6"><b>Holgado fácil</b><small>8.6 mm</small></button>
+            <button type="button" data-pencil-d="8.1"><b>Escolar al punto</b><small>8.1 mm · recomendado</small></button>
+            <button type="button" data-pencil-d="7.7"><b>Muy firme</b><small>7.7 mm</small></button>
             <button type="button" data-pencil-d="10.6"><b>Jumbo grueso</b><small>10.6 mm</small></button>
           </div>
           <div class="slider-row">
@@ -137,7 +137,7 @@ FAQ = [
  ("¿También hace nombres para lápices?",
   "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de ejemplo que muestra por dónde entra."),
  ("¿Qué diámetro de túnel elijo para el lápiz?",
-  "El ajuste Clásico de 7.7 mm agarra firme un lápiz estándar, como los toppers de siempre; hay presets holgado (8.6 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas de milímetro. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."),
+  "El ajuste Escolar de 8.1 mm entra firme en el lápiz de escuela tradicional: sus esquinas hexagonales miden unos 8.1 mm y los agujeros impresos salen unas décimas más chicos que el modelo. Hay presets muy firme (7.7 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."),
  ("¿Puedo venderlos?",
   "Los archivos que generas son tuyos. Ten en cuenta que la tipografía que elijas tiene su propia licencia: las incluidas aquí son de uso libre, pero si subes una tuya debes revisar sus condiciones."),
  ("¿Se guardan mis datos?",

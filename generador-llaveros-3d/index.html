@@ -32,8 +32,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="assets/app/estilos.css?v=0b99f18a">
-<link rel="stylesheet" href="assets/app/pagina.css?v=0b99f18a">
+<link rel="stylesheet" href="assets/app/estilos.css?v=2942b6c9">
+<link rel="stylesheet" href="assets/app/pagina.css?v=2942b6c9">
 <link rel="preload" as="fetch" href="assets/fuentes/fuentes.json" crossorigin="anonymous">
 <link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf" crossorigin="anonymous">
 <script type="application/ld+json">
@@ -213,7 +213,7 @@
           "name": "¿Qué diámetro de túnel elijo para el lápiz?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "El ajuste Clásico de 7.7 mm agarra firme un lápiz estándar, como los toppers de siempre; hay presets holgado (8.6 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas de milímetro. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."
+            "text": "El ajuste Escolar de 8.1 mm entra firme en el lápiz de escuela tradicional: sus esquinas hexagonales miden unos 8.1 mm y los agujeros impresos salen unas décimas más chicos que el modelo. Hay presets muy firme (7.7 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."
           }
         },
         {
@@ -298,8 +298,8 @@
         <div id="pencil-settings" hidden>
           <p class="pencil-group-label">¿Qué lápiz es?</p>
           <div class="pencil-fit-list" id="pencil-fit-list" role="group" aria-label="Ajuste para lápiz">
-            <button type="button" data-pencil-d="7.7"><b>Clásico firme</b><small>7.7 mm · recomendado</small></button>
-            <button type="button" data-pencil-d="8.6"><b>Holgado fácil</b><small>8.6 mm</small></button>
+            <button type="button" data-pencil-d="8.1"><b>Escolar al punto</b><small>8.1 mm · recomendado</small></button>
+            <button type="button" data-pencil-d="7.7"><b>Muy firme</b><small>7.7 mm</small></button>
             <button type="button" data-pencil-d="10.6"><b>Jumbo grueso</b><small>10.6 mm</small></button>
           </div>
           <div class="slider-row">
@@ -652,7 +652,7 @@
         </details>
         <details class="faq-item">
           <summary>¿Qué diámetro de túnel elijo para el lápiz?</summary>
-          <p>El ajuste Clásico de 7.7 mm agarra firme un lápiz estándar, como los toppers de siempre; hay presets holgado (8.6 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas de milímetro. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres.</p>
+          <p>El ajuste Escolar de 8.1 mm entra firme en el lápiz de escuela tradicional: sus esquinas hexagonales miden unos 8.1 mm y los agujeros impresos salen unas décimas más chicos que el modelo. Hay presets muy firme (7.7 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres.</p>
         </details>
         <details class="faq-item">
           <summary>¿Puedo venderlos?</summary>
@@ -682,7 +682,7 @@
 
 <footer class="pie">
   <p><a href="/">Lithora 3D</a> &middot; Impresi&oacute;n 3D en Tampico, Ciudad Madero y Altamira</p>
-  <p class="pie-version">Generador versi&oacute;n 0b99f18a &middot; si este c&oacute;digo no coincide con el m&aacute;s reciente, recarga con Ctrl+Shift+R</p>
+  <p class="pie-version">Generador versi&oacute;n 2942b6c9 &middot; si este c&oacute;digo no coincide con el m&aacute;s reciente, recarga con Ctrl+Shift+R</p>
   <p class="pie-enlaces">
     <a href="/servicio-impresion-3d/">Servicio</a>
     <a href="/prototipado-rapido/">Prototipado</a>
@@ -692,17 +692,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=0b99f18a"></script>
-<script src="assets/vendor/opentype.js?v=0b99f18a"></script>
-<script src="assets/vendor/fflate.js?v=0b99f18a"></script>
-<script src="assets/vendor/clipper.js?v=0b99f18a"></script>
-<script src="assets/app/geometria.js?v=0b99f18a"></script>
-<script src="assets/app/exportadores.js?v=0b99f18a"></script>
+<script src="assets/vendor/three.js?v=2942b6c9"></script>
+<script src="assets/vendor/opentype.js?v=2942b6c9"></script>
+<script src="assets/vendor/fflate.js?v=2942b6c9"></script>
+<script src="assets/vendor/clipper.js?v=2942b6c9"></script>
+<script src="assets/app/geometria.js?v=2942b6c9"></script>
+<script src="assets/app/exportadores.js?v=2942b6c9"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=0b99f18a').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=2942b6c9').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=0b99f18a" defer></script>
+<script src="assets/app/creador.js?v=2942b6c9" defer></script>
 </body>
 </html>

@@ -5637,3 +5637,10 @@
 * Motivo: el usuario descargó dos veces un 3MF con perfil viejo desde pestañas abiertas de días anteriores, sin forma de notar qué build tenía cargado; ahora lo puede comprobar de un vistazo sin DevTools.
 * Relación: completa el candado de versionado por hash; la prueba de sincronía de la auditoría cubre también este sello (mismo VER).
 * Resultado: ✅ suite completa en verde; index regenerado con v 0b99f18a
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/plantilla.py, assets/app/creador.js e index.html (regenerado)
+* Cambio: preset recomendado y default del túnel de lápiz: "Escolar al punto · 8.1 mm" (nuevo default de pencilHoleD), "Muy firme · 7.7 mm" se conserva como opción y sale el de 8.6 (el slider lo cubre); FAQ del diámetro actualizada con la explicación de esquinas hexagonales y contracción de agujeros FDM.
+* Motivo: bisección con pruebas físicas del usuario (7.7 impreso quedó demasiado apretado; 8.6 quedó flojo) más investigación: el lápiz escolar #2 mide ~7.0 mm entre caras pero ~8.1 mm entre esquinas (que son las que deben pasar), los toppers más descargados usan huecos de 7.8–8.0 mm y los agujeros FDM salen ~0.2 mm menores que el modelo → 8.1 modelado ≈ 7.9 real = roce firme.
+* Relación: refina la paridad de diámetro de 291b7ac con datos de impresión reales; la prueba de ajuste en 8.1 imprime 7.8/8.1/8.4, que encierra el rango útil.
+* Resultado: ✅ suite completa en verde; verificado en preview con almacenamiento limpio: preset Escolar al punto seleccionado, slider 8.1, sello de versión 2942b6c9

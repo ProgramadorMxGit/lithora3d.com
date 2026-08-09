@@ -29,7 +29,8 @@
     corner: 4,
     holeD: 4.5,
     ringThickness: 2.5,
-    pencilHoleD: 7.7,   // paridad con el topper clásico de referencia (Ø7.69 medido)
+    pencilHoleD: 8.1,   // esquinas del lápiz escolar hexagonal ≈8.1; impreso queda ≈7.9 = roce firme
+                        // (7.7 probado en físico: demasiado apretado; 8.6: flojo)
     pencilWall: 1.4,
     pencilCapEnd: 'end',    // 'end' (tope donde termina el nombre, como el clásico) | 'start' | 'open'
     pencilTunnelStyle: 'round', // 'round' (hueco redondo, como el clásico) | 'teardrop' (techo 45° sin soportes)
