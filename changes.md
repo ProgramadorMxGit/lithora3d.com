@@ -5609,3 +5609,10 @@
 * Motivo: la pieza "mia" impresa con el perfil de la ronda 1 seguía mostrando picaduras dispersas en las caras superiores. El patrón salpicado apunta también a humedad del filamento (se recomendó secado al usuario: zona costera ~80 % HR), pero estas cuatro claves atacan las picaduras de origen mecánico que sí dependen del perfil.
 * Relación: continúa la iteración anti-pillowing de d433c54; mismas garantías de declaración en different_settings_to_system (33 claves lápiz / 19 llavero verificadas sobre el project_settings parchado).
 * Resultado: ✅ suite en verde; perfil parchado verificado por harness en ambos productos
+## [2026-08-09]
+
+* Archivo: generador-llaveros-3d/plantilla.py e index.html (regenerado)
+* Cambio: versionado automático de recursos de la app: la plantilla calcula el hash md5 del contenido real (estilos, pagina, geometria, exportadores, creador y perfil-bambu) y lo añade como `?v=` a las URL de los seis recursos propios y los cuatro vendors, con asserts de ocurrencia única.
+* Motivo: el usuario descargó un 3MF "de producción" con el perfil de la ronda 1 aunque la ronda 2 ya estaba desplegada: su pestaña conservaba exportadores.js viejo y no había forma de notarlo. Se verificó con curl que el servidor y Cloudflare sí servían lo nuevo (Age: 0); el rezago era del navegador. Con el hash en la URL, una recarga normal siempre empareja HTML y JS del mismo despliegue.
+* Relación: la auditoría estática ya ignora query strings en localTarget; mismo patrón ?v= que usa la home con styles.css.
+* Resultado: ✅ suite completa en verde; index regenerado con ?v=647d12f2 en los diez recursos

@@ -370,6 +370,27 @@ for marca, valor in (
     ('{cuerpo}', CUERPO),
 ):
     salida = salida.replace(marca, valor)
+
+# Versionado de recursos: el hash del contenido real de la app viaja en la URL
+# (?v=...). Asi, tras un despliegue, una recarga normal SIEMPRE trae el JS y el
+# perfil que corresponden a este HTML; sin esto, un navegador podia quedarse
+# con exportadores.js viejo y generar 3MF con el perfil anterior sin avisar.
+import hashlib
+_hash = hashlib.md5()
+for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
+             'assets/app/geometria.js', 'assets/app/exportadores.js',
+             'assets/app/creador.js', 'assets/app/perfil-bambu.json'):
+    _hash.update(open(os.path.join(AQUI, _rec.replace('/', os.sep)), 'rb').read())
+VER = _hash.hexdigest()[:8]
+for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
+             'assets/vendor/three.js', 'assets/vendor/opentype.js',
+             'assets/vendor/fflate.js', 'assets/vendor/clipper.js',
+             'assets/app/geometria.js', 'assets/app/exportadores.js',
+             'assets/app/creador.js', 'assets/app/perfil-bambu.json'):
+    assert salida.count('"' + _rec + '"') + salida.count("'" + _rec + "'") == 1, _rec
+    salida = salida.replace('"' + _rec + '"', '"' + _rec + '?v=' + VER + '"')
+    salida = salida.replace("'" + _rec + "'", "'" + _rec + '?v=' + VER + "'")
+
 open(os.path.join(AQUI, 'index.html'), 'w', encoding='utf-8', newline='\n').write(salida)
 
 palabras = len(re.sub(r'<[^>]+>', ' ', re.search(r'<div class="contenido">.*?</div>\s*<footer', salida, re.S).group(0)).split())
