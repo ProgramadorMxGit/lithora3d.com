@@ -15,7 +15,7 @@ vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
 const {
   teardropProfile, roundProfile, pencilBodyTopZ, teardropAreaMM2, circularSegmentAreaMM2,
   normalizePencilCapEnd, normalizePencilTunnelStyle, pencilCapPlacement, capCoverageLimitX,
-  pencilVoidHalfWidth, estimatePencilVolumeMM3, signedArea,
+  pencilVoidHalfWidth, pencilBestAxisY, estimatePencilVolumeMM3, signedArea,
 } = sandbox.module.exports;
 
 test('el perfil de lágrima es simétrico y sus extremos son los teóricos', () => {
@@ -133,6 +133,21 @@ test('la cobertura de la tapa detecta dónde la silueta vuelve a envolver el tub
   const conAgujero = capCoverageLimitX([silueta, agujero], 0, 5.8, 40, 20, 0.4);
   assert.ok(conAgujero === null || conAgujero < 24 || conAgujero > 28.1,
     `la cobertura cayó dentro del agujero: ${conAgujero}`);
+});
+
+test('el eje del túnel se centra en la masa de las letras, no en la caja', () => {
+  // Cuerpo principal: rectángulo grueso de y=8 a y=20 (como las letras A-N-E-L).
+  // Descendente: lengüeta angosta que cuelga de y=0 a y=8 (como la g de Angel).
+  const cuerpo = [[0, 8], [60, 8], [60, 20], [0, 20]];
+  const rasgo = [[25, 0], [31, 0], [31, 8], [25, 8]];
+  const bb = {minX: 0, minY: 0, maxX: 60, maxY: 20};
+  const eje = pencilBestAxisY([cuerpo, rasgo], bb, 5.45);
+  // El centro de la caja (10) está arrastrado por el rasgo; la masa vive en 14.
+  assert.ok(eje > 12, `el eje quedó arrastrado por el descendente: ${eje}`);
+  assert.ok(eje < 16, `el eje se pasó del cuerpo: ${eje}`);
+  // Sin descendentes, el eje debe quedarse en el centro.
+  const soloCuerpo = pencilBestAxisY([cuerpo], {minX: 0, minY: 8, maxX: 60, maxY: 20}, 5.45);
+  assert.ok(Math.abs(soloCuerpo - 14) < 1.2, `eje sin rasgos fuera de centro: ${soloCuerpo}`);
 });
 
 test('el volumen estimado de un caso sintético cae en el rango esperado en gramos', () => {

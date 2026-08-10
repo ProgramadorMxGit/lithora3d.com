@@ -596,6 +596,53 @@ function boldenPolygons(polys, boldMM) {
   return out;
 }
 
+/** Eje vertical del túnel: la altura cuyo carril de ±(outerR−0.25) atrapa MÁS
+ *  material de letras, con un empate suave hacia el centro de la caja.
+ *  Centrar en la caja completa colgaba el lomo como una barra plana por
+ *  debajo de los nombres con descendentes (la g de Angel estira la caja
+ *  hacia abajo y arrastraba el túnel con ella); los clásicos centran el
+ *  túnel en el cuerpo de la letra y dejan colgar los rasgos. */
+function pencilBestAxisY(polys, bb, outerR) {
+  const half = outerR - 0.25;
+  const mid = (bb.minY + bb.maxY) / 2;
+  const lo = bb.minY;
+  const hi = bb.maxY;
+  if (!(hi - lo > half * 2 + 1)) return mid;
+  // Perfil de anchura por renglones (cruces de línea horizontal, paridad
+  // par/impar) y ventana deslizante con sumas prefijas: puro y barato.
+  const rows = 64;
+  const dy = (hi - lo) / rows;
+  const width = new Array(rows).fill(0);
+  for (let r = 0; r < rows; r++) {
+    const y = lo + (r + 0.5) * dy;
+    const xs = [];
+    for (const poly of polys) {
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const [x1, y1] = poly[i];
+        const [x2, y2] = poly[j];
+        if ((y1 > y) !== (y2 > y)) xs.push(x1 + ((y - y1) * (x2 - x1)) / (y2 - y1));
+      }
+    }
+    xs.sort((a, b) => a - b);
+    for (let k = 0; k + 1 < xs.length; k += 2) width[r] += xs[k + 1] - xs[k];
+  }
+  const pref = [0];
+  for (let r = 0; r < rows; r++) pref.push(pref[r] + width[r] * dy);
+  const win = Math.min(rows, Math.max(1, Math.round((half * 2) / dy)));
+  let best = mid;
+  let bestScore = -Infinity;
+  for (let r = 0; r + win <= rows; r++) {
+    const y = lo + (r + win / 2) * dy;
+    const area = pref[r + win] - pref[r];
+    const score = area - 0.05 * Math.abs(y - mid);
+    if (score > bestScore) {
+      bestScore = score;
+      best = y;
+    }
+  }
+  return best;
+}
+
 /** Suma de áreas de paths de Clipper en mm² (los agujeros restan solos). */
 function clipperPathsAreaMM2(paths) {
   let area = 0;
@@ -781,10 +828,7 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   if (!baseShapes.length) throw new Error('contorno para lápiz vacío');
   basePaths = ClipperLib.Clipper.PolyTreeToPaths(baseTree);
 
-  // El eje del túnel se centra en las LETRAS; los límites del tile se miden
-  // más abajo, ya con el lomo unido.
   const bbLetters = shapesBounds(baseShapes);
-  const centerY = (bbLetters.minY + bbLetters.maxY) / 2;
 
   const holeD = Math.max(7.6, opts.pencilHoleDiameterMM || 8.6);
   const wall = Math.max(1.2, opts.pencilWallMM || 1.4);
@@ -794,6 +838,13 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
   const tunnelStyle = normalizePencilTunnelStyle(opts);
   const totalZ = pencilBodyTopZ(tunnelStyle, centerZ, outerR);
   const capMode = normalizePencilCapEnd(opts);
+
+  // El eje del túnel se coloca donde las LETRAS tienen más masa (no en el
+  // centro de la caja): los descendentes cuelgan libres y el lomo no asoma
+  // como barra plana por debajo. Los límites del tile se miden más abajo,
+  // ya con el lomo unido.
+  const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+  const centerY = pencilBestAxisY(lettersMM, bbLetters, outerR);
 
   // Alcance del túnel: hasta donde las LETRAS cruzan la banda central, para
   // que nada cuelgue más allá de una letra angosta en los extremos.
@@ -823,7 +874,6 @@ function buildPencilNameTile(font, emojiFont, lines, opts) {
      trazo, sin cuevas. Solo si ninguna letra puede envolver el tubo (letras
      muy pequeñas) se recurre al tapón redondo como último recurso. */
   const tunnelLenU = tubeEndU - tubeStartU;
-  const lettersMM = basePaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const place = pencilCapPlacement(capMode, tubeStartU, tubeEndU, outerR);
   let plugNeeded = false;
   if (place.capX0 !== null) {
@@ -1808,7 +1858,7 @@ if (typeof module !== 'undefined' && module.exports) {
     SHAPES, SHAPE_CONTENT, buildShapeTile, buildDoubleOutlineTile, buildQRTile, buildGridMesh,
     traceBinaryGrid, simplifyPolygon, gridToPolygons, buildSilhouetteTile, buildPencilNameTile,
     teardropProfile, roundProfile, pencilBodyTopZ, normalizePencilCapEnd, normalizePencilTunnelStyle,
-    pencilCapPlacement, capCoverageLimitX, pencilVoidHalfWidth, teardropAreaMM2, circularSegmentAreaMM2,
-    estimatePencilVolumeMM3, buildPencilFitTestTile,
+    pencilCapPlacement, capCoverageLimitX, pencilVoidHalfWidth, pencilBestAxisY,
+    teardropAreaMM2, circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
   };
 }

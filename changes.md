@@ -5658,3 +5658,10 @@
 * Motivo: petición del usuario tras varias rondas de calibración: poder regresar cualquier control a su valor por defecto sin reiniciar todo el diseño.
 * Relación: complementa los defaults calibrados de las rondas anteriores (8.1 mm, tope al final, hueco redondo, negrita 0).
 * Resultado: ✅ 102 de 102 pruebas (exit 0 verificado); prueba funcional en preview: 20 iconos inyectados, aparecen al mover tamaño/tapa/colores y el clic restaura y los oculta; versión 05da57a4
+## [2026-08-10]
+
+* Archivo: generador-llaveros-3d/assets/app/geometria.js, tests/generator-pencil-tunnel.test.mjs e index.html (regenerado)
+* Cambio: el eje vertical del túnel dejó de ser el centro de la caja del nombre y pasa a ser la altura cuyo carril de ±(outerR−0.25) atrapa más masa de letras (`pencilBestAxisY`: perfil de anchura por 64 renglones vía cruces de línea horizontal con paridad par/impar + ventana deslizante con sumas prefijas y empate suave hacia el centro; pura y exportada, con regresión de descendente sintético).
+* Motivo: el usuario mostró ANGEL con su fuente Disney: la g descendente estiraba la caja hacia abajo, arrastraba el eje del túnel y el lomo colgaba como una barra plana bajo A-N-E-L. Con el eje en la masa real, los descendentes cuelgan libres como en los toppers clásicos.
+* Relación: el lomo, la banda del túnel, la tapa y el lápiz fantasma se recolocan solos porque todos parten de centerY. La primera versión con booleanas de Clipper por candidato costaba ~2.5 s por pieza; el escaneo de líneas la vuelve despreciable.
+* Resultado: ✅ suite completa en verde (incluida la regresión nueva y el guardián de hash que atrapó el index sin regenerar); verificado en Chrome con Angel/Caveat: el cuerpo abraza las letras y el rasgo cuelga libre (audits/lapiz-eje-por-masa-2026-08-10.png); versión 0bbec6e3
