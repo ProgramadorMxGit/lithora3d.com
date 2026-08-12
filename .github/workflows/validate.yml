@@ -1,0 +1,40 @@
+name: validate
+
+# Hasta ahora el unico portero era ejecutar `npm run validate` a mano, y se olvidaba:
+# 12 CTA hacia un ancla inexistente sobrevivieron semanas en produccion.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sincronia del contenido, sintaxis y suite
+        run: npm run validate
+
+      - name: El sitio no debe publicar documentacion interna
+        run: |
+          test -f _config.yml || { echo "Falta _config.yml: Pages serviria audits/ y specs/"; exit 1; }
+          for ruta in audits specs tests scripts package.json; do
+            grep -qE "^\s*-\s*\"?$ruta\"?\s*$" _config.yml || {
+              echo "_config.yml no excluye '$ruta'"; exit 1; }
+          done
+
+      - name: Cada pagina indexable esta en el sitemap
+        run: |
+          fallos=0
+          while IFS= read -r archivo; do
+            ruta="${archivo#./}"; ruta="${ruta%index.html}"
+            url="https://lithora3d.com/${ruta}"
+            grep -qF "<loc>${url}</loc>" sitemap.xml || { echo "Falta en sitemap: ${url}"; fallos=1; }
+          done < <(find . -name index.html -not -path "./audits/*" -not -path "./node_modules/*" -not -path "./sofa_planta_blender*")
+          exit $fallos

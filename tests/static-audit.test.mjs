@@ -18,6 +18,16 @@ function localTarget(fromFile, href) {
   return clean.endsWith('/') ? path.join(resolved, 'index.html') : resolved;
 }
 
+// El fragmento de un enlace hacia OTRA pagina hay que buscarlo en el destino, no en
+// el origen. Sin esto, 12 CTA hacia /#cotizar sobrevivieron semanas: el ancla no
+// existia en la portada y la suite seguia verde porque solo miraba el archivo emisor.
+function fragmentOf(href) {
+  const hash = href.indexOf('#');
+  if (hash === -1) return null;
+  const fragment = href.slice(hash + 1).split('?')[0];
+  return fragment.length ? fragment : null;
+}
+
 test('todas las paginas locales tienen metadata, canonical y un H1', () => {
   for (const file of htmlFiles) {
     const html = read(file);
@@ -37,6 +47,13 @@ test('enlaces internos y fragmentos apuntan a destinos existentes', () => {
       const target = localTarget(file, href);
       if (target) assert.ok(fs.existsSync(target), `${path.relative(root, file)} -> ${href}`);
       if (href.startsWith('#') && href.length > 1) assert.match(html, new RegExp(`id=["']${href.slice(1)}["']`), `${path.relative(root, file)} -> ${href}`);
+      const fragment = fragmentOf(href);
+      if (!fragment || href.startsWith('#') || /^(https?:|mailto:|tel:|javascript:)/i.test(href)) continue;
+      // Enlace con ancla hacia otra pagina: el id tiene que existir en el DESTINO.
+      const destino = target && fs.existsSync(target) ? target : null;
+      if (destino) {
+        assert.match(read(destino), new RegExp(`id=["']${fragment}["']`), `${path.relative(root, file)} -> ${href} (ancla ausente en el destino)`);
+      }
     }
   }
 });
@@ -78,7 +95,7 @@ test('sitemap contiene cada ruta indexable y robots lo declara', () => {
   assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/);
   assert.match(sitemap, /<image:loc>https:\/\/lithora3d\.com\/assets\/lading\/seccion-idea\.webp<\/image:loc>/);
   assert.ok(fs.existsSync(path.join(root, 'assets', 'lading', 'seccion-idea.webp')));
-  assert.match(sitemap, /<image:caption>Ejemplos conceptuales/);
+  assert.match(sitemap, /<image:caption>Productos personalizados/);
 });
 
 test('SEO estructurado usa datos aprobados y coincide con contenido visible', () => {
@@ -162,6 +179,10 @@ test('pares cromaticos principales superan contraste WCAG AA', () => {
   assert.ok(contrast('0369a1', 'ffffff') >= 4.5, 'CTA azul');
   assert.ok(contrast('ffffff', '0f172a') >= 4.5, 'CTA oscuro');
   assert.ok(contrast('cbd5e1', '172236') >= 4.5, 'formulario oscuro');
+  // Pie compartido sobre #0F172A: el gris que traia (#64748B) daba 3.78:1.
+  assert.ok(contrast('94a3b8', '0f172a') >= 4.5, 'pie: texto legal');
+  assert.ok(contrast('cbd5e1', '0f172a') >= 4.5, 'pie: enlaces legales');
+  assert.ok(contrast('94a3b8', '0f172a') >= 4.5, 'pie: navegacion');
 });
 
 test('no hay ids duplicados y los campos tienen etiqueta', () => {

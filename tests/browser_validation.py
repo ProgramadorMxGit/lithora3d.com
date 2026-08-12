@@ -182,13 +182,13 @@ def run():
         cdp.call("Emulation.setTouchEmulationEnabled", {"enabled": True, "maxTouchPoints": 5})
         cdp.evaluate("document.querySelector('#nicho-transporte .niche-open').click()")
         check("interaccion tactil", cdp.evaluate("!document.querySelector('#detail-transporte').hidden"))
-        check("galeria conceptual de Transporte", cdp.evaluate("document.querySelectorAll('#detail-transporte .detail-gallery figure').length===4 && [...document.querySelectorAll('#detail-transporte .detail-gallery img')].every(img=>img.getAttribute('src').includes('../assets/transporte/') && img.alt.includes('Ejemplo conceptual'))"))
+        check("galeria conceptual de Transporte", cdp.evaluate("document.querySelectorAll('#detail-transporte .detail-gallery figure').length===4 && [...document.querySelectorAll('#detail-transporte .detail-gallery img')].every(img=>img.getAttribute('src').includes('../assets/transporte/') && img.alt.length > 20)"))
         cdp.call("Emulation.setTouchEmulationEnabled", {"enabled": False})
 
         cdp.evaluate("document.querySelector('#nicho-transporte .niche-image-wrap img').removeAttribute('srcset'); document.querySelector('#nicho-transporte .niche-image-wrap img').src='/assets/no-existe.webp'")
         cdp.wait_for("document.querySelector('#nicho-transporte .niche-image-wrap').classList.contains('image-error')")
         check("estado de imagen fallida", cdp.evaluate("document.querySelector('#nicho-transporte .image-badge').textContent === 'Imagen no disponible'"))
-        check("etiquetas conceptuales", cdp.evaluate("[...document.querySelectorAll('.image-badge')].filter(e=>e.textContent.includes('Ejemplo conceptual')).length >= 2"))
+        check("sin etiquetas conceptuales", cdp.evaluate("[...document.querySelectorAll('.image-badge')].filter(e=>e.textContent.includes('Ejemplo conceptual')).length === 0"))
 
         cdp.evaluate("document.querySelector('[data-category-control][data-category=negocios]').click()")
         cdp.evaluate("document.querySelector('#nicho-barberias [data-application]').click(); document.querySelector('#nicho-barberias [data-quote-trigger]').click()")
@@ -207,7 +207,7 @@ def run():
         cdp.evaluate("window.LithoraEcosystemUI.setDetailState('barberias','error')")
         check("estado error y reintento de detalle", cdp.evaluate("document.querySelector('#detail-barberias .detail-state').textContent.includes('Reintentar')"))
         cdp.evaluate("document.querySelector('#detail-barberias .detail-state button').click()")
-        check("galeria conceptual de Barberías", cdp.evaluate("!document.querySelector('#detail-barberias .detail-gallery').hidden && document.querySelectorAll('#detail-barberias .detail-gallery figure').length===4 && [...document.querySelectorAll('#detail-barberias .detail-gallery img')].every(img=>img.getAttribute('src').includes('../assets/barber/') && img.alt.includes('Ejemplo conceptual'))"))
+        check("galeria conceptual de Barberías", cdp.evaluate("!document.querySelector('#detail-barberias .detail-gallery').hidden && document.querySelectorAll('#detail-barberias .detail-gallery figure').length===4 && [...document.querySelectorAll('#detail-barberias .detail-gallery img')].every(img=>img.getAttribute('src').includes('../assets/barber/') && img.alt.length > 20)"))
 
         cdp.call("Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "reduce"}]})
         check("prefers-reduced-motion", cdp.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"))
@@ -250,7 +250,7 @@ def run():
         check("nueve nichos visibles en la home", cdp.evaluate("document.querySelectorAll('[data-home-niche]').length === 9 && !document.querySelector('[data-home-niche=papelerias]') && !document.querySelector('[data-home-niche=joyerias]') && !document.querySelector('[data-home-niche=farmacias]') && !!document.querySelector('[data-home-niche=boda]') && !!document.querySelector('[data-home-niche=escuelas]')"))
         cdp.evaluate("document.querySelector('#ideas-impresas').scrollIntoView({block:'start'})")
         cdp.wait_for("document.querySelector('#ideas-impresas img').complete && document.querySelector('#ideas-impresas img').naturalWidth > 0")
-        check("Ideas impresas visible, conceptual y conectada", cdp.evaluate("!!document.querySelector('#ideas-impresas') && document.querySelector('#ideas-impresas').offsetHeight > 0 && document.querySelector('#ideas-impresas img').complete && document.querySelector('#ideas-impresas img').naturalWidth > 0 && document.querySelector('#ideas-impresas .idea-showcase__badge').textContent.includes('Ejemplo conceptual') && !!document.querySelector('#ideas-impresas a[href^=\"https://wa.me/528331080178?text=\"]')"))
+        check("Ideas impresas visible y conectada", cdp.evaluate("!!document.querySelector('#ideas-impresas') && document.querySelector('#ideas-impresas').offsetHeight > 0 && document.querySelector('#ideas-impresas img').complete && document.querySelector('#ideas-impresas img').naturalWidth > 0 && !!document.querySelector('#ideas-impresas a[href^=\"https://wa.me/528331080178?text=\"]')"))
         check("bloques internos y redundantes fuera de la portada visible", cdp.evaluate("['materiales','aplicaciones','casos-exito'].every(id => document.querySelector('#' + id).hidden && document.querySelector('#' + id).offsetHeight === 0) && [...document.querySelectorAll('section[hidden] h2')].some(h => h.textContent.includes('Encuentra la página adecuada'))"))
         time.sleep(0.25)
         ideas_desktop = cdp.call("Page.captureScreenshot", {"format": "png", "captureBeyondViewport": False})["data"]

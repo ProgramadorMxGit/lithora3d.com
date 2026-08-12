@@ -18,7 +18,9 @@ function renderImage(record) {
   if (!image.src) return `<div class="niche-image-wrap fallback-image" data-motion-widget="SOL-W11"><div class="fallback-symbol" aria-hidden="true">3D</div><span class="image-badge">${escapeHtml(image.label || 'Sin imagen disponible')}</span></div>`;
   const prefix = image.src.replace(/\.webp$/, '');
   const srcset = `${prefix}-480.webp 480w, ${prefix}-768.webp 768w, ${image.src} 960w`;
-  return `<div class="niche-image-wrap" data-motion-widget="SOL-W11"><img src="${escapeHtml(image.src)}" srcset="${escapeHtml(srcset)}" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) calc(50vw - 44px), 566px" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async"><span class="image-badge">${escapeHtml(image.label)}</span></div>`;
+  // Sin etiqueta se omite el <span> entero: uno vacio seguiria pintando su fondo.
+  const badge = image.label ? `<span class="image-badge">${escapeHtml(image.label)}</span>` : '';
+  return `<div class="niche-image-wrap" data-motion-widget="SOL-W11"><img src="${escapeHtml(image.src)}" srcset="${escapeHtml(srcset)}" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) calc(50vw - 44px), 566px" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async">${badge}</div>`;
 }
 
 function renderGallery(record) {
@@ -26,9 +28,10 @@ function renderGallery(record) {
   const figures = record.gallery.map((image) => {
     const prefix = image.src.replace(/\.webp$/, '');
     const srcset = `${prefix}-480.webp 480w, ${prefix}-768.webp 768w, ${image.src} 960w`;
-    return `<figure><div><img src="${escapeHtml(image.src)}" srcset="${escapeHtml(srcset)}" sizes="(max-width: 767px) calc(50vw - 28px), (max-width: 1200px) calc(25vw - 36px), 265px" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async"><span>${escapeHtml(image.label)}</span></div><figcaption>${escapeHtml(image.descriptor)}</figcaption></figure>`;
+    const badge = image.label ? `<span>${escapeHtml(image.label)}</span>` : '';
+    return `<figure><div><img src="${escapeHtml(image.src)}" srcset="${escapeHtml(srcset)}" sizes="(max-width: 767px) calc(50vw - 28px), (max-width: 1200px) calc(25vw - 36px), 265px" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async">${badge}</div><figcaption>${escapeHtml(image.descriptor)}</figcaption></figure>`;
   }).join('');
-  return `<div class="detail-gallery" aria-label="Ejemplos conceptuales para ${escapeHtml(record.name)}" data-motion-widget="SOL-W14">${figures}</div>`;
+  return `<div class="detail-gallery" aria-label="Galería de ${escapeHtml(record.name)}" data-motion-widget="SOL-W14">${figures}</div>`;
 }
 
 function renderApplications(items, className, limit = items.length, motionWidget = '') {
@@ -50,9 +53,10 @@ function renderCard(record) {
 function renderHomeVisual(record) {
   if (record.image.src) {
     const src = record.image.src.replace('../assets/', 'assets/');
-    return `<div class="home-niche-visual"><img src="${escapeHtml(src)}" alt="${escapeHtml(record.image.alt)}" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">${escapeHtml(record.image.label)}</span></div>`;
+    const badge = record.image.label ? `<span class="home-niche-badge">${escapeHtml(record.image.label)}</span>` : '';
+    return `<div class="home-niche-visual"><img src="${escapeHtml(src)}" alt="${escapeHtml(record.image.alt)}" width="960" height="720" loading="lazy" decoding="async">${badge}</div>`;
   }
-  return `<div class="home-niche-visual home-niche-visual--concept" aria-label="Representación conceptual para ${escapeHtml(record.name)}"><span class="concept-shape concept-shape--one" aria-hidden="true"></span><span class="concept-shape concept-shape--two" aria-hidden="true"></span><span class="concept-shape concept-shape--three" aria-hidden="true"></span><span class="home-niche-badge">Ejemplo conceptual</span><strong>${escapeHtml(record.name)}</strong><small>Ideas 3D personalizables</small></div>`;
+  return `<div class="home-niche-visual home-niche-visual--concept" aria-label="Ilustración para ${escapeHtml(record.name)}"><span class="concept-shape concept-shape--one" aria-hidden="true"></span><span class="concept-shape concept-shape--two" aria-hidden="true"></span><span class="concept-shape concept-shape--three" aria-hidden="true"></span><strong>${escapeHtml(record.name)}</strong><small>Ideas 3D personalizables</small></div>`;
 }
 
 function renderHomeCard(record) {
@@ -78,7 +82,7 @@ function renderHomeSection(records) {
     '      <div class="home-niches__container">',
     '        <p class="section-eyebrow">SOLUCIONES PARA NEGOCIOS</p>',
     '        <h2 id="home-niches-title">¿Qué quieres crear para tu negocio?</h2>',
-    '        <p class="home-niches__intro">Explora ejemplos por actividad. Son puntos de partida personalizables, no productos de catálogo ni proyectos reales.</p>',
+    '        <p class="home-niches__intro">Explora ideas por actividad. Cada pieza se personaliza con la identidad de tu negocio.</p>',
     '        <div class="home-niches__grid">',
     records.map(renderHomeCard).join('\n'),
     '        </div>',

@@ -321,7 +321,9 @@
   function initActiveNavLinks() {
     // IntersectionObserver highlights nav links when their section is in view.
     // Uses a single observer; fires on every scroll via threshold.
-    var sectionIds = ['features','servicios','proceso','materiales','aplicaciones','casos-exito','nosotros','recursos','cotizar'];
+    // 'cotizar' salio de la lista: no existe id="cotizar" en la portada. La cotizacion
+    // vive en /cotizar/, no en una seccion del home.
+    var sectionIds = ['features','servicios','proceso','materiales','aplicaciones','casos-exito','nosotros','recursos'];
     var navLinks = document.querySelectorAll('.site-header nav a[href], .site-header nav button.dropdown-btn');
     if (!navLinks.length) return;
 
@@ -339,8 +341,7 @@
           'materiales': 'Materiales',
           'casos-exito': 'Casos de éxito',
           'nosotros': 'Sobre nosotros',
-          'recursos': 'Recursos',
-          'cotizar': 'Servicios'
+          'recursos': 'Recursos'
         };
         // Highlight the matching nav item
         navLinks.forEach(function(link) {

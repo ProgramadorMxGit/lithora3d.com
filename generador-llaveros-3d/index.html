@@ -29,9 +29,9 @@
 <meta name="twitter:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
 <meta name="twitter:description" content="Crea llaveros con nombre y desc&aacute;rgalos en STL o 3MF multicolor. Sin registro.">
 <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/fonts/inter.css">
 <link rel="stylesheet" href="assets/app/estilos.css?v=0bbec6e3">
 <link rel="stylesheet" href="assets/app/pagina.css?v=0bbec6e3">
 <link rel="preload" as="fetch" href="assets/fuentes/fuentes.json" crossorigin="anonymous">
@@ -75,7 +75,6 @@
         "Varios nombres en una sola placa",
         "Aviso si la placa no cabe en la cama de impresion",
         "Compatible con enes, tildes y dieresis",
-        "Funciona sin conexion una vez cargada",
         "Nombres para lapiz con tunel sin soportes y tope opcional",
         "Prueba de ajuste imprimible para el diametro del lapiz"
       ],
@@ -213,7 +212,7 @@
           "name": "¿También hace nombres para lápices?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de ejemplo que muestra por dónde entra."
+            "text": "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de referencia que muestra por dónde entra."
           }
         },
         {
@@ -332,7 +331,7 @@
           </div>
           <label class="check-row" style="margin-top:2px;margin-bottom:13px">
             <input type="checkbox" id="in-showPencilGhost" checked>
-            <span>Mostrar un lápiz de ejemplo en la vista 3D (no se imprime)</span>
+            <span>Mostrar un lápiz de referencia en la vista 3D (no se imprime)</span>
           </label>
           <button type="button" class="fit-test-btn" id="btn-fit-test">🎯 Imprimir prueba de ajuste<small>3 medidas en una pieza chiquita: pruebas tu lápiz real antes de imprimir todo</small></button>
           <div class="info-box pencil-spec">
@@ -664,7 +663,7 @@
         </details>
         <details class="faq-item">
           <summary>¿También hace nombres para lápices?</summary>
-          <p>Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de ejemplo que muestra por dónde entra.</p>
+          <p>Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de referencia que muestra por dónde entra.</p>
         </details>
         <details class="faq-item">
           <summary>¿Qué diámetro de túnel elijo para el lápiz?</summary>

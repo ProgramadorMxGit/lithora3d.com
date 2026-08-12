@@ -1,0 +1,33 @@
+# GitHub Pages sirve por defecto TODO lo commiteado, no solo las paginas del sitio.
+# Sin esta lista quedaban publicos audits/, specs/, tests/ y package.json, incluidas
+# las cuentas de Google del proyecto. Verificado el 2026-08-11: /audits/2026-08-05/
+# reporte-seo.md devolvia 200.
+#
+# El glob de Jekyll se resuelve desde la raiz: "*.md" NO cubre los anidados, por eso
+# la entrada es "**/*.md". Los README de models/ y tools/ caen dentro de sus carpetas.
+
+exclude:
+  - audits
+  - specs
+  - tests
+  - scripts
+  - tools
+  - models
+  - artifacts
+  - campaign
+  - logs
+  - output
+  - node_modules
+  - .claude
+  - .github
+  - package.json
+  - package-lock.json
+  - "**/*.md"
+  - "**/*.py"
+  - "**/*.mjs"
+  - "**/*.log"
+  - "**/*.pdf"
+  - "**/*.csv"
+  - "**/*.bak"
+
+plugins: []

@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/fonts/inter.css">
   <meta property="og:locale" content="es_MX">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Lithora 3D">
@@ -33,7 +33,7 @@
   <meta name="twitter:description" content="Compara PLA, PETG, ASA, TPU, Nylon y compuestos para tu proyecto 3D.">
   <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.jpg">
   <link rel="stylesheet" href="../assets/tailwind-materials.css">
-  <link rel="stylesheet" href="../assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css?v=20260811">
   <link rel="stylesheet" href="../assets/motion-pages.css">
   <script type="application/ld+json">
     {
@@ -120,7 +120,7 @@
           <a href="/prototipado-rapido/" class="hover:text-[#0369A1]">Prototipado</a>
           <a href="/ecosistema-soluciones/" class="hover:text-[#0369A1]">Soluciones</a>
         </nav>
-        <a href="/#cotizar" class="cta-sheen header-cta inline-flex items-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2 rounded-full">Cotizar →</a>
+        <a href="/cotizar/" class="cta-sheen header-cta inline-flex items-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2 rounded-full">Cotizar →</a>
       </div>
     </div>
   </header>
@@ -135,7 +135,7 @@
             <h1 class="text-4xl lg:text-6xl font-bold text-[#0F172A] leading-tight mb-5">Materiales de impresi&oacute;n 3D: qu&eacute; elegir seg&uacute;n el uso real de la pieza</h1>
             <p class="text-lg text-[#334155] leading-relaxed mb-8">Elegir bien el material define resistencia, flexibilidad, acabado, tolerancia al ambiente y costo. Esta gu&iacute;a est&aacute; pensada para orientar la decisi&oacute;n antes de cotizar.</p>
             <div class="flex flex-wrap gap-4">
-              <a href="/#cotizar" class="btn-primary inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg">Pedir recomendaci&oacute;n →</a>
+              <a href="/cotizar/" class="btn-primary inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg">Pedir recomendaci&oacute;n →</a>
               <a href="/precios-impresion-3d/" class="btn-secondary inline-flex items-center gap-2 bg-white border border-[#D1D5DB] text-[#0F172A] font-semibold px-6 py-3 rounded-lg">Ver precios →</a>
             </div>
           </div>
@@ -187,6 +187,107 @@
             <p class="text-sm text-[#334155] leading-relaxed mb-3">Materiales reforzados con fibras para mayor rigidez y desempe&ntilde;o en aplicaciones espec&iacute;ficas.</p>
             <p class="text-xs text-[#64748B]">Buena ruta cuando importa relaci&oacute;n resistencia-peso o rigidez adicional.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad bg-[#F8FAFC]" aria-labelledby="tabla-materiales-title">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">DATOS T&Eacute;CNICOS</p>
+        <h2 id="tabla-materiales-title" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-4">Qu&eacute; aguanta cada material, en n&uacute;meros</h2>
+        <p class="text-lg text-[#334155] leading-relaxed text-center mb-12" style="max-width:760px;margin-left:auto;margin-right:auto">La diferencia entre un PLA y un PETG no es cuesti&oacute;n de gusto: es una temperatura concreta a la que la pieza se dobla sola. Estos son los valores con los que conviene decidir.</p>
+
+        <div class="rounded-xl border border-[#E2E8F0] bg-white shadow-md" style="overflow-x:auto" role="region" aria-labelledby="tabla-materiales-title" tabindex="0">
+          <table style="width:100%;min-width:940px;border-collapse:collapse;text-align:left">
+            <caption class="text-xs text-[#64748B] leading-relaxed" style="caption-side:bottom;text-align:left;padding:14px 16px;border-top:1px solid #E2E8F0">Valores t&iacute;picos de filamentos FDM comerciales sin refuerzo. Cambian entre marcas, colores y par&aacute;metros de impresi&oacute;n: sirven para comparar materiales entre s&iacute;, no como especificaci&oacute;n de ingenier&iacute;a.</caption>
+            <thead>
+              <tr style="background:#F1F5F9">
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Material</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Temp. m&aacute;x. de servicio</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Resistencia al impacto</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Flexibilidad</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">UV / exterior</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Facilidad de impresi&oacute;n</th>
+                <th scope="col" class="text-xs font-semibold uppercase tracking-widest text-[#334155]" style="padding:14px 16px;vertical-align:bottom">Acabado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-top:1px solid #E2E8F0">
+                <th scope="row" class="text-sm font-semibold text-[#0F172A]" style="padding:16px;vertical-align:top">PLA<span class="text-xs text-[#64748B]" style="display:block;font-weight:400;margin-top:4px">&Aacute;cido polil&aacute;ctico</span></th>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">~50 &deg;C</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">HDT ~55 &deg;C a 0.45 MPa; Tg 55-60 &deg;C</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">2-5 kJ/m&sup2; Izod con entalla. Astilla</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Muy baja</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">3-6 % de alargamiento a la rotura</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Mala</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Se vence con el calor antes que con el sol</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Muy alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Sin c&aacute;mara cerrada y casi sin contracci&oacute;n</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">El mejor detalle</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Capas limpias, lija y pinta bien</span></td>
+              </tr>
+              <tr style="border-top:1px solid #E2E8F0">
+                <th scope="row" class="text-sm font-semibold text-[#0F172A]" style="padding:16px;vertical-align:top">PETG<span class="text-xs text-[#64748B]" style="display:block;font-weight:400;margin-top:4px">Poli&eacute;ster glicolizado</span></th>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">~65 &deg;C</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">HDT ~70 &deg;C a 0.45 MPa; Tg ~80 &deg;C</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Media-alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">5-9 kJ/m&sup2;. Cede antes de romper</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja-media</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">8-25 % de alargamiento a la rotura</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Buena</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Amarillea con los meses, no se desmorona</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Media</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Hace hilos y se pega de m&aacute;s a la cama</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Brillante</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Semitransl&uacute;cido; capas m&aacute;s visibles</span></td>
+              </tr>
+              <tr style="border-top:1px solid #E2E8F0">
+                <th scope="row" class="text-sm font-semibold text-[#0F172A]" style="padding:16px;vertical-align:top">ASA<span class="text-xs text-[#64748B]" style="display:block;font-weight:400;margin-top:4px">Acrilonitrilo estireno acrilato</span></th>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">~90 &deg;C</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">HDT ~95 &deg;C a 0.45 MPa; Tg ~100 &deg;C</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">10-20 kJ/m&sup2;. Tenaz a temperatura ambiente</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja-media</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">10-25 % de alargamiento a la rotura</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Excelente</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Formulado para vivir a la intemperie</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Se contrae; pide c&aacute;mara cerrada y ventilaci&oacute;n</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Mate uniforme</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Acepta pintura y alisado con vapor</span></td>
+              </tr>
+              <tr style="border-top:1px solid #E2E8F0">
+                <th scope="row" class="text-sm font-semibold text-[#0F172A]" style="padding:16px;vertical-align:top">TPU 95A<span class="text-xs text-[#64748B]" style="display:block;font-weight:400;margin-top:4px">Poliuretano termopl&aacute;stico</span></th>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">~60-70 &deg;C</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Reblandece gradual (Vicat); no hay HDT comparable</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">No rompe</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Absorbe el golpe en lugar de transmitirlo</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Muy alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">300-600 % de alargamiento a la rotura</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Media-alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">El TPU arom&aacute;tico amarillea; el alif&aacute;tico no</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja-media</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Lento y solo con extrusor directo</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Mate ahulado</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Casi no se lija ni se pinta</span></td>
+              </tr>
+              <tr style="border-top:1px solid #E2E8F0">
+                <th scope="row" class="text-sm font-semibold text-[#0F172A]" style="padding:16px;vertical-align:top">Nylon<span class="text-xs text-[#64748B]" style="display:block;font-weight:400;margin-top:4px">Poliamida (PA6 / PA12)</span></th>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">~80-100 &deg;C</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">HDT 90-110 &deg;C a 0.45 MPa, en seco</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Muy alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">5-15 kJ/m&sup2; con entalla; sin entalla no rompe</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Alta</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">40-200 % seg&uacute;n sea PA6 o PA12</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Media</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Su enemigo afuera es la humedad, no el sol</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Baja</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Higrosc&oacute;pico: hay que secarlo antes y durante</span></td>
+                <td class="text-sm text-[#334155]" style="padding:16px;vertical-align:top"><strong class="font-semibold text-[#0F172A]">Mate ceroso</strong><span class="text-xs text-[#64748B]" style="display:block;margin-top:4px">Se ti&ntilde;e bien, pero pega y pinta mal</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-[#64748B] mb-12" style="margin-top:12px">Si la tabla no te cabe en la pantalla, desl&iacute;zala de lado para ver el resto de las columnas.</p>
+
+        <div class="max-w-[1000px] mx-auto">
+          <h3 class="text-2xl font-bold text-[#0F172A] mb-2">C&oacute;mo falla cada uno</h3>
+          <p class="text-sm text-[#334155] leading-relaxed mb-8">Una tabla dice cu&aacute;nto aguanta un material. Lo que de verdad decide la elecci&oacute;n es c&oacute;mo se rinde cuando ya no aguanta.</p>
+          <div class="grid grid-cols-1 gap-6">
+            <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+              <h4 class="text-lg font-semibold text-[#0F172A] mb-2">PLA: se rinde dentro de un carro estacionado</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">El PLA casi nunca falla por carga: falla por calor. Su transici&oacute;n v&iacute;trea empieza cerca de los 55 &deg;C y su temperatura de deflexi&oacute;n anda por ah&iacute; mismo, as&iacute; que no hace falta un horno para vencerlo. Un d&iacute;a de 35 &deg;C deja el aire de una cabina cerrada en 50-60 &deg;C y el tablero arriba de 70 &deg;C: un soporte de celular en PLA se dobla solo, sin que nadie lo toque. Fuera de ese escenario es el material m&aacute;s predecible que existe, y para un lote de sesenta recuerdos iguales que van a vivir bajo techo es la opci&oacute;n obvia: imprime r&aacute;pido, no se contrae y la pieza sesenta sale igual que la primera.</p>
+            </article>
+            <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+              <h4 class="text-lg font-semibold text-[#0F172A] mb-2">PETG: aguanta afuera porque reblandece 25 &deg;C m&aacute;s arriba</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">El PETG resiste mejor la intemperie por dos razones que se pueden medir. La t&eacute;rmica: su Tg ronda los 80 &deg;C, as&iacute; que el mismo carro al sol que dobla al PLA a &eacute;l ni lo despeina. Y la mec&aacute;nica: estira entre 8 y 25 % antes de romper, de modo que ante un golpe se dobla en vez de astillarse. Su criterio de fallo es lento y visible: meses de sol directo lo amarillean y le quitan tenacidad en la superficie, pero la pieza sigue trabajando mucho despu&eacute;s de que un PLA equivalente ya se venci&oacute;.</p>
+            </article>
+            <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+              <h4 class="text-lg font-semibold text-[#0F172A] mb-2">ASA: el que s&iacute; vive al sol, y lo que exige a cambio</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">El ASA es, en qu&iacute;mica, un ABS al que le cambiaron el caucho de butadieno por uno acr&iacute;lico. Esa diferencia lo es todo: los dobles enlaces del butadieno son justo lo que ataca la radiaci&oacute;n UV, y por eso una pieza de ABS al sol se pone gris, se cuartea y termina hecha polvo, mientras que una de ASA no. Con deflexi&oacute;n t&eacute;rmica cercana a 95 &deg;C, el calor tampoco es su problema. Su verdadero criterio de fallo se adelanta a la vida &uacute;til y ocurre durante la impresi&oacute;n: se contrae mucho al enfriar, y sin c&aacute;mara cerrada ni control de corrientes de aire la pieza se levanta de la cama o se abre entre capas. Cuando un ASA falla, casi siempre fall&oacute; la adherencia entre capas, no el material.</p>
+            </article>
+            <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+              <h4 class="text-lg font-semibold text-[#0F172A] mb-2">TPU: la &uacute;nica opci&oacute;n cuando la pieza debe deformarse y volver</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">Aqu&iacute; la cuenta es directa: un TPU 95A estira entre 300 y 600 % antes de romper, un PETG llega a 25 % en el mejor de los casos y un PLA se queda en 5 %. Si el dise&ntilde;o pide una leng&uuml;eta que abre y cierra todos los d&iacute;as, un empaque que sella contra una superficie irregular, una funda que absorba la ca&iacute;da o una rueda que agarre sin patinar, cualquier material r&iacute;gido va a fallar por fatiga: se forma una grieta en el punto de flexi&oacute;n y a los cientos de ciclos revienta. El TPU ni siquiera rompe en el ensayo de impacto con entalla, simplemente absorbe. Eso s&iacute;, complica la producci&oacute;n: se imprime lento, exige extrusor directo y no se lija ni se pinta bien.</p>
+            </article>
+            <article class="rounded-xl border border-[#E2E8F0] bg-white p-6">
+              <h4 class="text-lg font-semibold text-[#0F172A] mb-2">Nylon: falla por humedad, no por carga</h4>
+              <p class="text-sm text-[#334155] leading-relaxed">El nylon es el m&aacute;s tenaz de la lista y el que mejor aguanta desgaste y fatiga, por eso se usa en engranes, bujes y bisagras que trabajan de verdad. Su criterio de fallo no es mec&aacute;nico, es higrosc&oacute;pico: absorbe agua del aire hasta varios puntos porcentuales de su peso, y al hacerlo crece de tama&ntilde;o y pierde rigidez. En la zona de Tampico, con humedad relativa alta casi todo el a&ntilde;o, eso significa dos cosas concretas: el filamento se seca antes y durante la impresi&oacute;n o la pieza sale con burbujas y capas d&eacute;biles, y una pieza con tolerancias apretadas se mueve con el clima. Si necesitas medida estable, el nylon no es el camino aunque sea el m&aacute;s fuerte.</p>
+            </article>
+          </div>
+          <p class="text-sm text-[#334155] leading-relaxed" style="margin-top:2rem">&iquest;No sabes cu&aacute;l de los cinco corresponde a tu pieza? Describe d&oacute;nde va a vivir y qu&eacute; tiene que soportar en <a href="/cotizar/" class="text-[#0369A1] font-semibold hover:text-[#0369A1]">la p&aacute;gina de cotizaci&oacute;n</a> y lo vemos por WhatsApp.</p>
         </div>
       </div>
     </section>
@@ -243,12 +344,41 @@
         <h2 class="text-3xl lg:text-4xl font-bold mb-4">Si no tienes claro el material, describe el problema que debe resolver la pieza</h2>
         <p class="text-[#CBD5E1] leading-relaxed mb-8">Con esa informaci&oacute;n es m&aacute;s f&aacute;cil recomendar PLA, PETG, ASA, TPU, Nylon o un compuesto sin perder tiempo en opciones que no aplican.</p>
         <div class="flex flex-wrap items-center justify-center gap-4">
-          <a href="/#cotizar" class="inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg">Pedir recomendaci&oacute;n →</a>
+          <a href="/cotizar/" class="inline-flex items-center gap-2 bg-[#0369A1] text-white font-semibold px-6 py-3 rounded-lg">Pedir recomendaci&oacute;n →</a>
           <a href="/servicio-impresion-3d/" class="inline-flex items-center gap-2 bg-white text-[#0F172A] font-semibold px-6 py-3 rounded-lg">Ver servicio →</a>
         </div>
       </div>
     </section>
   </main>
   <script src="../assets/motion-pages.js" defer></script>
+  <footer class="site-footer-lite">
+    <div class="site-footer-lite__inner">
+      <div class="site-footer-lite__top">
+        <div class="site-footer-lite__brand">
+          <strong>Lithora 3D</strong>
+          <p>Impresi&oacute;n 3D y dise&ntilde;o personalizado. Atenci&oacute;n en Tampico, Ciudad Madero y Altamira, con env&iacute;os a todo M&eacute;xico.</p>
+        </div>
+        <div class="site-footer-lite__contact">
+          <a class="site-footer-lite__wa" href="https://wa.me/528331080178?text=Hola%2C%20quiero%20cotizar%20una%20pieza%20con%20Lithora%203D." target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>
+          <a class="site-footer-lite__tel" href="tel:+528331080178">+52 833 108 0178</a>
+        </div>
+      </div>
+      <nav class="site-footer-lite__nav" aria-label="Enlaces del pie">
+        <a href="/">Inicio</a>
+        <a href="/servicio-impresion-3d/">Servicio de impresi&oacute;n 3D</a>
+        <a href="/recuerdos-personalizados-3d/">Recuerdos personalizados</a>
+        <a href="/precios-impresion-3d/">C&oacute;mo se cotiza</a>
+        <a href="/prototipado-rapido/">Prototipado r&aacute;pido</a>
+        <a href="/ecosistema-soluciones/">Soluciones por actividad</a>
+        <a href="/generador-llaveros-3d/">Generador de llaveros gratis</a>
+        <a href="/cotizar/">Cotizar</a>
+      </nav>
+      <div class="site-footer-lite__legal">
+        <span>&copy; 2026 Lithora 3D</span>
+        <span><a href="/privacidad/">Aviso de privacidad</a> &middot; <a href="/terminos/">T&eacute;rminos</a></span>
+      </div>
+    </div>
+  </footer>
 </body>
+
 </html>

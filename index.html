@@ -16,9 +16,9 @@
   <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+  <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/fonts/inter.css">
   <meta property="og:locale" content="es_MX">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Lithora 3D">
@@ -45,7 +45,7 @@
     } catch {}
   </script>
   <link rel="stylesheet" href="assets/tailwind-home.css">
-  <link rel="stylesheet" href="assets/styles.css?v=20260805-1">
+  <link rel="stylesheet" href="/assets/styles.css?v=20260811">
   <link rel="preload" as="image" href="assets/fondo_web.webp" fetchpriority="high">
   <script type="application/ld+json">
     {
@@ -331,10 +331,10 @@
       <div class="home-niches__container">
         <p class="section-eyebrow">SOLUCIONES PARA NEGOCIOS</p>
         <h2 id="home-niches-title">¿Qué quieres crear para tu negocio?</h2>
-        <p class="home-niches__intro">Explora ejemplos por actividad. Son puntos de partida personalizables, no productos de catálogo ni proyectos reales.</p>
+        <p class="home-niches__intro">Explora ideas por actividad. Cada pieza se personaliza con la identidad de tu negocio.</p>
         <div class="home-niches__grid">
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=barberias#negocios" data-home-niche="barberias">
-          <div class="home-niche-visual"><img src="assets/barber/barber-letrero-clasico.webp" alt="Ejemplo conceptual de letrero 3D personalizado para una barbería" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/barber/barber-letrero-clasico.webp" alt="Letrero 3D personalizado para una barbería" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Negocios</p>
             <h3>Barberías</h3>
@@ -343,7 +343,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=boda#negocios" data-home-niche="boda">
-          <div class="home-niche-visual"><img src="assets/boda/boda-figura-novios.webp" alt="Ejemplo conceptual de figura 3D personalizada de una pareja de novios" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/boda/boda-nombres-pareja.webp" alt="Nombres de una pareja impresos en 3D como decoración de mesa de boda" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Negocios</p>
             <h3>Boda</h3>
@@ -352,7 +352,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=dentistas#industria" data-home-niche="dentistas">
-          <div class="home-niche-visual"><img src="assets/dentista/dentista-llavero.webp" alt="Ejemplo conceptual de llavero 3D temático para una clínica dental" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/dentista/dentista-llavero.webp" alt="Llavero 3D temático para una clínica dental" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Industria</p>
             <h3>Dentistas</h3>
@@ -361,7 +361,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=transporte#industria" data-home-niche="transporte">
-          <div class="home-niche-visual"><img src="assets/transporte/transporte-display-ruta.webp" alt="Ejemplo conceptual de display 3D personalizado para una empresa de transporte" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/transporte/transporte-display-ruta.webp" alt="Display 3D personalizado para una empresa de transporte" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Industria</p>
             <h3>Transporte</h3>
@@ -370,7 +370,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=escuelas#industria" data-home-niche="escuelas">
-          <div class="home-niche-visual"><img src="assets/escuela/escuela-identificador-lapiz.webp" alt="Ejemplo conceptual de identificador 3D personalizado para lápiz escolar" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/escuela/escuela-identificador-lapiz.webp" alt="Identificador 3D personalizado para lápiz escolar" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Industria</p>
             <h3>Escuelas</h3>
@@ -379,7 +379,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=hoteles#eventos" data-home-niche="hoteles">
-          <div class="home-niche-visual"><img src="assets/hotel/hotel-display-informativo.webp" alt="Ejemplo conceptual de display 3D informativo para huéspedes de un hotel" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/hotel/hotel-display-informativo.webp" alt="Display 3D informativo para huéspedes de un hotel" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Eventos</p>
             <h3>Hoteles</h3>
@@ -388,7 +388,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=pizzerias#eventos" data-home-niche="pizzerias">
-          <div class="home-niche-visual"><img src="assets/pizzeria/pizzeria-llavero.webp" alt="Ejemplo conceptual de llavero 3D con identidad visual para una pizzería" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/pizzeria/pizzeria-llavero.webp" alt="Llavero 3D con identidad visual para una pizzería" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Eventos</p>
             <h3>Pizzerías</h3>
@@ -397,7 +397,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=hamburgueserias#eventos" data-home-niche="hamburgueserias">
-          <div class="home-niche-visual"><img src="assets/hamburgueseria/hamburgueseria-figura.webp" alt="Ejemplo conceptual de figura 3D de personaje para una hamburguesería" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/hamburgueseria/hamburgueseria-figura.webp" alt="Figura 3D de personaje para una hamburguesería" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Eventos</p>
             <h3>Hamburgueserías</h3>
@@ -406,7 +406,7 @@
           </div>
         </a>
         <a class="home-niche-card" href="/ecosistema-soluciones/?nicho=gimnasios#diseno-prototipos" data-home-niche="gimnasios">
-          <div class="home-niche-visual"><img src="assets/gym/gym-letrero-power.webp" alt="Ejemplo conceptual de letrero 3D decorativo con identidad para un gimnasio" width="960" height="720" loading="lazy" decoding="async"><span class="home-niche-badge">Ejemplo conceptual</span></div>
+          <div class="home-niche-visual"><img src="assets/gym/gym-letrero-power.webp" alt="Letrero 3D decorativo con identidad para un gimnasio" width="960" height="720" loading="lazy" decoding="async"></div>
           <div class="home-niche-card__body">
             <p class="home-niche-category">Diseño y prototipos</p>
             <h3>Gimnasios</h3>
@@ -434,9 +434,8 @@
         <div class="idea-showcase__media" data-animate="image-reveal">
           <picture>
             <source srcset="assets/lading/seccion-idea-480.webp 480w, assets/lading/seccion-idea-768.webp 768w, assets/lading/seccion-idea.webp 960w" type="image/webp" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1279px) calc(100vw - 64px), 1180px">
-            <img src="assets/lading/seccion-idea.webp" alt="Ejemplo conceptual de menús, llaveros, figuras y letreros personalizados para restaurantes" width="960" height="431" loading="lazy" decoding="async">
+            <img src="assets/lading/seccion-idea.webp" alt="Menús, llaveros, figuras y letreros personalizados para restaurantes impresos en 3D" width="960" height="431" loading="lazy" decoding="async">
           </picture>
-          <span class="idea-showcase__badge">Ejemplo conceptual</span>
         </div>
 
         <div class="idea-showcase__footer" data-animate="fade-up" data-delay="120">
@@ -658,7 +657,7 @@
           <div class="max-w-2xl">
             <p class="text-[#7DD3FC] text-xs font-semibold uppercase tracking-widest mb-2">COTIZA CON CLARIDAD</p>
             <h3 class="text-2xl font-bold mb-3">Conoce qué necesitamos para estimar tu proyecto</h3>
-            <p class="text-[#CBD5E1] leading-relaxed">Revisa ejemplos sencillos y los datos que nos ayudan a darte una estimación más precisa desde el primer contacto.</p>
+            <p class="text-[#CBD5E1] leading-relaxed">Revisa casos sencillos y los datos que nos ayudan a darte una estimación más precisa desde el primer contacto.</p>
           </div>
           <a href="/precios-impresion-3d/" class="inline-flex items-center justify-center gap-2 bg-white text-[#0F172A] font-semibold px-6 py-3 rounded-lg whitespace-nowrap">
             Ver precios y requisitos →
@@ -855,15 +854,15 @@
       <div class="max-w-[1280px] mx-auto px-6">
         <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">PROYECTOS</p>
         <h2 data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-12">
-          Ejemplos de aplicación
+          Aplicaciones
         </h2>
 
         <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <!-- Ejemplo 1 -->
+          <!-- Caso 1 -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
             <div class="flex items-center gap-2 mb-4">
-              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Caso de aplicación</span>
             </div>
             <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z"/><path d="M12 2 V12 M12 12 L21 7 M12 12 L3 7"/></svg>
@@ -879,10 +878,10 @@
             <a href="/cotizar/" class="inline-flex items-center gap-1 text-[#0369A1] text-sm font-semibold hover:underline">Tengo un proyecto similar →</a>
           </article>
 
-          <!-- Ejemplo 2 -->
+          <!-- Caso 2 -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
             <div class="flex items-center gap-2 mb-4">
-              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Caso de aplicación</span>
             </div>
             <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94L5.47 21A2.12 2.12 0 0 1 2.53 18 L10.06 10.53a6 6 0 0 1 7.94-7.94z"/></svg>
@@ -898,10 +897,10 @@
             <a href="/cotizar/" class="inline-flex items-center gap-1 text-[#0369A1] text-sm font-semibold hover:underline">Tengo un proyecto similar →</a>
           </article>
 
-          <!-- Ejemplo 3 -->
+          <!-- Caso 3 -->
           <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md flex flex-col">
             <div class="flex items-center gap-2 mb-4">
-              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Ejemplo de aplicación</span>
+              <span class="text-xs font-semibold uppercase tracking-widest text-[#64748B] bg-[#F1F5F9] px-2.5 py-1 rounded-full">Caso de aplicación</span>
             </div>
             <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-[#EFF6FF] text-[#0369A1] mb-4">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4 H20 V14 H4 Z"/><path d="M8 14 V20 M16 14 V20 M4 20 H20"/></svg>
@@ -1172,7 +1171,8 @@
         <a href="#nosotros"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Nosotros</a>
         <a href="#recursos"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Recursos</a>
         <a href="/cotizar/"     class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Contacto</a>
-        <!-- Privacidad: pendiente de página real -->
+        <a href="/privacidad/"  class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Privacidad</a>
+        <a href="/terminos/"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Términos</a>
       </nav>
 
     </div>

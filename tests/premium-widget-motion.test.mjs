@@ -100,7 +100,7 @@ test('Specular Button y Glare Hover son finitos y permanecen en superficies apro
   }
   assert.match(pages.solutions, /data-image-type="conceptual"/);
   assert.doesNotMatch(css, /animation[^;{]*infinite/i);
-  assert.equal((pages.solutions.match(/Ejemplo conceptual/g) || []).length > 0, true);
+  assert.equal((pages.solutions.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
 test('reduced motion, touch y ausencia de JS preservan contenido y estado final', () => {
