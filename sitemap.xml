@@ -6,7 +6,7 @@
     <image:image>
       <image:loc>https://lithora3d.com/assets/lading/seccion-idea.webp</image:loc>
       <image:title>Ideas de productos personalizados con impresion 3D</image:title>
-      <image:caption>Ejemplos conceptuales de productos impresos en 3D para negocios.</image:caption>
+      <image:caption>Productos personalizados impresos en 3D para negocios.</image:caption>
     </image:image>
   </url>
   <url>
@@ -36,5 +36,33 @@
   <url>
     <loc>https://lithora3d.com/generador-llaveros-3d/</loc>
     <lastmod>2026-08-07</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/privacidad/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/terminos/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/recuerdos-para-baby-shower/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/recuerdos-primera-comunion/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/recuerdos-para-bautizo/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/recuerdos-para-boda/</loc>
+    <lastmod>2026-08-11</lastmod>
+  </url>
+  <url>
+    <loc>https://lithora3d.com/recuerdos-personalizados-3d/</loc>
+    <lastmod>2026-08-11</lastmod>
   </url>
 </urlset>

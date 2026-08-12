@@ -1,7 +1,6 @@
 /**
  * Fuente estatica mantenible del Ecosistema Lithora 3D.
  * Los nueve nichos fueron aprobados para esta fase el 2026-07-20.
- * Las imagenes OpenArt siguen siendo ejemplos conceptuales, nunca proyectos reales.
  */
 
 export const PUBLICATION_STATES = Object.freeze({ PUBLISHED: 'published', PUBLISHED_DEMO: 'published-demo', HIDDEN: 'hidden', DRAFT: 'draft' });
@@ -18,7 +17,7 @@ export const VISUAL_REFERENCE = Object.freeze({
   intent: 'Modelos 3D listos para imprimir agrupados por nicho, con estetica publicitaria comercial y lectura inmediata.',
   palette: ['negro', 'gris', 'amarillo'],
   background: 'oscuro elegante',
-  usageRule: 'Referencia para activos futuros; conservar Ejemplo conceptual salvo evidencia aprobada de proyecto real.',
+  usageRule: 'Referencia visual para activos futuros del catalogo.',
 });
 
 export const categories = Object.freeze([
@@ -30,7 +29,7 @@ export const categories = Object.freeze([
 
 const conceptualApproval = Object.freeze({ status: 'concept-only', owner: 'Responsable comercial de Lithora 3D', approvedAsRealProject: false });
 const missingImage = (id) => ({ id, src: null, width: 960, height: 720, alt: '', type: 'missing', label: 'Sin imagen disponible', source: 'none', approval: conceptualApproval, visualReference: VISUAL_REFERENCE });
-const conceptualImage = ({ id, src, alt, descriptor, source = 'OpenArt' }) => ({ id, src, width: 960, height: 720, alt, type: 'conceptual', label: 'Ejemplo conceptual', descriptor, source, approval: conceptualApproval, visualReference: VISUAL_REFERENCE });
+const conceptualImage = ({ id, src, alt, descriptor, source = 'OpenArt' }) => ({ id, src, width: 960, height: 720, alt, type: 'conceptual', label: '', descriptor, source, approval: conceptualApproval, visualReference: VISUAL_REFERENCE });
 const baseCta = (label) => ({
   label,
   availability: 'available',
@@ -41,7 +40,7 @@ const baseCta = (label) => ({
 const niche = (value) => Object.freeze({
   description: value.problem,
   services: [],
-  personalizationNotice: 'Estos productos son ejemplos y puntos de partida; cada propuesta puede adaptarse a la identidad y contexto del negocio.',
+  personalizationNotice: 'Cada pieza se adapta a la identidad y el contexto de tu negocio.',
   publicationStatus: PUBLICATION_STATES.PUBLISHED,
   commercialApproval: 'approved-2026-07-20-user-decision',
   updatedAt: '2026-07-20',
@@ -50,66 +49,66 @@ const niche = (value) => Object.freeze({
 });
 
 const barberGallery = Object.freeze([
-  conceptualImage({ id: 'barber-letrero-clasico', src: '../assets/barber/barber-letrero-clasico.webp', alt: 'Ejemplo conceptual de letrero 3D personalizado para una barbería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'barber-llavero', src: '../assets/barber/barber-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D con identidad visual para barbería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'barber-figura', src: '../assets/barber/barber-figura.webp', alt: 'Ejemplo conceptual de figura 3D decorativa con temática de barbería', descriptor: 'Figura decorativa temática', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'barber-display', src: '../assets/barber/barber-display.webp', alt: 'Ejemplo conceptual de placa o display 3D de marca para una barbería', descriptor: 'Placa o display de marca', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'barber-letrero-clasico', src: '../assets/barber/barber-letrero-clasico.webp', alt: 'Letrero 3D personalizado para una barbería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'barber-llavero', src: '../assets/barber/barber-llavero.webp', alt: 'Llavero 3D con identidad visual para barbería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'barber-figura', src: '../assets/barber/barber-figura.webp', alt: 'Figura 3D decorativa con temática de barbería', descriptor: 'Figura decorativa temática', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'barber-display', src: '../assets/barber/barber-display.webp', alt: 'Placa o display 3D de marca para una barbería', descriptor: 'Placa o display de marca', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const transportGallery = Object.freeze([
-  conceptualImage({ id: 'transporte-display-ruta', src: '../assets/transporte/transporte-display-ruta.webp', alt: 'Ejemplo conceptual de display 3D personalizado para una empresa de transporte', descriptor: 'Display de ruta o unidad', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'transporte-llavero', src: '../assets/transporte/transporte-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D con identidad visual para transporte', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'transporte-figura', src: '../assets/transporte/transporte-figura.webp', alt: 'Ejemplo conceptual de figura 3D de personal para una empresa de transporte', descriptor: 'Figura de operador o personal', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'transporte-emblema', src: '../assets/transporte/transporte-emblema.webp', alt: 'Ejemplo conceptual de emblema 3D personalizado para una empresa de logística', descriptor: 'Letrero o emblema de logística', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'transporte-display-ruta', src: '../assets/transporte/transporte-display-ruta.webp', alt: 'Display 3D personalizado para una empresa de transporte', descriptor: 'Display de ruta o unidad', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'transporte-llavero', src: '../assets/transporte/transporte-llavero.webp', alt: 'Llavero 3D con identidad visual para transporte', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'transporte-figura', src: '../assets/transporte/transporte-figura.webp', alt: 'Figura 3D de personal para una empresa de transporte', descriptor: 'Figura de operador o personal', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'transporte-emblema', src: '../assets/transporte/transporte-emblema.webp', alt: 'Emblema 3D personalizado para una empresa de logística', descriptor: 'Letrero o emblema de logística', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const pizzeriaGallery = Object.freeze([
-  conceptualImage({ id: 'pizzeria-llavero', src: '../assets/pizzeria/pizzeria-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D con identidad visual para una pizzería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'pizzeria-letrero', src: '../assets/pizzeria/pizzeria-letrero.webp', alt: 'Ejemplo conceptual de letrero 3D personalizado para una pizzería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'pizzeria-figura', src: '../assets/pizzeria/pizzeria-figura.webp', alt: 'Ejemplo conceptual de figura 3D decorativa con temática de pizzería', descriptor: 'Figura decorativa temática', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'pizzeria-display', src: '../assets/pizzeria/pizzeria-display.webp', alt: 'Ejemplo conceptual de display 3D de marca para una pizzería', descriptor: 'Display de marca', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'pizzeria-llavero', src: '../assets/pizzeria/pizzeria-llavero.webp', alt: 'Llavero 3D con identidad visual para una pizzería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'pizzeria-letrero', src: '../assets/pizzeria/pizzeria-letrero.webp', alt: 'Letrero 3D personalizado para una pizzería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'pizzeria-figura', src: '../assets/pizzeria/pizzeria-figura.webp', alt: 'Figura 3D decorativa con temática de pizzería', descriptor: 'Figura decorativa temática', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'pizzeria-display', src: '../assets/pizzeria/pizzeria-display.webp', alt: 'Display 3D de marca para una pizzería', descriptor: 'Display de marca', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const hamburgueseriaGallery = Object.freeze([
-  conceptualImage({ id: 'hamburgueseria-figura', src: '../assets/hamburgueseria/hamburgueseria-figura.webp', alt: 'Ejemplo conceptual de figura 3D de personaje para una hamburguesería', descriptor: 'Figura de personaje o mascota', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hamburgueseria-letrero', src: '../assets/hamburgueseria/hamburgueseria-letrero.webp', alt: 'Ejemplo conceptual de letrero 3D personalizado para una hamburguesería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hamburgueseria-llavero', src: '../assets/hamburgueseria/hamburgueseria-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D con identidad visual para hamburguesería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hamburgueseria-display', src: '../assets/hamburgueseria/hamburgueseria-display.webp', alt: 'Ejemplo conceptual de display 3D de marca para una hamburguesería', descriptor: 'Display o letrero de marca', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hamburgueseria-figura', src: '../assets/hamburgueseria/hamburgueseria-figura.webp', alt: 'Figura 3D de personaje para una hamburguesería', descriptor: 'Figura de personaje o mascota', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hamburgueseria-letrero', src: '../assets/hamburgueseria/hamburgueseria-letrero.webp', alt: 'Letrero 3D personalizado para una hamburguesería', descriptor: 'Letrero personalizado', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hamburgueseria-llavero', src: '../assets/hamburgueseria/hamburgueseria-llavero.webp', alt: 'Llavero 3D con identidad visual para hamburguesería', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hamburgueseria-display', src: '../assets/hamburgueseria/hamburgueseria-display.webp', alt: 'Display 3D de marca para una hamburguesería', descriptor: 'Display o letrero de marca', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const dentistaGallery = Object.freeze([
-  conceptualImage({ id: 'dentista-llavero', src: '../assets/dentista/dentista-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D temático para una clínica dental', descriptor: 'Llavero temático', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'dentista-placa-clinica', src: '../assets/dentista/dentista-placa-clinica.webp', alt: 'Ejemplo conceptual de placa 3D personalizada para una clínica dental', descriptor: 'Placa o señalización', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'dentista-figura', src: '../assets/dentista/dentista-figura.webp', alt: 'Ejemplo conceptual de figura 3D decorativa de dentista', descriptor: 'Figura decorativa', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'dentista-letrero', src: '../assets/dentista/dentista-letrero.webp', alt: 'Ejemplo conceptual de letrero 3D con identidad visual para una clínica dental', descriptor: 'Branding decorativo para recepción', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'dentista-llavero', src: '../assets/dentista/dentista-llavero.webp', alt: 'Llavero 3D temático para una clínica dental', descriptor: 'Llavero temático', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'dentista-placa-clinica', src: '../assets/dentista/dentista-placa-clinica.webp', alt: 'Placa 3D personalizada para una clínica dental', descriptor: 'Placa o señalización', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'dentista-figura', src: '../assets/dentista/dentista-figura.webp', alt: 'Figura 3D decorativa de dentista', descriptor: 'Figura decorativa', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'dentista-letrero', src: '../assets/dentista/dentista-letrero.webp', alt: 'Letrero 3D con identidad visual para una clínica dental', descriptor: 'Branding decorativo para recepción', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const hotelGallery = Object.freeze([
-  conceptualImage({ id: 'hotel-display-informativo', src: '../assets/hotel/hotel-display-informativo.webp', alt: 'Ejemplo conceptual de display 3D informativo para huéspedes de un hotel', descriptor: 'Display informativo para huéspedes', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hotel-placa-habitacion', src: '../assets/hotel/hotel-placa-habitacion.webp', alt: 'Ejemplo conceptual de placa 3D personalizada con número de habitación', descriptor: 'Placa de habitación', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hotel-organizador-recepcion', src: '../assets/hotel/hotel-organizador-recepcion.webp', alt: 'Ejemplo conceptual de organizador 3D con identidad visual para recepción de hotel', descriptor: 'Organizador para recepción', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'hotel-colgante-puerta', src: '../assets/hotel/hotel-colgante-puerta.webp', alt: 'Ejemplo conceptual de señal colgante 3D reversible para una habitación de hotel', descriptor: 'Señal colgante para habitación', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hotel-display-informativo', src: '../assets/hotel/hotel-display-informativo.webp', alt: 'Display 3D informativo para huéspedes de un hotel', descriptor: 'Display informativo para huéspedes', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hotel-placa-habitacion', src: '../assets/hotel/hotel-placa-habitacion.webp', alt: 'Placa 3D personalizada con número de habitación', descriptor: 'Placa de habitación', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hotel-organizador-recepcion', src: '../assets/hotel/hotel-organizador-recepcion.webp', alt: 'Organizador 3D con identidad visual para recepción de hotel', descriptor: 'Organizador para recepción', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'hotel-colgante-puerta', src: '../assets/hotel/hotel-colgante-puerta.webp', alt: 'Señal colgante 3D reversible para una habitación de hotel', descriptor: 'Señal colgante para habitación', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const bodaGallery = Object.freeze([
-  conceptualImage({ id: 'boda-figura-novios', src: '../assets/boda/boda-figura-novios.webp', alt: 'Ejemplo conceptual de figura 3D personalizada de una pareja de novios', descriptor: 'Figura personalizada de novios', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'boda-letrero-bienvenida', src: '../assets/boda/boda-letrero-bienvenida.webp', alt: 'Ejemplo conceptual de letrero 3D de bienvenida para una boda', descriptor: 'Letrero de bienvenida', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'boda-adorno-pastel', src: '../assets/boda/boda-adorno-pastel.webp', alt: 'Ejemplo conceptual de adorno 3D personalizado para pastel de boda', descriptor: 'Adorno para pastel', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'boda-numero-mesa', src: '../assets/boda/boda-numero-mesa.webp', alt: 'Ejemplo conceptual de número de mesa 3D decorativo para una boda', descriptor: 'Número de mesa decorativo', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'boda-nombres-pareja', src: '../assets/boda/boda-nombres-pareja.webp', alt: 'Nombres de una pareja impresos en 3D como decoración de mesa de boda', descriptor: 'Nombres de la pareja', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'boda-figura-novios-3d', src: '../assets/boda/boda-figura-novios-3d.webp', alt: 'Figura 3D personalizada de novios con iniciales y fecha en la base', descriptor: 'Figura personalizada de novios', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'boda-numero-mesa-3d', src: '../assets/boda/boda-numero-mesa-3d.webp', alt: 'Número de mesa 3D con base propia para una recepción de boda', descriptor: 'Número de mesa con base', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'boda-set-empaque', src: '../assets/boda/boda-set-empaque.webp', alt: 'Set de recuerdos de boda personalizados presentados en caja de regalo', descriptor: 'Set de recuerdos con empaque', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const escuelaGallery = Object.freeze([
-  conceptualImage({ id: 'escuela-identificador-lapiz', src: '../assets/escuela/escuela-identificador-lapiz.webp', alt: 'Ejemplo conceptual de identificador 3D personalizado para lápiz escolar', descriptor: 'Identificador personalizado para lápiz', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'escuela-llavero', src: '../assets/escuela/escuela-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D escolar personalizado con nombre', descriptor: 'Llavero escolar con nombre', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'escuela-organizador', src: '../assets/escuela/escuela-organizador.webp', alt: 'Ejemplo conceptual de organizador 3D personalizado para útiles escolares', descriptor: 'Organizador para útiles', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'escuela-separador', src: '../assets/escuela/escuela-separador.webp', alt: 'Ejemplo conceptual de separador 3D personalizado para cuaderno escolar', descriptor: 'Separador personalizado', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'escuela-identificador-lapiz', src: '../assets/escuela/escuela-identificador-lapiz.webp', alt: 'Identificador 3D personalizado para lápiz escolar', descriptor: 'Identificador personalizado para lápiz', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'escuela-llavero', src: '../assets/escuela/escuela-llavero.webp', alt: 'Llavero 3D escolar personalizado con nombre', descriptor: 'Llavero escolar con nombre', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'escuela-organizador', src: '../assets/escuela/escuela-organizador.webp', alt: 'Organizador 3D personalizado para útiles escolares', descriptor: 'Organizador para útiles', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'escuela-separador', src: '../assets/escuela/escuela-separador.webp', alt: 'Separador 3D personalizado para cuaderno escolar', descriptor: 'Separador personalizado', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 const gymGallery = Object.freeze([
-  conceptualImage({ id: 'gym-letrero-power', src: '../assets/gym/gym-letrero-power.webp', alt: 'Ejemplo conceptual de letrero 3D decorativo con identidad para un gimnasio', descriptor: 'Letrero o placa con marca del gimnasio', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'gym-trofeo-coach', src: '../assets/gym/gym-trofeo-coach.webp', alt: 'Ejemplo conceptual de trofeo 3D personalizado para reconocer a un coach de gimnasio', descriptor: 'Trofeo personalizado', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'gym-llavero', src: '../assets/gym/gym-llavero.webp', alt: 'Ejemplo conceptual de llavero 3D personalizado con identidad de gimnasio', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
-  conceptualImage({ id: 'gym-figura-coach', src: '../assets/gym/gym-figura-coach.webp', alt: 'Ejemplo conceptual de figura 3D personalizada de un coach de gimnasio', descriptor: 'Figura de coach o personaje', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'gym-letrero-power', src: '../assets/gym/gym-letrero-power.webp', alt: 'Letrero 3D decorativo con identidad para un gimnasio', descriptor: 'Letrero o placa con marca del gimnasio', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'gym-trofeo-coach', src: '../assets/gym/gym-trofeo-coach.webp', alt: 'Trofeo 3D personalizado para reconocer a un coach de gimnasio', descriptor: 'Trofeo personalizado', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'gym-llavero', src: '../assets/gym/gym-llavero.webp', alt: 'Llavero 3D personalizado con identidad de gimnasio', descriptor: 'Llavero con branding', source: 'Referencia conceptual aportada por el usuario' }),
+  conceptualImage({ id: 'gym-figura-coach', src: '../assets/gym/gym-figura-coach.webp', alt: 'Figura 3D personalizada de un coach de gimnasio', descriptor: 'Figura de coach o personaje', source: 'Referencia conceptual aportada por el usuario' }),
 ]);
 
 export const niches = Object.freeze([
@@ -139,7 +138,7 @@ export function validateNiche(record, knownCategories = categories) {
   if (!Array.isArray(record?.applications) || record.applications.length < 4 || record.applications.length > 7) errors.push('invalid:applications');
   if (!record?.cta?.label || record.cta.availability !== 'available' || record.cta.destination !== WHATSAPP_CHANNEL.destination) errors.push('invalid:cta');
   if (!record?.image || !['real', 'conceptual', 'missing'].includes(record.image.type)) errors.push('invalid:image');
-  if (record?.image?.type === 'conceptual' && record.image.label !== 'Ejemplo conceptual') errors.push('invalid:concept-label');
+  if (record?.image?.type === 'conceptual' && record.image.label !== '') errors.push('invalid:concept-label');
   if (record?.image?.type === 'real' && record.image.approval?.approvedAsRealProject !== true) errors.push('invalid:real-approval');
   if (!['published', 'published-demo', 'hidden', 'draft'].includes(record?.publicationStatus)) errors.push('invalid:publicationStatus');
   if ([PUBLICATION_STATES.PUBLISHED, PUBLICATION_STATES.PUBLISHED_DEMO].includes(record?.publicationStatus) && !String(record.commercialApproval || '').startsWith('approved-')) errors.push('invalid:commercial-approval');

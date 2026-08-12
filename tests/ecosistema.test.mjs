@@ -47,8 +47,8 @@ test('cada nicho publicado contiene entre cuatro y siete aplicaciones', () => {
 test('la pagina comunica personalizacion y orientacion sin archivo 3D', () => {
   const html = read(routePath);
   assert.match(html, /No necesitas un archivo 3D/i);
-  assert.match(html, /soluciones personalizadas/i);
-  assert.match(html, /puntos de partida/i);
+  assert.match(html, /personaliza/i);
+  assert.match(html, /adaptarse a tu necesidad, marca o contexto/i);
 });
 
 test('el script expone los eventos de analitica definidos', () => {
@@ -76,24 +76,24 @@ test('la ruta usa recursos visuales locales y mantiene el menu movil cerrado', (
   assert.match(html, /id="mobile-menu"[^>]*\shidden/);
 });
 
-test('el detalle de Barberías publica sus cuatro ejemplos conceptuales optimizados', () => {
+test('el detalle de Barberías publica sus cuatro imagenes optimizadas', () => {
   const html = read(routePath);
   const detail = html.match(/id="detail-barberias"[\s\S]*?<div class="detail-inner">/)?.[0] || '';
   for (const asset of ['barber-letrero-clasico', 'barber-llavero', 'barber-figura', 'barber-display']) {
     assert.match(detail, new RegExp(`assets/barber/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
   assert.match(detail, /class="detail-gallery"/);
 });
 
-test('Transporte ocupa el lugar de Ferreterías con cuatro ejemplos conceptuales', () => {
+test('Transporte ocupa el lugar de Ferreterías con sus cuatro imagenes', () => {
   const html = read(routePath);
   assert.doesNotMatch(html, /data-niche="ferreterias"/);
   const detail = html.match(/id="detail-transporte"[\s\S]*?<div class="detail-inner">/)?.[0] || '';
   for (const asset of ['transporte-display-ruta', 'transporte-llavero', 'transporte-figura', 'transporte-emblema']) {
     assert.match(detail, new RegExp(`assets/transporte/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
 test('Papelerías se elimina y Pizzerías publica el llavero principal y su galería', () => {
@@ -107,7 +107,7 @@ test('Papelerías se elimina y Pizzerías publica el llavero principal y su gale
   }
 });
 
-test('Hamburgueserías publica la figura principal y sus cuatro ejemplos', () => {
+test('Hamburgueserías publica la figura principal y sus cuatro imagenes', () => {
   const html = read(routePath);
   const card = html.match(/<article[^>]*data-niche="hamburgueserias"[\s\S]*?<\/article>/)?.[0] || '';
   assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/hamburgueseria\/hamburgueseria-figura\.webp"/);
@@ -117,7 +117,7 @@ test('Hamburgueserías publica la figura principal y sus cuatro ejemplos', () =>
   }
 });
 
-test('Dentistas publica el llavero principal y sus cuatro ejemplos', () => {
+test('Dentistas publica el llavero principal y sus cuatro imagenes', () => {
   const html = read(routePath);
   const card = html.match(/<article[^>]*data-niche="dentistas"[\s\S]*?<\/article>/)?.[0] || '';
   assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/dentista\/dentista-llavero\.webp"/);
@@ -125,10 +125,10 @@ test('Dentistas publica el llavero principal y sus cuatro ejemplos', () => {
   for (const asset of ['dentista-llavero', 'dentista-placa-clinica', 'dentista-figura', 'dentista-letrero']) {
     assert.match(detail, new RegExp(`assets/dentista/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
-test('Hoteles publica el display informativo principal y sus cuatro ejemplos', () => {
+test('Hoteles publica el display informativo principal y sus cuatro imagenes', () => {
   const html = read(routePath);
   const card = html.match(/<article[^>]*data-niche="hoteles"[\s\S]*?<\/article>/)?.[0] || '';
   assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/hotel\/hotel-display-informativo\.webp"/);
@@ -136,19 +136,19 @@ test('Hoteles publica el display informativo principal y sus cuatro ejemplos', (
   for (const asset of ['hotel-display-informativo', 'hotel-placa-habitacion', 'hotel-organizador-recepcion', 'hotel-colgante-puerta']) {
     assert.match(detail, new RegExp(`assets/hotel/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
-test('Boda reemplaza Joyerías y publica la figura de novios principal', () => {
+test('Boda reemplaza Joyerías y publica los nombres de la pareja como principal', () => {
   const html = read(routePath);
   assert.doesNotMatch(html, /data-niche="joyerias"/);
   const card = html.match(/<article[^>]*data-niche="boda"[\s\S]*?<\/article>/)?.[0] || '';
-  assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/boda\/boda-figura-novios\.webp"/);
+  assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/boda\/boda-nombres-pareja\.webp"/);
   const detail = card.match(/id="detail-boda"[\s\S]*?<div class="detail-inner">/)?.[0] || '';
-  for (const asset of ['boda-figura-novios', 'boda-letrero-bienvenida', 'boda-adorno-pastel', 'boda-numero-mesa']) {
+  for (const asset of ['boda-nombres-pareja', 'boda-figura-novios-3d', 'boda-numero-mesa-3d', 'boda-set-empaque']) {
     assert.match(detail, new RegExp(`assets/boda/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
 test('Escuelas reemplaza Farmacias y publica el identificador para lápiz principal', () => {
@@ -160,10 +160,10 @@ test('Escuelas reemplaza Farmacias y publica el identificador para lápiz princi
   for (const asset of ['escuela-identificador-lapiz', 'escuela-llavero', 'escuela-organizador', 'escuela-separador']) {
     assert.match(detail, new RegExp(`assets/escuela/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
-test('Gimnasios publica el letrero Power Gym principal y sus cuatro ejemplos', () => {
+test('Gimnasios publica el letrero Power Gym principal y sus cuatro imagenes', () => {
   const html = read(routePath);
   const card = html.match(/<article[^>]*data-niche="gimnasios"[\s\S]*?<\/article>/)?.[0] || '';
   assert.match(card, /class="niche-image-wrap"[^>]*><img src="\.\.\/assets\/gym\/gym-letrero-power\.webp"/);
@@ -171,7 +171,7 @@ test('Gimnasios publica el letrero Power Gym principal y sus cuatro ejemplos', (
   for (const asset of ['gym-letrero-power', 'gym-trofeo-coach', 'gym-llavero', 'gym-figura-coach']) {
     assert.match(detail, new RegExp(`assets/gym/${asset}\\.webp`));
   }
-  assert.equal((detail.match(/<span>Ejemplo conceptual<\/span>/g) || []).length, 4);
+  assert.equal((detail.match(/Ejemplo conceptual/g) || []).length, 0);
 });
 
 test('los controles de categoria conservan enlaces nativos y el script separa sus selectores', () => {
@@ -213,13 +213,13 @@ test('la home muestra y enlaza directamente los nueve nichos aprobados', () => {
   assert.ok(!cards.some(([, id]) => id === 'farmacias'));
   assert.ok(!cards.some(([, id]) => id === 'papelerias'));
   assert.ok(!cards.some(([, id]) => id === 'joyerias'));
-  assert.match(html, /data-home-niche="boda">[\s\S]*?assets\/boda\/boda-figura-novios\.webp/);
+  assert.match(html, /data-home-niche="boda">[\s\S]*?assets\/boda\/boda-nombres-pareja\.webp/);
   assert.match(html, /data-home-niche="escuelas">[\s\S]*?assets\/escuela\/escuela-identificador-lapiz\.webp/);
   assert.match(html, /data-home-niche="gimnasios">[\s\S]*?assets\/gym\/gym-letrero-power\.webp/);
   assert.match(html, /data-home-niche="pizzerias">[\s\S]*?assets\/pizzeria\/pizzeria-llavero\.webp/);
   for (const [, id] of cards) assert.match(html, new RegExp(`/ecosistema-soluciones/\\?nicho=${id}#[^"]+`));
   assert.match(html, /¿Qué quieres crear para tu negocio\?/);
-  assert.match(html, /Ejemplo conceptual/);
+  assert.doesNotMatch(html, /Ejemplo conceptual/);
 });
 
 test('un enlace de nicho desde la home abre su categoria y detalle', () => {
@@ -237,7 +237,7 @@ test('la home integra Ideas impresas con imagen responsive y cotizacion real', (
   assert.match(section, /assets\/lading\/seccion-idea-768\.webp 768w/);
   assert.match(section, /assets\/lading\/seccion-idea\.webp 960w/);
   assert.match(section, /width="960" height="431"/);
-  assert.match(section, /Ejemplo conceptual/);
+  assert.doesNotMatch(section, /Ejemplo conceptual/);
   assert.match(section, /https:\/\/wa\.me\/528331080178\?text=/);
   for (const file of ['seccion-idea-480.webp', 'seccion-idea-768.webp', 'seccion-idea.webp']) {
     assert.ok(fs.existsSync(path.join(root, 'assets', 'lading', file)), `${file} debe existir`);

@@ -48,10 +48,22 @@ test('la columna izquierda queda preparada para reemplazarla por el timelapse', 
   assert.match(quote, /data-animation-slot="print-timelapse"/);
   assert.match(quote, /Tu idea toma forma, capa por capa\./);
   assert.doesNotMatch(quote, /Vista del proceso/);
-  assert.match(quote, /<video[\s\S]*?class="quote-process-video"[\s\S]*?autoplay[\s\S]*?muted[\s\S]*?loop[\s\S]*?playsinline[\s\S]*?preload="metadata"/);
-  assert.match(quote, /<source src="\/assets\/video_cotizacion\/video_cotizacion\.mp4" type="video\/mp4">/);
+  // El original pesaba 16.27 MB y se descargaba tambien en movil, por delante del
+  // formulario. Ahora: 740px/24fps sin audio (1.21 MB), preload="none" y poster,
+  // y oculto por CSS bajo 880px. Estas dos lineas fijan esa decision.
+  assert.match(quote, /<video[\s\S]*?class="quote-process-video"[\s\S]*?muted[\s\S]*?loop[\s\S]*?playsinline[\s\S]*?preload="none"[\s\S]*?poster="\/assets\/video_cotizacion\/video_cotizacion-poster\.webp"/);
+  // Sin <source> en el marcado y sin autoplay: el mp4 se conecta desde JS solo por
+  // encima de 880px. Con autoplay el navegador lo descargaba aunque estuviera oculto.
+  assert.doesNotMatch(quote, /<video[\s\S]*?autoplay/);
+  assert.doesNotMatch(quote, /<source[^>]*video_cotizacion/);
+  assert.match(quote, /data-video-src="\/assets\/video_cotizacion\/video_cotizacion-740\.mp4"/);
+  assert.match(quoteVideo, /min-width: 881px/);
+  assert.match(quoteStyles, /@media \(max-width: 880px\)[\s\S]*?\.quote-media-slot \{ display: none/);
+  assert.match(quoteStyles, /\.quote-form-panel \{ order: -1/);
   assert.doesNotMatch(quote, /class="printer-scene/);
-  assert.match(quote, /src="\/assets\/quote-video\.js"[^>]*defer/);
+  // El ?v= es obligatorio: sin el, un visitante con el script viejo en cache se
+  // quedaba con la version que descargaba el mp4 en movil.
+  assert.match(quote, /src="\/assets\/quote-video\.js\?v=[^"]+"[^>]*defer/);
   assert.match(quoteStyles, /grid-template-columns:\s*minmax\(620px,\s*1\.22fr\)\s+minmax\(500px,\s*\.78fr\)/);
   assert.match(quoteStyles, /min-height:\s*clamp\(560px,\s*72vh,\s*720px\)/);
   assert.match(quoteStyles, /\.quote-visual__copy\s*\{[\s\S]*?display:\s*none/);
@@ -68,7 +80,7 @@ test('la columna izquierda queda preparada para reemplazarla por el timelapse', 
 test('la confirmación solo nace del envío exitoso confirmado por Tally', () => {
   assert.match(quote, /formEventsForwarding=1/);
   assert.doesNotMatch(quote, /data-tally-on-submit/);
-  assert.match(quote, /src="\/assets\/quote-success\.js"[^>]*defer/);
+  assert.match(quote, /src="\/assets\/quote-success\.js\?v=[^"]+"[^>]*defer/);
   assert.match(quoteSuccess, /event\.origin\s*!==\s*'https:\/\/tally\.so'/);
   assert.match(quoteSuccess, /event\.source\s*!==\s*frame\.contentWindow/);
   assert.match(quoteSuccess, /data\?\.event\s*!==\s*'Tally\.FormSubmitted'/);

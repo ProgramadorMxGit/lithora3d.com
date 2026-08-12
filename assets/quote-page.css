@@ -611,6 +611,18 @@ html.quote-success-active .quote-success {
 body[data-page="quote"] .quote-visual { animation: quote-enter-visual .85s .08s var(--quote-ease) both; }
 body[data-page="quote"] .quote-form-panel { animation: quote-enter-form .85s .16s var(--quote-ease) both; }
 
+/* Salida directa a WhatsApp: la pagina de conversion no tenia ni un enlace al
+   telefono, ni respaldo visible si el embed de Tally no cargaba. */
+.quote-direct { margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(203, 213, 225, .28); }
+.quote-direct__lead { margin: 0 0 12px; font-size: .95rem; color: #CBD5E1; }
+.quote-direct__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 0 0 12px; }
+.quote-direct__wa { display: inline-flex; align-items: center; gap: .5rem; background: #0369A1; color: #fff; text-decoration: none; font-weight: 600; font-size: .95rem; padding: .7rem 1.25rem; border-radius: .5rem; }
+.quote-direct__wa:hover, .quote-direct__wa:focus-visible { background: #075985; }
+.quote-direct__alt { color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: .95rem; }
+.quote-direct__alt:hover, .quote-direct__alt:focus-visible { text-decoration: underline; }
+.quote-direct__fallback { margin: 0; font-size: .85rem; color: #94A3B8; }
+.quote-direct__fallback a { color: #7DD3FC; }
+
 @media (max-width: 1080px) {
   .quote-layout { grid-template-columns: minmax(0, 1fr) minmax(470px, .92fr); gap: 36px; }
   .quote-visual h2 { font-size: clamp(2.2rem, 4.5vw, 3.8rem); }
@@ -620,11 +632,15 @@ body[data-page="quote"] .quote-form-panel { animation: quote-enter-form .85s .16
 @media (max-width: 880px) {
   .quote-header { width: min(100% - 40px, 720px); grid-template-columns: 1fr auto; }
   .quote-header__status { display: none; }
-  .quote-layout { display: block; width: min(100% - 40px, 720px); }
-  .quote-visual { position: relative; min-height: 0; padding: 42px 0 20px; }
+  /* El formulario va primero: antes se apilaban ~900 px de decoracion por delante
+     del H1 y del primer campo. Flex + order lo sube sin tocar el orden del DOM,
+     que debe seguir siendo visual -> formulario para el lector de pantalla. */
+  .quote-layout { display: flex; flex-direction: column; width: min(100% - 40px, 720px); }
+  .quote-form-panel { order: -1; padding: 40px 0 20px; }
+  .quote-visual { position: relative; min-height: 0; padding: 24px 0 20px; }
   .quote-visual__copy { display: block; margin-bottom: 26px; }
-  .quote-media-slot { min-height: 430px; overflow: hidden; }
-  .quote-form-panel { padding: 72px 0 20px; }
+  /* El video pesa 1.2 MB y es decorativo: en movil no entra al viaje. */
+  .quote-media-slot { display: none; }
   .quote-footer { width: min(100% - 40px, 720px); }
 }
 

@@ -1,0 +1,19 @@
+# Credenciales y estado local de campañas de correo
+*credentials.csv
+logs/ses-campaign-state.jsonl
+
+# El repo es publico y GitHub Pages sirve todo lo commiteado: nada personal ni
+# interno debe entrar aqui. Ver audits/2026-08-11/PLAN-MAESTRO.md §0.
+*.pdf
+.tmp_*/
+node_modules/
+_site/
+.DS_Store
+Thumbs.db
+
+# Material de trabajo que no forma parte del sitio
+output/
+logs/
+*.log
+*.bak/
+sofa_planta_blender.stdout.log.*/

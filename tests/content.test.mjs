@@ -55,7 +55,7 @@ test('Barberías usa las cuatro referencias conceptuales aportadas por el usuari
   ]);
   for (const image of barberias.gallery) {
     assert.equal(image.type, 'conceptual');
-    assert.equal(image.label, 'Ejemplo conceptual');
+    assert.equal(image.label, '');
     assert.equal(image.source, 'Referencia conceptual aportada por el usuario');
     assert.equal(image.approval.approvedAsRealProject, false);
   }
@@ -75,7 +75,7 @@ test('Transporte reemplaza Ferreterías y usa sus cuatro referencias conceptuale
     'Figura de operador o personal',
     'Letrero o emblema de logística',
   ]);
-  assert.ok(transporte.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(transporte.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('elimina Papelerías y Pizzerías usa el llavero como imagen principal', () => {
@@ -91,7 +91,7 @@ test('elimina Papelerías y Pizzerías usa el llavero como imagen principal', ()
     'Figura decorativa temática',
     'Display de marca',
   ]);
-  assert.ok(pizzerias.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(pizzerias.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('Hamburgueserías usa la figura tres como imagen principal', () => {
@@ -105,10 +105,10 @@ test('Hamburgueserías usa la figura tres como imagen principal', () => {
     'Llavero con branding',
     'Display o letrero de marca',
   ]);
-  assert.ok(hamburgueserias.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(hamburgueserias.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
-test('Dentistas usa el llavero como imagen principal y conserva cuatro ejemplos conceptuales', () => {
+test('Dentistas usa el llavero como imagen principal y conserva sus cuatro imagenes', () => {
   const dentistas = getPublishedNiches().find(({ id }) => id === 'dentistas');
   assert.equal(dentistas.gallery.length, 4);
   assert.equal(dentistas.image.id, 'dentista-llavero');
@@ -119,7 +119,7 @@ test('Dentistas usa el llavero como imagen principal y conserva cuatro ejemplos 
     'Figura decorativa',
     'Branding decorativo para recepción',
   ]);
-  assert.ok(dentistas.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(dentistas.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('Hoteles usa el display informativo tres como imagen principal', () => {
@@ -133,25 +133,25 @@ test('Hoteles usa el display informativo tres como imagen principal', () => {
     'Organizador para recepción',
     'Señal colgante para habitación',
   ]);
-  assert.ok(hoteles.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(hoteles.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
-test('Boda reemplaza Joyerías y usa la figura de novios como imagen principal', () => {
+test('Boda reemplaza Joyerías y usa los nombres de la pareja como imagen principal', () => {
   const published = getPublishedNiches();
   const boda = published.find(({ id }) => id === 'boda');
   assert.ok(!published.some(({ id }) => id === 'joyerias'));
   assert.equal(boda.categoryId, 'negocios');
   assert.equal(boda.order, 2);
   assert.equal(boda.gallery.length, 4);
-  assert.equal(boda.image.id, 'boda-figura-novios');
+  assert.equal(boda.image.id, 'boda-nombres-pareja');
   assert.equal(boda.image, boda.gallery[0]);
   assert.deepEqual(boda.gallery.map(({ descriptor }) => descriptor), [
+    'Nombres de la pareja',
     'Figura personalizada de novios',
-    'Letrero de bienvenida',
-    'Adorno para pastel',
-    'Número de mesa decorativo',
+    'Número de mesa con base',
+    'Set de recuerdos con empaque',
   ]);
-  assert.ok(boda.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(boda.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('Escuelas reemplaza Farmacias y publica el identificador para lápiz como imagen principal', () => {
@@ -169,7 +169,7 @@ test('Escuelas reemplaza Farmacias y publica el identificador para lápiz como i
     'Organizador para útiles',
     'Separador personalizado',
   ]);
-  assert.ok(escuelas.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(escuelas.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('Gimnasios usa el letrero Power Gym cuatro como imagen principal', () => {
@@ -183,7 +183,7 @@ test('Gimnasios usa el letrero Power Gym cuatro como imagen principal', () => {
     'Llavero con branding',
     'Figura de coach o personaje',
   ]);
-  assert.ok(gimnasios.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === 'Ejemplo conceptual' && approval.approvedAsRealProject === false));
+  assert.ok(gimnasios.gallery.every(({ type, label, approval }) => type === 'conceptual' && label === '' && approval.approvedAsRealProject === false));
 });
 
 test('ocultar, publicar y agregar contenido son operaciones de datos aisladas', () => {
@@ -197,7 +197,8 @@ test('impide publicacion invalida, concepto sin etiqueta y proyecto real no apro
   const base = niches[0];
   const conceptual = niches.find(({ image }) => image.type === 'conceptual');
   assert.equal(validateNiche({ ...base, applications: [] }).valid, false);
-  assert.match(validateNiche({ ...conceptual, image: { ...conceptual.image, label: '' } }).errors.join(','), /concept-label/);
+  // La etiqueta retirada queda explicitamente prohibida: si vuelve, el registro es invalido.
+  assert.match(validateNiche({ ...conceptual, image: { ...conceptual.image, label: 'Ejemplo conceptual' } }).errors.join(','), /concept-label/);
   assert.match(validateNiche({ ...base, image: { ...base.image, type: 'real', approval: { approvedAsRealProject: false } } }).errors.join(','), /real-approval/);
   assert.match(validateNiche({ ...base, seo: { ...base.seo, indexIndividualPage: true } }).errors.join(','), /individual-seo/);
 });
@@ -205,7 +206,7 @@ test('impide publicacion invalida, concepto sin etiqueta y proyecto real no apro
 test('todos los recursos OpenArt siguen identificados como conceptos y demostracion', () => {
   for (const record of niches.filter(({ image }) => image.source === 'OpenArt')) {
     assert.equal(record.image.type, 'conceptual');
-    assert.equal(record.image.label, 'Ejemplo conceptual');
+    assert.equal(record.image.label, '');
     assert.equal(record.image.approval.approvedAsRealProject, false);
     assert.equal(record.commercialApproval, 'approved-2026-07-20-user-decision');
   }

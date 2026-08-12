@@ -127,7 +127,9 @@ img { max-width: 100%; height: auto; }
     box-shadow              var(--motion-duration-base) var(--motion-ease-standard),
     -webkit-backdrop-filter var(--motion-duration-reveal) var(--motion-ease-standard),
     backdrop-filter         var(--motion-duration-reveal) var(--motion-ease-standard);
-  will-change: background, backdrop-filter;
+  /* Sin will-change permanente: la cabecera vive en toda la pagina, asi que la capa
+     de compositor no se liberaba nunca. gsap clearProps solo limpia estilos inline,
+     jamas una regla de hoja. El navegador ya promociona solo durante la transicion. */
 }
 
 /* Static light streak across the glass — refraction, not a moving shimmer.
@@ -401,7 +403,8 @@ img { max-width: 100%; height: auto; }
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center right;
-  will-change: transform;
+  /* El fondo del hero es el elemento LCP: mantenerlo en su propia capa de compositor
+     de forma permanente costaba memoria sin beneficio, porque solo se anima al entrar. */
 }
 .hero__overlay {
   position: absolute;
@@ -519,10 +522,43 @@ img { max-width: 100%; height: auto; }
   }
   .hero__container { padding: 90px 20px 64px; }
   .hero__content { max-width: 100%; gap: 20px; }
+  /* El clamp global parte de 3.25rem, que en movil son 52 px fijos (4.5vw nunca
+     gana en pantallas estrechas) y empujaban el CTA fuera del primer pantallazo.
+     Aqui el vw si manda y el titulo escala con el ancho real. */
+  .hero__title { font-size: clamp(2.1rem, 8.5vw, 2.75rem); line-height: 1.06; }
   .hero-copy { font-size: 1.0625rem; }
   .hero-locality { margin-top: -6px; }
   .hero-cta { width: 100%; }
   .hero-cta a { flex: 1 1 auto; justify-content: center; }
+}
+
+/* ============================================================
+   PIE COMPARTIDO — las 4 landings no tenian ninguno: ni telefono,
+   ni WhatsApp, ni enlaces al resto del sitio. Un visitante que
+   aterrizaba ahi desde Google no tenia forma de contactar.
+   ============================================================ */
+.site-footer-lite { background: #0F172A; color: #94A3B8; padding: 56px 20px 40px; }
+.site-footer-lite__inner { max-width: 1080px; margin: 0 auto; }
+.site-footer-lite__top { display: flex; flex-wrap: wrap; gap: 28px 48px; justify-content: space-between; align-items: flex-start; padding-bottom: 32px; border-bottom: 1px solid rgba(148, 163, 184, .2); }
+.site-footer-lite__brand strong { display: block; color: #fff; font-size: 1.0625rem; font-weight: 700; margin-bottom: 6px; }
+.site-footer-lite__brand p { margin: 0; font-size: .9375rem; line-height: 1.6; max-width: 34ch; }
+.site-footer-lite__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.site-footer-lite__wa { display: inline-flex; align-items: center; gap: .5rem; background: #0369A1; color: #fff; text-decoration: none; font-weight: 600; font-size: .9375rem; padding: .7rem 1.35rem; border-radius: .5rem; }
+.site-footer-lite__wa:hover, .site-footer-lite__wa:focus-visible { background: #075985; }
+.site-footer-lite__tel { color: #E2E8F0; text-decoration: none; font-weight: 600; font-size: .9375rem; }
+.site-footer-lite__tel:hover, .site-footer-lite__tel:focus-visible { text-decoration: underline; }
+.site-footer-lite__nav { display: flex; flex-wrap: wrap; gap: 10px 24px; padding: 28px 0 24px; }
+.site-footer-lite__nav a { color: #94A3B8; text-decoration: none; font-size: .875rem; }
+.site-footer-lite__nav a:hover, .site-footer-lite__nav a:focus-visible { color: #fff; text-decoration: underline; }
+/* #64748B sobre #0F172A daba 3.78:1, por debajo del 4.5 de AA. #94A3B8 da 7.08:1. */
+.site-footer-lite__legal { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; font-size: .8125rem; color: #94A3B8; }
+.site-footer-lite__legal a { color: #CBD5E1; text-decoration: underline; text-underline-offset: 2px; }
+.site-footer-lite__legal a:hover, .site-footer-lite__legal a:focus-visible { color: #fff; }
+.site-footer-lite a:focus-visible { outline: 2px solid #7DD3FC; outline-offset: 2px; }
+@media (max-width: 640px) {
+  .site-footer-lite { padding: 40px 18px 32px; }
+  .site-footer-lite__top { flex-direction: column; gap: 22px; }
+  .site-footer-lite__wa { width: 100%; justify-content: center; }
 }
 
 /* ============================================================

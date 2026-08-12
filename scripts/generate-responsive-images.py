@@ -34,10 +34,12 @@ SOURCES = {
     "hotel-placa-habitacion": ASSETS / "hotel" / "ChatGPT Image 20 jul 2026, 15_23_22 (1).png",
     "hotel-organizador-recepcion": ASSETS / "hotel" / "ChatGPT Image 20 jul 2026, 15_23_23 (2).png",
     "hotel-colgante-puerta": ASSETS / "hotel" / "ChatGPT Image 20 jul 2026, 15_23_23 (4).png",
-    "boda-figura-novios": ASSETS / "boda" / "ChatGPT Image 20 jul 2026, 15_33_43.png",
-    "boda-letrero-bienvenida": ASSETS / "boda" / "ChatGPT Image 20 jul 2026, 15_33_51 (1).png",
-    "boda-adorno-pastel": ASSETS / "boda" / "ChatGPT Image 20 jul 2026, 15_33_51 (2).png",
-    "boda-numero-mesa": ASSETS / "boda" / "ChatGPT Image 20 jul 2026, 15_33_52 (4).png",
+    # Renders de recuerdos de boda: llegan cuadrados y se guardan ya extendidos a 4:3
+    # con relleno desenfocado (recortarlos decapitaba la figura de los novios).
+    "boda-nombres-pareja": ASSETS / "boda" / "boda-nombres-pareja.png",
+    "boda-figura-novios-3d": ASSETS / "boda" / "boda-figura-novios-3d.png",
+    "boda-numero-mesa-3d": ASSETS / "boda" / "boda-numero-mesa-3d.png",
+    "boda-set-empaque": ASSETS / "boda" / "boda-set-empaque.png",
     "escuela-identificador-lapiz": ASSETS / "escuela" / "ChatGPT Image 20 jul 2026, 15_47_54 (1).png",
     "escuela-llavero": ASSETS / "escuela" / "ChatGPT Image 20 jul 2026, 15_47_55 (2).png",
     "escuela-organizador": ASSETS / "escuela" / "ChatGPT Image 20 jul 2026, 15_47_55 (3).png",

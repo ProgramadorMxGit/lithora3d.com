@@ -64,7 +64,7 @@ PRODUCTO_LAPIZ = '''      <section class="card product-card">
           </div>
           <label class="check-row" style="margin-top:2px;margin-bottom:13px">
             <input type="checkbox" id="in-showPencilGhost" checked>
-            <span>Mostrar un lápiz de ejemplo en la vista 3D (no se imprime)</span>
+            <span>Mostrar un lápiz de referencia en la vista 3D (no se imprime)</span>
           </label>
           <button type="button" class="fit-test-btn" id="btn-fit-test">🎯 Imprimir prueba de ajuste<small>3 medidas en una pieza chiquita: pruebas tu lápiz real antes de imprimir todo</small></button>
           <div class="info-box pencil-spec">
@@ -147,7 +147,7 @@ FAQ = [
  ("¿Puedo hacer varios nombres a la vez?",
   "Sí, y es lo más útil para un grupo escolar, una boda o un equipo. Añade un nombre por fila y la herramienta los acomoda en una sola placa lista para imprimir de una pasada."),
  ("¿También hace nombres para lápices?",
-  "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de ejemplo que muestra por dónde entra."),
+  "Sí. Elige «Nombre para lápiz» y el nombre se genera atravesado por un túnel a la medida del lápiz, sin argolla. El túnel se imprime acostado y sin soportes, y puedes dejarlo abierto o con tope en el extremo que prefieras. En la vista 3D aparece un lápiz de referencia que muestra por dónde entra."),
  ("¿Qué diámetro de túnel elijo para el lápiz?",
   "El ajuste Escolar de 8.1 mm entra firme en el lápiz de escuela tradicional: sus esquinas hexagonales miden unos 8.1 mm y los agujeros impresos salen unas décimas más chicos que el modelo. Hay presets muy firme (7.7 mm) y jumbo (10.6 mm), y el diámetro se afina en décimas. Si no estás seguro, imprime la prueba de ajuste: una pieza pequeña con tres medidas (apretada, exacta y holgada) para probar tu lápiz real antes de imprimir todos los nombres."),
  ("¿Puedo venderlos?",
@@ -196,7 +196,9 @@ jsonld = {
    "featureList": ["Exportacion a STL", "Exportacion a 3MF multicolor para Bambu Studio",
                    "Quince tipografias incluidas", "Carga de tipografias propias en TTF u OTF",
                    "Varios nombres en una sola placa", "Aviso si la placa no cabe en la cama de impresion",
-                   "Compatible con enes, tildes y dieresis", "Funciona sin conexion una vez cargada",
+                   # Se retiro "Funciona sin conexion una vez cargada": no hay service
+                   # worker ni manifest en el repo, asi que era una promesa sin respaldo.
+                   "Compatible con enes, tildes y dieresis",
                    "Nombres para lapiz con tunel sin soportes y tope opcional",
                    "Prueba de ajuste imprimible para el diametro del lapiz"],
    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "MXN",
@@ -246,9 +248,9 @@ PAGINA = '''<!DOCTYPE html>
 <meta name="twitter:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
 <meta name="twitter:description" content="Crea llaveros con nombre y desc&aacute;rgalos en STL o 3MF multicolor. Sin registro.">
 <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.jpg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/fonts/inter.css">
 <link rel="stylesheet" href="assets/app/estilos.css">
 <link rel="stylesheet" href="assets/app/pagina.css">
 <link rel="preload" as="fetch" href="assets/fuentes/fuentes.json" crossorigin="anonymous">
