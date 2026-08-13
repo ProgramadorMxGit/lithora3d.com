@@ -290,8 +290,15 @@ const QUALITY_OVERRIDES = {
      del color de fondo. Con el default del sistema, esos viajes van SIN
      retracción (reduce_infill_retraction=1) — escurriendo material y esquivando
      el z-hop — y en línea recta por encima de todo. En piezas de dos colores
-     eso se ve como rayones y puntitos del color de arriba sobre el de abajo. */
-  reduce_infill_retraction: '0', // retrae SIEMPRE al viajar → el z-hop de 0.4 sí se ejecuta y la boquilla no arrastra
+     eso se ve como rayones y puntitos del color de arriba sobre el de abajo.
+
+     Ronda 4: laminando el "mia" real por CLI se comprobó que esto arregla la
+     RETRACCIÓN pero no la ELEVACIÓN. El laminador sí lo aplica (aparece como
+     reduce_infill_retraction_mode=Disabled en el volcado del gcode), y aun así
+     quedaban 264 viajes a la altura de capa —0.2 mm sobre la meseta ya
+     planchada— con uno solo de 152 mm cruzando la pieza entera. El salto en Z
+     vive en PRINTER_OVERRIDES, no aquí. */
+  reduce_infill_retraction: '0', // retrae SIEMPRE al viajar: condición necesaria para que haya z-hop
   reduce_crossing_wall: '1',     // los viajes rodean las paredes en vez de cruzar por encima de la cara terminada
 
   // ---- Structure: piezas LIVIANAS a pedido del usuario; el techo reforzado
@@ -332,6 +339,52 @@ const PENCIL_QUALITY_OVERRIDES = {
   overhang_4_4_speed: '15',
 };
 
+/**
+ * Ajustes de IMPRESORA (no de proceso) que protegen la meseta del color de
+ * abajo. Van aparte porque `different_settings_to_system` los declara en el
+ * hueco del preset de impresora, no en el de proceso: declarados en el hueco
+ * equivocado, el cargador de Bambu Studio los revierte al abrir igual que hacía
+ * con las claves de proceso antes de que existiera esa declaración.
+ *
+ * Medido sobre el "mia" real (base rosa 2.4 mm + letras blancas 1.4 mm),
+ * laminando con `bambu-studio.exe --slice` y contando los viajes de las capas
+ * blancas que cruzan la meseta rosa: 264 viajes / 176 mm iban a la altura de
+ * capa, sin salto. Con estas dos claves bajan a 153 / 83 mm, y el peor viaje
+ * suelto pasa de 152.1 mm a 5.0 mm.
+ */
+const PRINTER_OVERRIDES = {
+  // La plantilla trae "Auto Lift", que no eleva en todos los viajes: es la razón
+  // de que la ronda 3 no bastara pese a forzar la retracción.
+  z_hop_types: 'Normal Lift',
+  // Por defecto 1 mm: los saltos cortos entre trazos vecinos de una script no
+  // llegaban a retraer, así que tampoco elevaban.
+  retraction_minimum_travel: '0.2',
+};
+
+/** True cuando ningún par de grupos de color se solapa en Z. El llavero apila
+ * una base maciza bajo las letras en relieve: la placa necesita un solo cambio
+ * de filamento y la torre de purga sólo se construiría a sí misma. En modo
+ * arcoíris las letras de todos los nombres comparten las mismas capas, así que
+ * NO está estratificado y la torre sí hace falta. */
+function zSpansAreStratified(soups) {
+  const spans = soups.map(soup => {
+    let lo = Infinity, hi = -Infinity;
+    for (let i = 2; i < soup.length; i += 3) {
+      if (soup[i] < lo) lo = soup[i];
+      if (soup[i] > hi) hi = soup[i];
+    }
+    return [lo, hi];
+  }).filter(s => s[0] <= s[1]);
+  if (spans.length < 2) return true;
+  spans.sort((a, b) => a[0] - b[0]);
+  let top = spans[0][1];
+  for (let i = 1; i < spans.length; i++) {
+    if (spans[i][0] < top - 1e-6) return false;
+    if (spans[i][1] > top) top = spans[i][1];
+  }
+  return true;
+}
+
 /** Set cfg[key] to `val`, preserving the template's shape: per-extruder arrays
  * stay arrays (every slot gets the value), scalars stay scalar strings. */
 function setCfgValue(cfg, key, val) {
@@ -358,13 +411,22 @@ function patchProjectSettings(template, groups, options = {}) {
   const pencilMode = options.productType === 'pencil';
   const overrides = pencilMode
     ? {...QUALITY_OVERRIDES, ...PENCIL_QUALITY_OVERRIDES}
-    : QUALITY_OVERRIDES;
+    : {...QUALITY_OVERRIDES};
+
+  /* Fuera la torre de purga cuando los colores están apilados en Z. Sólo hay un
+     cambio de filamento y la A1 lo purga en su estación fuera de cama: medido,
+     45.8 mm de filamento con torre y sin ella, IDÉNTICO — así que el blanco no
+     se contamina. La torre únicamente se construía a sí misma en las 19 capas:
+     0.83 g de desperdicio en una pieza de 1.07 g, y dos viajes largos por capa
+     entre la pieza y la torre (el de 152 mm que rayaba la meseta). */
+  if (options.zStratified) overrides.enable_prime_tower = '0';
 
   // Name the official preset that actually underpins the embedded values.
   if (pencilMode) cfg.print_settings_id = '0.16mm High Quality @BBL A1';
 
   // Force the finish-quality tuning last, so it always wins over the template.
   for (const [k, v] of Object.entries(overrides)) setCfgValue(cfg, k, v);
+  for (const [k, v] of Object.entries(PRINTER_OVERRIDES)) setCfgValue(cfg, k, v);
 
   // Declare those overrides as "modified vs the system preset". WITHOUT this,
   // Bambu Studio's loader (update_non_diff_values_to_base_config in Preset.cpp)
@@ -373,11 +435,16 @@ function patchProjectSettings(template, groups, options = {}) {
   // clean preset — so the embedded tuning was silently dropped on open (ironing
   // off, classic walls) even though it was present in the file. Every override is
   // a print/process key, so all go in slot 0 (semicolon-separated); the filament
-  // and printer slots stay empty. Array length (num_filaments + 2) and slot layout
-  // mirror what a real Bambu "modified system preset" project export writes.
-  const changedKeys = Object.keys(overrides).join(';');
+  // slot stays empty. Array length (num_filaments + 2) and slot layout mirror
+  // what a real Bambu "modified system preset" project export writes: el hueco 0
+  // es el proceso, luego uno por filamento, y el ÚLTIMO es la impresora. Las
+  // claves de viaje/elevación son de impresora y por eso van en ese último hueco:
+  // declararlas en el 0 las dejaría sin declarar en su propio preset y el
+  // cargador las revertiría, que es exactamente el fallo que este bloque evita.
   const numFil = cfg.filament_colour.length;
-  cfg.different_settings_to_system = [changedKeys].concat(new Array(numFil + 1).fill(''));
+  cfg.different_settings_to_system = [Object.keys(overrides).join(';')]
+    .concat(new Array(numFil).fill(''))
+    .concat([Object.keys(PRINTER_OVERRIDES).join(';')]);
 
   return JSON.stringify(cfg);
 }
@@ -547,7 +614,8 @@ function buildBambu3MF(groups, projectTemplate, options = {}) {
     'Metadata/model_settings.config': fflate.strToU8(modelSettings),
   };
   if (projectTemplate) {
-    const patched = patchProjectSettings(projectTemplate, groups, options);
+    const patched = patchProjectSettings(projectTemplate, groups,
+      {...options, zStratified: zSpansAreStratified(soups)});
     if (patched) pkg['Metadata/project_settings.config'] = fflate.strToU8(patched);
   }
   return fflate.zipSync(pkg, {level: 6});
