@@ -49,6 +49,13 @@
   "kbMini": 1.6
  },
  {
+  "nombre": "Leckerli One",
+  "archivo": "leckerli-one.ttf",
+  "miniatura": "leckerli-one-abc.woff2",
+  "kb": 41,
+  "kbMini": 0.9
+ },
+ {
   "nombre": "Bangers",
   "archivo": "bangers.ttf",
   "miniatura": "bangers-abc.woff2",

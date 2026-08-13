@@ -63,13 +63,19 @@ test('el ?v del generador coincide con el hash real de los recursos de la app', 
   // edita un recurso sin regenerar la plantilla, los navegadores reutilizarían
   // caché viejo bajo la misma URL — justo la clase de rezago que el versionado
   // promete impedir (un usuario generó un 3MF con el perfil anterior así).
+  // Los finales de línea se normalizan antes de hashear: con core.autocrlf el
+  // checkout de Windows deja CRLF y el del CI en Linux deja LF, así que hashear
+  // los bytes crudos daba un ?v= distinto en cada máquina y esta prueba fallaba
+  // en CI con el contenido idéntico. El hash es del CONTENIDO, no del checkout.
+  // Debe coincidir exactamente con el cálculo de plantilla.py.
   const {createHash} = await import('node:crypto');
   const base = path.join(root, 'generador-llaveros-3d');
   const hash = createHash('md5');
   for (const rec of ['assets/app/estilos.css', 'assets/app/pagina.css',
     'assets/app/geometria.js', 'assets/app/exportadores.js',
-    'assets/app/creador.js', 'assets/app/perfil-bambu.json']) {
-    hash.update(fs.readFileSync(path.join(base, rec)));
+    'assets/app/creador.js', 'assets/app/perfil-bambu.json',
+    'assets/fuentes/fuentes.json']) {
+    hash.update(fs.readFileSync(path.join(base, rec)).toString('binary').replaceAll('\r\n', '\n'), 'binary');
   }
   const esperado = hash.digest('hex').slice(0, 8);
   const html = read(path.join(base, 'index.html'));
