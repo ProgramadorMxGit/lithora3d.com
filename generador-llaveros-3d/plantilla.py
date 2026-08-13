@@ -160,7 +160,7 @@ FAQ = [
 
 PASOS = [
  ("Escribe los nombres", "Uno por fila, para llavero o para nombre de lápiz. Puedes añadir tantos como necesites para hacerlos todos de una sola impresión."),
- ("Elige estilo, letra y colores", "Placa, contorno o doble contorno, con quince tipografías incluidas o la tuya propia."),
+ ("Elige estilo, letra y colores", "Placa, contorno o doble contorno, con dieciséis tipografías incluidas o la tuya propia."),
  ("Descarga el archivo", "STL para cualquier laminador, o 3MF listo para Bambu Studio con los colores ya asignados."),
 ]
 
@@ -390,18 +390,35 @@ for marca, valor in (
 # (?v=...). Asi, tras un despliegue, una recarga normal SIEMPRE trae el JS y el
 # perfil que corresponden a este HTML; sin esto, un navegador podia quedarse
 # con exportadores.js viejo y generar 3MF con el perfil anterior sin avisar.
+#
+# Se normalizan los finales de linea antes de hashear. Con core.autocrlf el
+# checkout de Windows deja CRLF y el del CI en Linux deja LF: hasheando los
+# bytes crudos, el mismo commit producia un ?v= distinto en cada maquina y la
+# prueba del candado (tests/static-audit.test.mjs) fallaba en CI aunque el
+# contenido fuera identico. El hash es del CONTENIDO, no del checkout.
+#
+# fuentes.json entra en el hash: enumera las tipografias incluidas y la app la
+# pide en tiempo de ejecucion, asi que al anadir una fuente el ?v= debe cambiar
+# para que un navegador con cache vieja no se quede sin ella.
 import hashlib
 _hash = hashlib.md5()
 for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
              'assets/app/geometria.js', 'assets/app/exportadores.js',
-             'assets/app/creador.js', 'assets/app/perfil-bambu.json'):
-    _hash.update(open(os.path.join(AQUI, _rec.replace('/', os.sep)), 'rb').read())
+             'assets/app/creador.js', 'assets/app/perfil-bambu.json',
+             'assets/fuentes/fuentes.json'):
+    _datos = open(os.path.join(AQUI, _rec.replace('/', os.sep)), 'rb').read()
+    _hash.update(_datos.replace(b'\r\n', b'\n'))
 VER = _hash.hexdigest()[:8]
 for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
              'assets/vendor/three.js', 'assets/vendor/opentype.js',
              'assets/vendor/fflate.js', 'assets/vendor/clipper.js',
              'assets/app/geometria.js', 'assets/app/exportadores.js',
-             'assets/app/creador.js', 'assets/app/perfil-bambu.json'):
+             'assets/app/creador.js', 'assets/app/perfil-bambu.json',
+             # Las dos precargas de tipografia tambien: creador.js pide estos
+             # recursos con el ?v= de la app, asi que sin versionar aqui el
+             # navegador descargaba cada uno DOS veces (la precarga sin version
+             # y luego el fetch versionado) y la precarga no servia de nada.
+             'assets/fuentes/fuentes.json', 'assets/fuentes/poppins-bold.ttf'):
     assert salida.count('"' + _rec + '"') + salida.count("'" + _rec + "'") == 1, _rec
     salida = salida.replace('"' + _rec + '"', '"' + _rec + '?v=' + VER + '"')
     salida = salida.replace("'" + _rec + "'", "'" + _rec + '?v=' + VER + "'")

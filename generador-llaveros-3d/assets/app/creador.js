@@ -181,6 +181,15 @@
      tarjetas, y el TTF completo de una tipografia se pide solo cuando se elige.
      La primera se precarga para que el modelo aparezca sin esperar. */
   const RUTA_FUENTES = 'assets/fuentes/';
+  /* Las tipografias se piden con el mismo ?v= con el que se sirvio esta app: se
+     lee del src de este propio script, que la plantilla ya versiona por hash.
+     Sin esto, fuentes.json se pedia a pelo y un navegador con cache vieja se
+     quedaba con el catalogo anterior: al anadir una tipografia, no le aparecia. */
+  const VER_APP = (() => {
+    try { return new URL(document.currentScript.src).searchParams.get('v') || ''; }
+    catch { return ''; }
+  })();
+  const rutaFuente = archivo => RUTA_FUENTES + archivo + (VER_APP ? '?v=' + VER_APP : '');
   const cargasEnCurso = {};
 
   async function asegurarFuenteCompleta(key) {
@@ -189,7 +198,7 @@
     if (cargasEnCurso[key]) return cargasEnCurso[key];
     cargasEnCurso[key] = (async () => {
       try {
-        const resp = await fetch(RUTA_FUENTES + f.archivo, {mode: 'cors'});
+        const resp = await fetch(rutaFuente(f.archivo), {mode: 'cors'});
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const buf = await resp.arrayBuffer();
         if (!looksLikeFont(buf)) throw new Error('archivo no es una fuente');
@@ -229,14 +238,14 @@
   }
 
   async function loadBuiltinFonts() {
-    const resp = await fetch(RUTA_FUENTES + 'fuentes.json', {mode: 'cors'});
+    const resp = await fetch(rutaFuente('fuentes.json'), {mode: 'cors'});
     const lista = await resp.json();
     lista.forEach(meta => {
       const key = 'f' + (fontCounter++);
       const cssName = 'kcfont_' + key;
       // La miniatura entra por CSS puro: no hace falta parsear nada para pintarla.
       const css = '@font-face{font-family:"' + cssName + '";src:url("' +
-        RUTA_FUENTES + meta.miniatura + '") format("woff2");font-display:swap}';
+        rutaFuente(meta.miniatura) + '") format("woff2");font-display:swap}';
       const st = document.createElement('style');
       st.textContent = css;
       document.head.appendChild(st);
