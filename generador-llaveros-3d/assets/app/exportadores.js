@@ -626,6 +626,30 @@ function safeFileName(s) {
     .replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'pieza';
 }
 
+/**
+ * Dónde cae DE VERDAD el cambio de color en el modo sin AMS.
+ *
+ * El laminador sólo corta en fronteras de capa: si el grosor de la base no es
+ * múltiplo de la altura de capa, el plano del cambio SUBE a la siguiente
+ * frontera. Comprobado laminando con la CLI de Bambu Studio: con capas de
+ * 0.2 mm, una base de 2.4 termina el color de abajo en z=2.40 (capa 12), pero
+ * una de 2.5 lo termina en z=2.60 (capa 13) — no en 2.40.
+ *
+ * El deslizador de grosor va en pasos de 0.1 y las capas suelen ser de 0.2, así
+ * que la mitad de los valores caen fuera de la rejilla. Calculando la capa con
+ * `floor` el aviso mandaba a cambiar el rollo una capa antes de tiempo y
+ * quedaba una capa entera de 0.2 mm del color de arriba sobre la base.
+ *
+ * Devuelve la altura real del cambio y la primera capa del color de arriba.
+ */
+function colourChangeLayer(baseZ, layerHeight) {
+  if (!(baseZ > 0) || !(layerHeight > 0)) return {baseLayers: 0, z: 0, firstTopLayer: 1, aligned: true};
+  // El -1e-6 evita que 2.4 / 0.2 === 11.999999999999998 pida una capa de más.
+  const baseLayers = Math.ceil(baseZ / layerHeight - 1e-6);
+  const z = baseLayers * layerHeight;
+  return {baseLayers, z, firstTopLayer: baseLayers + 1, aligned: Math.abs(z - baseZ) < 1e-6};
+}
+
 /** One STL per colour, bundled in a zip. All parts share the same origin, so
  * loading them together in a slicer keeps them aligned. */
 function buildSTLZip(groups) {
@@ -647,7 +671,7 @@ function buildSTLZip(groups) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     mergeToTriangleSoup, faceNormal, buildBinarySTL, build3MF, buildSTLZip,
-    toDisplayColor, safeFileName, geometriesToIndexedMesh, buildBambu3MF,
-    toHex6, patchProjectSettings,
+    toDisplayColor, safeFileName, colourChangeLayer, geometriesToIndexedMesh,
+    buildBambu3MF, toHex6, patchProjectSettings, zSpansAreStratified,
   };
 }

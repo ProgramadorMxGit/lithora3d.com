@@ -705,14 +705,23 @@
       box.className = 'info-box';
       box.innerHTML = 'Se imprime tal cual, de un color. Los colores de arriba solo sirven para verlo en pantalla.' + pencilNote;
     } else if (state.printMode === 'swap') {
-      // +1e-6 guards against float error: 2.4 / 0.2 === 11.999999999999998,
-      // which would otherwise report the colour change one layer too early.
-      const layer = Math.floor(z / state.layerHeight + 1e-6) + 1;
+      /* El laminador sólo corta en frontera de capa: con un grosor que no es
+         múltiplo de la altura de capa, el cambio SUBE a la siguiente frontera.
+         Antes esto se calculaba con floor y el aviso mandaba a cambiar el rollo
+         una capa antes, dejando una capa entera del color de arriba sobre la
+         base. Ver colourChangeLayer en exportadores.js. */
+      const cambio = colourChangeLayer(z, state.layerHeight);
+      const desalineado = !cambio.aligned
+        ? '<br><small>⚠️ Tu grosor es <b>' + z.toFixed(2) + ' mm</b>, pero el laminador sólo corta en frontera de capa y sube el cambio a ' +
+          cambio.z.toFixed(2) + ' mm. Para que coincidan exacto, usa un grosor múltiplo de ' + state.layerHeight.toFixed(2) + ' mm.</small>'
+        : '';
       box.className = 'info-box highlight';
       box.innerHTML =
-        'Pon el <b>cambio de color a ' + z.toFixed(2) + ' mm</b> de altura ' +
-        '(aprox. capa <b>' + layer + '</b> con capas de ' + state.layerHeight.toFixed(2) + ' mm).<br>' +
-        '<small>La altura en mm es lo exacto. El número de capa es orientativo porque muchos laminadores usan una primera capa más gruesa — compruébalo en la vista previa.</small>' +
+        'Pon el <b>cambio de color a ' + cambio.z.toFixed(2) + ' mm</b> de altura: ' +
+        'la <b>capa ' + cambio.firstTopLayer + '</b> es la primera del color de arriba, con capas de ' +
+        state.layerHeight.toFixed(2) + ' mm.<br>' +
+        '<small>La altura en mm es lo exacto. El número de capa supone que la primera mide igual que las demás; si tu laminador usa una primera capa más gruesa, guíate por los milímetros.</small>' +
+        desalineado +
         (state.rainbow ? '<br><small>⚠️ Con un color por nombre no puedes usar este modo: solo hay una pausa para todos. Usa multicolor.</small>' : '') +
         pencilNote;
     } else {
@@ -1321,6 +1330,17 @@
   }
 
   // ---------- downloads ----------
+  /* Nombre base del archivo. Cuando la placa lleva UN solo nombre, el archivo
+     sale llamado como ese nombre: descargando de uno en uno, "mia.3mf" es lo
+     que se busca luego en la carpeta de descargas, no seis "llaveros (3).3mf".
+     Con varios nombres se mantiene el genérico porque ninguno manda. El lápiz
+     conserva su sufijo para que el mismo nombre en los dos productos no colisione. */
+  function downloadBaseName() {
+    const solo = lastValidNames.length === 1 ? safeFileName(lastValidNames[0]) : '';
+    if (state.productType === 'pencil') return solo ? solo + '-lapiz' : 'nombres-para-lapiz';
+    return solo || 'llaveros';
+  }
+
   function downloadBlob(bytes, filename, mime) {
     const blob = new Blob([bytes], {type: mime});
     const url = URL.createObjectURL(blob);
@@ -1358,7 +1378,7 @@
 
   $('btn-stl').addEventListener('click', () => runExport('Preparando STL…', () => ({
     bytes: buildBinarySTL(lastLayoutPieces.map(p => p.geometry)),
-    filename: state.productType === 'pencil' ? 'nombres-para-lapiz.stl' : 'llaveros.stl', mime: 'model/stl',
+    filename: downloadBaseName() + '.stl', mime: 'model/stl',
   })));
   $('btn-3mf').addEventListener('click', () => runExport('Preparando 3MF…', () => {
     // Multicolour and every pencil-name export use Bambu Studio's project
@@ -1377,13 +1397,13 @@
         ? buildBambu3MF(state.productType === 'pencil' ? pencilGroups : regularGroups,
           window.__BAMBU_PROJECT__, {productType: state.productType})
         : build3MF(regularGroups),
-      filename: state.productType === 'pencil' ? 'nombres-para-lapiz.3mf' : 'llaveros.3mf',
+      filename: downloadBaseName() + '.3mf',
       mime: 'model/3mf',
     };
   }));
   $('btn-zip').addEventListener('click', () => runExport('Preparando ZIP…', () => ({
     bytes: buildSTLZip(buildGroups()),
-    filename: state.productType === 'pencil' ? 'nombres-para-lapiz-por-colores.zip' : 'llaveros-por-colores.zip', mime: 'application/zip',
+    filename: downloadBaseName() + '-por-colores.zip', mime: 'application/zip',
   })));
   const fitTestBtn = $('btn-fit-test');
   if (fitTestBtn) {
