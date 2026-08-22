@@ -32,10 +32,10 @@
 <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/fonts/inter.css">
-<link rel="stylesheet" href="assets/app/estilos.css?v=c37fe3ad">
-<link rel="stylesheet" href="assets/app/pagina.css?v=c37fe3ad">
-<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=c37fe3ad" crossorigin="anonymous">
-<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=c37fe3ad" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/app/estilos.css?v=afe0e2c9">
+<link rel="stylesheet" href="assets/app/pagina.css?v=afe0e2c9">
+<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=afe0e2c9" crossorigin="anonymous">
+<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=afe0e2c9" crossorigin="anonymous">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -345,6 +345,13 @@
         <h2>✏️ Nombres</h2>
         <div id="name-rows"></div>
         <button class="big add" id="btn-add-name">+ Añadir nombre</button>
+        <p class="group-label" id="case-label">¿Mayúsculas o minúsculas?</p>
+        <div class="case-list" id="case-list" role="group" aria-labelledby="case-label">
+          <button type="button" data-case="asis" aria-pressed="true"><b>Como lo escribo</b><small>Tal cual el teclado</small></button>
+          <button type="button" data-case="upper" aria-pressed="false"><b>MAYÚSCULAS</b><small>Todo capitales</small></button>
+          <button type="button" data-case="lower" aria-pressed="false"><b>minúsculas</b><small>Todo bajas</small></button>
+        </div>
+        <div class="info-box warn" id="case-font-warn" role="alert" hidden></div>
         <div class="info-box" id="name-cap" role="status" hidden></div>
         <div class="info-box warn" id="text-warn" role="alert" hidden></div>
       </section>
@@ -352,7 +359,9 @@
       <section class="card" id="style-card">
         <h2>✨ Estilo</h2>
         <div class="info-box" id="pencil-style-note" hidden>
-          Se usa un contorno reforzado y mayúsculas para mantener unido cualquier nombre alrededor del túnel.
+          Se usa un contorno reforzado para mantener unido cualquier nombre alrededor del túnel.
+          Las <b>MAYÚSCULAS</b> son lo más resistente aquí: no tienen rabitos que bajen (g, p, y)
+          y agarran el túnel en todo su largo. Puedes cambiarlo arriba, en <b>Nombres</b>.
         </div>
         <div class="style-list" id="style-list">
           <button class="style-opt" data-style="plate">
@@ -707,17 +716,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=c37fe3ad"></script>
-<script src="assets/vendor/opentype.js?v=c37fe3ad"></script>
-<script src="assets/vendor/fflate.js?v=c37fe3ad"></script>
-<script src="assets/vendor/clipper.js?v=c37fe3ad"></script>
-<script src="assets/app/geometria.js?v=c37fe3ad"></script>
-<script src="assets/app/exportadores.js?v=c37fe3ad"></script>
+<script src="assets/vendor/three.js?v=afe0e2c9"></script>
+<script src="assets/vendor/opentype.js?v=afe0e2c9"></script>
+<script src="assets/vendor/fflate.js?v=afe0e2c9"></script>
+<script src="assets/vendor/clipper.js?v=afe0e2c9"></script>
+<script src="assets/app/geometria.js?v=afe0e2c9"></script>
+<script src="assets/app/exportadores.js?v=afe0e2c9"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=c37fe3ad').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=afe0e2c9').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=c37fe3ad" defer></script>
+<script src="assets/app/creador.js?v=afe0e2c9" defer></script>
 </body>
 </html>
