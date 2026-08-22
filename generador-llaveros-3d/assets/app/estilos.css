@@ -474,7 +474,9 @@ button.big:active { transform: translateY(0) scale(.985); }
    ============================================================ */
 .product-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* auto-fit y no un número fijo de columnas: con el tercer producto (camiseta)
+     dos columnas dejaban una tarjeta sola en su fila. */
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
   gap: 10px;
 }
 .product-opt {
@@ -991,6 +993,16 @@ button.big:active { transform: translateY(0) scale(.985); }
 }
 .name-h:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 .name-h-wrap { font-size: 11px; font-weight: 700; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 3px; }
+
+/* Dorsal de la camiseta. Va centrado y no a la derecha como los milímetros
+   porque es un dato de la pieza, no una medida: leerlo junto al nombre es lo
+   que confirma de un vistazo que "Felix 27" está completo. */
+.name-num {
+  width: 52px; padding: 9px 6px; border: 1.5px solid var(--line); border-radius: 10px;
+  font-size: 15px; font-weight: 800; text-align: center; font-family: inherit; color: var(--ink-strong);
+  flex: 0 0 auto;
+}
+.name-num:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-ring); }
 
 /* ============================================================
    Sección plegable de opciones avanzadas

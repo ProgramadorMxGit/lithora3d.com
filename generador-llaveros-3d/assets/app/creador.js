@@ -23,6 +23,9 @@
   const state = {
     productType: 'keychain',
     names: ['Dafne', 'Hugo'],
+    numbers: ['10', '7'],  // dorsal de cada fila, solo en camiseta; paralelo a names
+    jerseyTemplate: 'lisa',  // 'lisa' = camiseta de un color | id de assets/plantillas
+    jerseyInks: [],          // color de cada tinta de la plantilla, en orden
     fontKey: null,
     letterHeight: 12,
     textBold: 0,         // negrita sintética en mm por lado; engorda trazos de fuentes script
@@ -80,6 +83,13 @@
   const emojiFont = null;
   let lastLayoutPieces = [];
   let lastBaseZ = state.baseThickness;
+  // Alturas de cambio de color de la pieza actual, cuando lleva más de una.
+  let lastColourSteps = null;
+  // Nº de tintas planas de la plantilla en uso; 0 si la pieza no es de plantilla.
+  let lastFlatInks = 0;
+  // Diámetro real del agujero de la argolla: en una plantilla puede salir menor
+  // que el pedido, porque el aro viene dibujado y la pieza se escala.
+  let lastHoleMM = 0;
   let lastValidNames = [];
   // tileIndex -> index into state.names/state.nameColors (skips empty rows)
   let lastValidOrig = [];
@@ -197,6 +207,41 @@
   })();
   const rutaFuente = archivo => RUTA_FUENTES + archivo + (VER_APP ? '?v=' + VER_APP : '');
   const cargasEnCurso = {};
+
+  /* Plantillas de camiseta: el dibujo trazado pesa 20 KB, así que no se baja al
+     abrir la página sino la primera vez que se elige una. Va con el mismo ?v=
+     que el resto de la app (camisetas.json entra en el hash) para que al
+     cambiar el dibujo no quede una caché vieja sirviendo el anterior. */
+  const plantillas = {};
+  let plantillasCargadas = null;
+  function cargarPlantillas() {
+    if (plantillasCargadas) return plantillasCargadas;
+    plantillasCargadas = (async () => {
+      const url = 'assets/plantillas/camisetas.json' + (VER_APP ? '?v=' + VER_APP : '');
+      const resp = await fetch(url, {mode: 'cors'});
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const doc = await resp.json();
+      (doc.plantillas || []).forEach(t => { plantillas[t.id] = t; });
+      return plantillas;
+    })().catch(err => {
+      // Se deja el fallo a la vista y se sigue con la camiseta lisa: mejor una
+      // pieza que una pantalla en blanco.
+      console.error('no se pudieron cargar las plantillas', err);
+      plantillasCargadas = null;
+      return plantillas;
+    });
+    return plantillasCargadas;
+  }
+  const plantillaActiva = () =>
+    (state.productType === 'jersey' && state.jerseyTemplate !== 'lisa')
+      ? plantillas[state.jerseyTemplate] || null : null;
+
+  /** Color de la tinta `i`: el elegido por el usuario o el del propio dibujo. */
+  function inkColor(i) {
+    if (state.jerseyInks[i]) return state.jerseyInks[i];
+    const t = plantillaActiva();
+    return (t && t.colores[i]) || '#cccccc';
+  }
 
   async function asegurarFuenteCompleta(key) {
     const f = fonts[key];
@@ -350,6 +395,22 @@
       textEl.value = name;
       main.appendChild(textEl);
 
+      /* El dorsal es un campo aparte y no "Felix 27" dentro del nombre: van a
+         franjas distintas de la camiseta y con tamaños muy distintos, así que
+         separarlos aquí evita tener que adivinar dónde termina uno. */
+      if (state.productType === 'jersey') {
+        const numEl = document.createElement('input');
+        numEl.type = 'text';
+        numEl.className = 'name-num';
+        numEl.maxLength = 3;
+        numEl.inputMode = 'numeric';
+        numEl.placeholder = 'Nº';
+        numEl.title = 'Número del dorsal (vacío = solo el nombre)';
+        numEl.setAttribute('aria-label', 'Número del dorsal ' + (i + 1));
+        numEl.value = state.numbers[i] || '';
+        main.appendChild(numEl);
+      }
+
       if (state.fixedHeight && state.productType !== 'pencil') {
         const wrap = document.createElement('label');
         wrap.className = 'name-h-wrap';
@@ -379,6 +440,11 @@
       const input = row.querySelector('input[type=text]');
       input.addEventListener('input', () => { state.names[i] = input.value; scheduleRebuild(); });
       input.addEventListener('focus', () => { lastNameInput = input; });
+      const numInput = row.querySelector('.name-num');
+      if (numInput) numInput.addEventListener('input', () => {
+        state.numbers[i] = numInput.value;
+        scheduleRebuild();
+      });
       const hInput = row.querySelector('.name-h');
       if (hInput) hInput.addEventListener('input', () => {
         const v = parseFloat(hInput.value);
@@ -400,6 +466,7 @@
       row.querySelector('button').addEventListener('click', () => {
         if (state.names.length <= 1) return;
         state.names.splice(i, 1);
+        state.numbers.splice(i, 1);
         state.nameColors.splice(i, 1);
         state.nameHeights.splice(i, 1);
         renderNameRows();
@@ -420,6 +487,7 @@
   $('btn-add-name').addEventListener('click', () => {
     if (state.names.length >= MAX_NAMES) { updateNameCapHint(); return; }
     state.names.push('');
+    state.numbers.push('');
     renderNameRows();
     updateNameCapHint();
     // Solo los campos de texto: querySelectorAll('input') incluia el selector de
@@ -520,6 +588,7 @@
 
   function syncProductUI() {
     const pencil = state.productType === 'pencil';
+    const jersey = state.productType === 'jersey';
     if (!pencil) lastBaseZ = state.baseThickness;
     productListEl.querySelectorAll('.product-opt').forEach(btn => {
       const on = btn.dataset.product === state.productType;
@@ -528,20 +597,88 @@
     });
     $('pencil-settings').hidden = !pencil;
     $('pencil-style-note').hidden = !pencil;
-    $('style-list').style.display = pencil ? 'none' : 'grid';
+    const jerseyNote = $('jersey-style-note');
+    if (jerseyNote) jerseyNote.hidden = !jersey;
+    // La camiseta trae su propia composición (nombre arriba, número al centro),
+    // así que los tres estilos de placa no le aplican.
+    $('style-list').style.display = (pencil || jersey) ? 'none' : 'grid';
     $('fixed-height-row').style.display = pencil ? 'none' : 'flex';
     $('fixed-h-note').hidden = pencil || !state.fixedHeight;
     $('base-thickness-row').style.display = pencil ? 'none' : 'block';
     $('keyring-hole-row').style.display = pencil ? 'none' : 'block';
-    $('btn-add-name').textContent = pencil ? '+ Añadir otro nombre para lápiz' : '+ Añadir nombre';
+    $('btn-add-name').textContent = pencil ? '+ Añadir otro nombre para lápiz'
+      : jersey ? '+ Añadir otra camiseta' : '+ Añadir nombre';
     renderNameRows();
     syncPencilPresets();
     syncPencilCapUI();
+    syncJerseyTplUI();
     syncStyleUI();
     updatePrintInfo();
     updatePencilHint();
     updateFitTestButton();
     updateWhatsAppCta();
+  }
+
+  // ---------- plantilla de camiseta ----------
+  const jerseyTplListEl = $('jersey-tpl-list');
+  if (jerseyTplListEl) {
+    jerseyTplListEl.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.jerseyTemplate = btn.dataset.tpl;
+        // Las tintas del usuario son de la plantilla anterior: se vacían para
+        // que la nueva entre con sus propios colores en vez de heredar los del
+        // dibujo que se acaba de dejar.
+        state.jerseyInks = [];
+        syncJerseyTplUI();
+        scheduleRebuild();
+      });
+    });
+  }
+
+  function syncJerseyTplUI() {
+    const jersey = state.productType === 'jersey';
+    const card = $('jersey-tpl-card');
+    if (card) card.hidden = !jersey;
+    if (jerseyTplListEl) {
+      jerseyTplListEl.querySelectorAll('button').forEach(btn => {
+        const on = btn.dataset.tpl === state.jerseyTemplate;
+        btn.classList.toggle('selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    renderInkPickers();
+  }
+
+  /** Un selector de color por tinta del dibujo. Se rehace al cambiar de
+   *  plantilla porque el número de tintas cambia con ella. */
+  function renderInkPickers() {
+    const box = $('tinta-pickers');
+    if (!box) return;
+    const tpl = plantillaActiva();
+    box.innerHTML = '';
+    box.hidden = !tpl;
+    const clasico = $('color-pickers');
+    const presets = $('color-presets');
+    if (clasico) clasico.hidden = !!tpl;
+    if (presets) presets.hidden = !!tpl;
+    if (!tpl) return;
+    tpl.colores.forEach((_, i) => {
+      const lab = document.createElement('label');
+      lab.className = 'color-pick';
+      const span = document.createElement('span');
+      span.textContent = 'Tinta ' + (i + 1);
+      const inp = document.createElement('input');
+      inp.type = 'color';
+      inp.value = inkColor(i);
+      inp.setAttribute('aria-label', 'Color de la tinta ' + (i + 1) + ' de la camiseta');
+      inp.addEventListener('input', () => {
+        state.jerseyInks[i] = inp.value;
+        applyColours();
+      });
+      lab.appendChild(span);
+      lab.appendChild(inp);
+      box.appendChild(lab);
+    });
   }
 
   // ---------- style ----------
@@ -556,12 +693,17 @@
 
   function syncStyleUI() {
     const pencil = state.productType === 'pencil';
+    const jersey = state.productType === 'jersey';
     styleListEl.querySelectorAll('.style-opt').forEach(b =>
       b.classList.toggle('selected', b.dataset.style === state.style));
-    const needsOutline = pencil || state.style === 'outline' || state.style === 'double';
+    /* En camiseta el contorno del dorsal NO se expone en milímetros: el grosor
+       que se lee bien depende del tamaño del texto, y un valor fijo que iba
+       bien con el número tapaba las letras del nombre. Se calcula por
+       proporción en buildJerseyTile. */
+    const needsOutline = !jersey && (pencil || state.style === 'outline' || state.style === 'double');
     $('outline-width-row').style.display = needsOutline ? 'block' : 'none';
     if (!needsOutline) $('islands-warn').hidden = true;
-    $('borde-pick').hidden = pencil || state.style !== 'double';
+    $('borde-pick').hidden = pencil || (!jersey && state.style !== 'double');
   }
 
   /** Anything above one island means the dilated letters never merged, so the
@@ -578,6 +720,42 @@
       'o elige una letra más redonda y pegada (Pacifico, Caveat, Permanent Marker).</small>';
   }
 
+  /* Por debajo de esto el nombre del dorsal deja de imprimirse limpio: el trazo
+     de una negrita ronda el 22% del alto de letra, así que 3.2 mm ya son ~0.7 mm
+     de trazo, menos de dos pasadas de boquilla 0.4, y el contorno que lo rodea
+     se come el hueco entre letras. */
+  const JERSEY_MIN_NAME_MM = 3.2;
+
+  /** El nombre se encoge solo para caber en su franja, así que un apellido
+   *  largo puede quedar ilegible sin que nada falle. Se avisa con la medida
+   *  real en vez de dejar que se descubra al despegar la pieza de la cama. */
+  function updateJerseyWarning(tiles) {
+    const box = $('jersey-warn');
+    if (!box) return;
+    if (state.productType !== 'jersey') { box.hidden = true; return; }
+    const avisos = [];
+    const caps = tiles.map(t => t.nameCapMM || 0).filter(v => v > 0);
+    const min = caps.length ? Math.min(...caps) : 0;
+    if (min && min < JERSEY_MIN_NAME_MM) {
+      avisos.push('⚠️ El nombre queda de <b>' + min.toFixed(1) + ' mm</b> de alto: ' +
+        'a ese tamaño las letras se cierran al imprimir.' +
+        '<br><small>Sube el <b>tamaño del número</b> (la camiseta crece con él) ' +
+        'o usa un nombre más corto: en los dorsales de verdad va el apellido, no el nombre completo.</small>');
+    }
+    /* El agujero de la argolla de una plantilla no puede ser el que pida el
+       control: viene dibujado en el contorno y al escalar la pieza se estrecha.
+       Se recorta dejando pared y se dice, en vez de entregar una argolla que se
+       rompe al colgarla. */
+    if (lastHoleMM && lastHoleMM < state.holeD - 0.05) {
+      avisos.push('⚠️ La argolla de esta camiseta solo da para un agujero de <b>' +
+        lastHoleMM.toFixed(1) + ' mm</b>, no los ' + state.holeD.toFixed(1) + ' mm que pediste.' +
+        '<br><small>Sube el <b>tamaño del número</b> para agrandar la pieza entera si necesitas un aro más grueso.</small>');
+    }
+    if (!avisos.length) { box.hidden = true; return; }
+    box.hidden = false;
+    box.innerHTML = avisos.join('<br>');
+  }
+
   /** Avisa de las filas que no pudieron construirse y de los caracteres que la
    *  tipografia elegida no tiene. Antes ambos casos eran mudos: el usuario
    *  descargaba "Bego a" y solo lo descubria al imprimir. */
@@ -591,7 +769,8 @@
     }
     const parts = [];
     if (failedNames && failedNames.length) {
-      const noun = state.productType === 'pencil' ? 'el nombre para lápiz' : 'el llavero';
+      const noun = state.productType === 'pencil' ? 'el nombre para lápiz'
+        : state.productType === 'jersey' ? 'la camiseta' : 'el llavero';
       parts.push('⚠️ No se pudo crear ' + noun + ' de: <b>' + failedNames.map(escapeHtml).join('</b>, <b>') +
         '</b>. El resto sí se generó.');
     }
@@ -733,6 +912,25 @@
         ? '<br><small>⚠️ Tu grosor es <b>' + z.toFixed(2) + ' mm</b>, pero el laminador sólo corta en frontera de capa y sube el cambio a ' +
           cambio.z.toFixed(2) + ' mm. Para que coincidan exacto, usa un grosor múltiplo de ' + state.layerHeight.toFixed(2) + ' mm.</small>'
         : '';
+      /* Una pieza de tres colores en tres alturas (camiseta, y también el
+         estilo Doble) necesita DOS pausas, no una. Antes el aviso anunciaba un
+         único cambio y el segundo color simplemente no aparecía. */
+      /* Una plantilla lleva todas sus tintas en la MISMA capa: no existe altura
+         donde pausar, así que el modo "cambio de rollo" no puede darla. */
+      if (lastFlatInks > 1) {
+        box.className = 'info-box warn';
+        box.innerHTML = '⚠️ Esta camiseta lleva <b>' + lastFlatInks + ' colores en la misma capa</b>: ' +
+          'no hay ninguna altura donde pausar y cambiar el rollo.' +
+          '<br><small>Usa <b>multicolor (AMS)</b> para que salga con sus colores, ' +
+          'o <b>un solo color</b> si vas a imprimirla lisa.</small>';
+        return;
+      }
+      const tresColores = lastColourSteps && lastColourSteps.length > 1;
+      const segundaPausa = tresColores
+        ? '<br><small>⚠️ Esta pieza lleva <b>tres colores en tres alturas</b>: hacen falta <b>dos pausas</b>, ' +
+          'la segunda a ' + colourChangeLayer(lastColourSteps[1], state.layerHeight).z.toFixed(2) +
+          ' mm. Si tu laminador solo admite una, usa <b>multicolor</b> o imprime de un color.</small>'
+        : '';
       box.className = 'info-box highlight';
       box.innerHTML =
         'Pon el <b>cambio de color a ' + cambio.z.toFixed(2) + ' mm</b> de altura: ' +
@@ -740,6 +938,7 @@
         state.layerHeight.toFixed(2) + ' mm.<br>' +
         '<small>La altura en mm es lo exacto. El número de capa supone que la primera mide igual que las demás; si tu laminador usa una primera capa más gruesa, guíate por los milímetros.</small>' +
         desalineado +
+        segundaPausa +
         (state.rainbow ? '<br><small>⚠️ Con un color por nombre no puedes usar este modo: solo hay una pausa para todos. Usa multicolor.</small>' : '') +
         pencilNote;
     } else {
@@ -981,6 +1180,24 @@
     return nameMaterials[i];
   }
 
+  /* Un material por tinta de plantilla. Se crean bajo demanda y se reutilizan:
+     crear uno por malla en cada rebuild dejaba materiales huérfanos en la GPU. */
+  const tintaMaterials = [];
+  function tintaMaterialFor(i) {
+    if (!tintaMaterials[i]) {
+      tintaMaterials[i] = new THREE.MeshStandardMaterial({roughness: 0.5, metalness: 0});
+    }
+    tintaMaterials[i].color.set(inkColor(i));
+    return tintaMaterials[i];
+  }
+
+  /** Índice de tinta de una pieza 'tinta3', o null si no es de plantilla. */
+  function tintaIndex(part) {
+    if (typeof part !== 'string' || part.slice(0, 5) !== 'tinta') return null;
+    const i = parseInt(part.slice(5), 10);
+    return Number.isFinite(i) ? i : null;
+  }
+
   function applyColours() {
     // Los colores no reconstruyen geometría, así que no pasan por
     // scheduleRebuild: sus flechitas de reset se refrescan aquí.
@@ -990,6 +1207,8 @@
     textMaterialSolid.color.set(state.textColor);
     group.traverse(m => {
       if (!m.isMesh) return;
+      const tinta = tintaIndex(m.userData.part);
+      if (tinta !== null) { m.material = tintaMaterialFor(tinta); return; }
       if (m.userData.part === 'borde') m.material = bordeMaterial;
       if (m.userData.part === 'text') {
         m.material = state.rainbow
@@ -1212,15 +1431,30 @@
     group.children.forEach(m => { if (m.userData.owned && m.geometry) m.geometry.dispose(); });
     group.clear();
     lastLayoutPieces = [];
+    lastColourSteps = null;
+    lastFlatInks = 0;
+    lastHoleMM = 0;
     let pencilLayout = null; // {tiles, offsets} solo en modo lápiz, para fantasma y gramos
 
+    /* En camiseta una fila con solo el número es válida: hay dorsales sin
+       nombre. Para el nombre de archivo y los grupos de color se usa el número
+       como etiqueta cuando no hay nombre. */
+    const jerseyMode = state.productType === 'jersey';
     const validEntries = state.names
-      .map((n, i) => ({name: n.trim(), orig: i}))
-      .filter(e => e.name);
-    const validNames = validEntries.map(e => e.name);
+      .map((n, i) => ({name: n.trim(), number: String(state.numbers[i] || '').trim(), orig: i}))
+      .filter(e => e.name || (jerseyMode && e.number));
+    const validNames = validEntries.map(e => e.name || e.number);
     lastValidNames = validNames;
     lastValidOrig = validEntries.map(e => e.orig);
     const font = state.fontKey && fonts[state.fontKey] ? fonts[state.fontKey].otFont : null;
+    // El dibujo de la plantilla se baja la primera vez que hace falta.
+    if (jerseyMode && state.jerseyTemplate !== 'lisa' && !plantillas[state.jerseyTemplate]) {
+      showBusy('Cargando la camiseta…');
+      await cargarPlantillas();
+      if (cancelled()) return;
+      renderInkPickers();
+    }
+    const tpl = plantillaActiva();
 
     let bedH = 0;
     let plateLabel = '';
@@ -1242,7 +1476,12 @@
         const lines = [{text: applyTextCase(e.name)}];
         let tile;
         try {
-          if (state.productType === 'pencil') tile = buildPencilNameTile(font, emojiFont, lines, currentOpts());
+          if (jerseyMode) tile = tpl
+            ? buildJerseyTemplateTile(font, emojiFont,
+              applyTextCase(e.name), applyTextCase(e.number), tpl, currentOpts())
+            : buildJerseyTile(font, emojiFont,
+              applyTextCase(e.name), applyTextCase(e.number), currentOpts());
+          else if (state.productType === 'pencil') tile = buildPencilNameTile(font, emojiFont, lines, currentOpts());
           else if (state.style === 'outline') tile = buildOutlineTile(font, emojiFont, lines, currentOpts());
           else if (state.style === 'double') tile = buildDoubleOutlineTile(font, emojiFont, lines, currentOpts());
           else tile = buildKeychainTile(font, emojiFont, lines, currentOpts());
@@ -1284,7 +1523,15 @@
         ? Math.max(...tiles.map(t => t.baseThickness || state.baseThickness))
         : state.baseThickness;
 
+      // Todas las piezas se construyen con las mismas opciones, así que basta
+      // con la primera. Se recogen ANTES de avisar: el aviso de la argolla los
+      // usa, y leyéndolos después contaba siempre lo de la pasada anterior.
+      lastColourSteps = tiles[0].colourStepsZ || null;
+      lastFlatInks = tiles[0].flatInks || 0;
+      lastHoleMM = tiles[0].holeDiameterMM || 0;
+
       updateIslandsWarning(Math.max(1, ...tiles.map(t => t.islands || 1)));
+      updateJerseyWarning(tiles);
       const layout = layoutTiles(tiles, {columns: state.columns, gapXMM: state.gap, gapYMM: state.gap * 1.3});
       layout.pieces.forEach(piece => {
         const mesh = new THREE.Mesh(piece.geometry, baseMaterial);
@@ -1300,7 +1547,9 @@
       // escritos: con una fila descartada el HUD anunciaba una pieza de mas.
       plateLabel = tiles.length + (state.productType === 'pencil'
         ? ' nombre' + (tiles.length > 1 ? 's' : '') + ' para lápiz'
-        : ' llavero' + (tiles.length > 1 ? 's' : ''));
+        : jerseyMode
+          ? ' camiseta' + (tiles.length > 1 ? 's' : '')
+          : ' llavero' + (tiles.length > 1 ? 's' : ''));
     }
 
     if (!lastLayoutPieces.length) {
@@ -1380,6 +1629,16 @@
       msg = 'Hola, diseñé ' + (n || 'unos') + ' nombre' + (n === 1 ? '' : 's') + ' para lápiz' +
         (n ? ' (' + names + ')' : '') + ' con túnel de ' + state.pencilHoleD.toFixed(1) +
         ' mm en el generador de Lithora 3D y quiero cotizar la impresión.';
+    } else if (state.productType === 'jersey') {
+      // El dorsal es el dato que hay que confirmar por WhatsApp, así que el
+      // mensaje lleva nombre y número juntos, como se pedirían de viva voz.
+      const dorsales = lastValidNames.slice(0, 6).map((nm, k) => {
+        const num = String(state.numbers[lastValidOrig[k]] || '').trim();
+        return num && num !== nm ? nm + ' ' + num : nm;
+      }).join(', ') + (n > 6 ? '…' : '');
+      msg = 'Hola, diseñé ' + (n || 'unas') + ' camiseta' + (n === 1 ? '' : 's') + ' llavero' +
+        (n ? ' (' + dorsales + ')' : '') +
+        ' en el generador de Lithora 3D y quiero cotizar la impresión.';
     } else {
       msg = 'Hola, diseñé ' + (n || 'unos') + ' llavero' + (n === 1 ? '' : 's') +
         (n ? ' (' + names + ')' : '') + ' en el Creador de Llaveros y quiero cotizar la impresión.';
@@ -1389,6 +1648,21 @@
 
   /** Split the built pieces into one printable group per colour. */
   function buildGroups() {
+    // Una plantilla no tiene fondo/letras/borde: son N tintas planas, y el
+    // dorsal reutiliza dos de ellas. Se agrupan por índice de tinta para que
+    // la pieza siga usando solo los filamentos del dibujo.
+    const porTinta = new Map();
+    lastLayoutPieces.forEach(p => {
+      const i = tintaIndex(p.part);
+      if (i === null) return;
+      if (!porTinta.has(i)) porTinta.set(i, []);
+      porTinta.get(i).push(p.geometry);
+    });
+    if (porTinta.size) {
+      return [...porTinta.keys()].sort((a, b) => a - b).map(i => ({
+        label: 'tinta' + (i + 1), color: inkColor(i), geometries: porTinta.get(i),
+      }));
+    }
     const basePieces = lastLayoutPieces.filter(p => p.part === 'base');
     const textPieces = lastLayoutPieces.filter(p => p.part === 'text');
     const groups = [];
@@ -1423,6 +1697,7 @@
   function downloadBaseName() {
     const solo = lastValidNames.length === 1 ? safeFileName(lastValidNames[0]) : '';
     if (state.productType === 'pencil') return solo ? solo + '-lapiz' : 'nombres-para-lapiz';
+    if (state.productType === 'jersey') return solo ? solo + '-camiseta' : 'camisetas';
     return solo || 'llaveros';
   }
 
@@ -1528,7 +1803,7 @@
      de que hay que abrirlos otra vez. */
   const SAVE_KEY = 'lithora.llaveros.v1';
   const SAVED_KEYS = [
-    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
+    'productType', 'names', 'numbers', 'jerseyTemplate', 'jerseyInks', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
     'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
@@ -1582,6 +1857,13 @@
         .slice(0, MAX_NAMES);          // el tope no se aplicaba al restaurar
       if (!clean.names.length) delete clean.names;
     }
+    if (Array.isArray(clean.numbers)) {
+      // Mismo tope y mismo recorte que los nombres: `numbers` va en paralelo a
+      // `names` y una lista más larga dejaría dorsales huérfanos al restaurar.
+      clean.numbers = clean.numbers
+        .map(n => (typeof n === 'string' || typeof n === 'number' ? String(n).slice(0, 3) : ''))
+        .slice(0, MAX_NAMES);
+    }
     return clean;
   }
 
@@ -1610,7 +1892,7 @@
     if (!state.fontKey || !fonts[state.fontKey]) state.fontKey = Object.keys(fonts)[0] || null;
     // Una impresora que ya no existe apagaba el aviso de cama en silencio.
     if (!PRINTERS.some(p => p.id === state.printer)) state.printer = DEFAULT_STATE.printer;
-    if (!['keychain', 'pencil'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
+    if (!['keychain', 'pencil', 'jersey'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
     if (!['open', 'start', 'end'].includes(state.pencilCapEnd)) state.pencilCapEnd = DEFAULT_STATE.pencilCapEnd;
     if (!['round', 'teardrop'].includes(state.pencilTunnelStyle)) state.pencilTunnelStyle = DEFAULT_STATE.pencilTunnelStyle;
     if (!TEXT_CASES.includes(state.textCase)) state.textCase = DEFAULT_STATE.textCase;

@@ -1604,6 +1604,8 @@ function buildDoubleOutlineTile(font, emojiFont, lines, opts) {
     height: bb.maxY - bb.minY,
     islands,
     missingChars: polys.missing || [],
+    // Tres colores en tres alturas: quien avise de la pausa necesita las dos.
+    colourStepsZ: [tBase, tBase + tBand],
   };
 }
 
@@ -1849,6 +1851,355 @@ function buildSilhouetteTile(polys, opts) {
   };
 }
 
+/* ------------------------------------------------------------------ *
+ * Camiseta con dorsal: silueta de jersey + nombre y número en relieve.
+ * ------------------------------------------------------------------ */
+
+/** Proporciones del jersey, en fracciones de su propio ancho (x) y alto (y),
+ *  con el origen en el centro de la caja. Están medidas sobre un llavero de
+ *  camiseta real de 50 × 61.4 mm, no inventadas: de ahí sale `aspect`, y de ahí
+ *  que el número quede centrado en el pecho y el nombre pegado bajo el cuello. */
+const JERSEY = {
+  aspect: 1.228,          // alto / ancho de la camiseta (sin contar la argolla)
+  collarHalf: 0.125,      // medio ancho de la boca del cuello
+  collarBaseHalf: 0.19,   // donde el cuello se junta con el hombro
+  collarBaseY: 0.455,
+  shoulderHalf: 0.315,    // donde el hombro se convierte en manga
+  shoulderY: 0.425,
+  sleeveTopY: 0.340,      // esquina exterior alta de la manga
+  sleeveBotY: 0.045,      // esquina exterior baja de la manga
+  /* El bajo de la manga va casi horizontal y la sisa apenas por encima: con un
+     corte en diagonal la manga se fundía con el cuerpo y la pieza parecía una
+     campana en vez de una camiseta. */
+  armpitX: 0.295,
+  armpitY: 0.020,
+  hipX: 0.310,            // el cuerpo abre solo un poco hacia el bajo
+  hemDip: 0.022,          // el bajo cae al centro, como una camiseta de verdad
+  round: 0.022,           // radio de suavizado, en fracción del lado menor
+  /* Los anchos de franja dejan sitio al contorno: con 0.56 y 0.52 el borde del
+     número llegaba justo a la sisa y se recortaba contra la manga. */
+  nameCY: 0.293, nameH: 0.105, nameW: 0.52,   // franja del nombre
+  numCY: -0.075, numH: 0.300, numW: 0.480,    // franja del número
+  nameOutline: 0.14,      // grosor del contorno, en fracción del alto de su texto
+  numOutline: 0.085,
+  minOutline: 0.6,        // 1.5 anchos de extrusión a boquilla 0.4: menos no sale
+};
+
+/** Contorno de la camiseta centrado en el origen, ancho `w` y alto `h`. */
+function jerseySilhouette(w, h) {
+  const J = JERSEY;
+  const X = f => f * w, Y = f => f * h;
+  const hem = -h / 2;
+  const hipY = hem + Y(J.hemDip);
+  const pts = [];
+  pts.push([-X(J.collarHalf), h / 2]);
+  pts.push([-X(J.collarBaseHalf), Y(J.collarBaseY)]);
+  pts.push([-X(J.shoulderHalf), Y(J.shoulderY)]);
+  pts.push([-X(0.5), Y(J.sleeveTopY)]);
+  pts.push([-X(0.5), Y(J.sleeveBotY)]);
+  pts.push([-X(J.armpitX), Y(J.armpitY)]);
+  pts.push([-X(J.hipX), hipY]);
+  // El bajo se muestrea como arco: dos puntos rectos dejaban un canto duro que
+  // en la pieza impresa se leía como un rectángulo, no como una camiseta.
+  const seg = 12;
+  for (let i = 1; i < seg; i++) {
+    const t = i / seg;
+    pts.push([-X(J.hipX) + t * 2 * X(J.hipX), hipY - Math.sin(t * Math.PI) * Y(J.hemDip)]);
+  }
+  pts.push([X(J.hipX), hipY]);
+  pts.push([X(J.armpitX), Y(J.armpitY)]);
+  pts.push([X(0.5), Y(J.sleeveBotY)]);
+  pts.push([X(0.5), Y(J.sleeveTopY)]);
+  pts.push([X(J.shoulderHalf), Y(J.shoulderY)]);
+  pts.push([X(J.collarBaseHalf), Y(J.collarBaseY)]);
+  pts.push([X(J.collarHalf), h / 2]);
+  return pts;
+}
+
+/** Suaviza un contorno con una apertura y un cierre de Clipper (erosionar +
+ *  dilatar, y al revés). Se hace así y no con arcos vértice a vértice porque
+ *  los ángulos del hombro, de la manga y de la sisa son muy distintos entre sí
+ *  y un radio fijo por esquina dejaba muescas justo en la sisa. */
+function roundPolys(polys, r) {
+  if (!(r > 0) || !polys.length) return polys;
+  const grow = (ps, d) => ClipperLib.Clipper.PolyTreeToPaths(offsetPolygonsOutward(ps, d))
+    .map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]))
+    .filter(p => p.length >= 3);
+  let out = grow(grow(polys, -r), r);     // apertura: redondea las esquinas salientes
+  if (!out.length) return polys;          // radio mayor que la manga: mejor sin redondear
+  out = grow(grow(out, r), -r);           // cierre: redondea la sisa y el cuello
+  return out.length ? out : polys;
+}
+
+/** Escala `polys` (centrados en el origen) para que quepan a lo ancho de `boxW`
+ *  y los sitúa centrados en (0, cy). Solo se encogen: el alto de letra lo fija
+ *  quien llama, y encogerlo también en vertical haría que un nombre con "g"
+ *  saliera con letras más chicas que el mismo nombre sin ella. */
+function placeTextPolys(polys, cy, boxW) {
+  const b = polysBounds(polys);
+  const s = b.width > boxW ? boxW / b.width : 1;
+  const cx = (b.minX + b.maxX) / 2, my = (b.minY + b.maxY) / 2;
+  return polys.map(p => p.map(([x, y]) => [(x - cx) * s, (y - my) * s + cy]));
+}
+
+/**
+ * Llavero con forma de camiseta: nombre arriba y número grande al centro, los
+ * dos con contorno de un segundo color, en dos escalones de relieve.
+ *
+ * `opts.letterHeightMM` manda sobre el NÚMERO, que es lo que domina la pieza;
+ * la camiseta se dimensiona a su alrededor y el nombre ocupa su propia franja.
+ */
+function buildJerseyTile(font, emojiFont, name, number, opts) {
+  const curveSegments = opts.curveSegments || 10;
+  const J = JERSEY;
+  const missing = [];
+  const addMissing = list => (list || []).forEach(ch => {
+    if (missing.indexOf(ch) === -1) missing.push(ch);
+  });
+
+  // La camiseta sale del alto pedido para el número.
+  const h = Math.max(12, opts.letterHeightMM / J.numH);
+  const w = h / J.aspect;
+
+  const render = (text, capMM) => {
+    if (!text) return null;
+    const polys = boldenPolygons(
+      linesToPolygons(font, emojiFont, [{text}], capMM, curveSegments), opts.textBoldMM);
+    addMissing(polys.missing);
+    return polys.length ? polys : null;
+  };
+
+  const numPolys = render(number, h * J.numH);
+  const namePolys = render(name, h * J.nameH);
+  if (!numPolys && !namePolys) {
+    const err = new Error('sin texto');
+    err.missingChars = missing;
+    throw err;
+  }
+
+  const placed = [];
+  let nameCapMM = 0, numCapMM = 0;
+  if (namePolys) {
+    const p = placeTextPolys(namePolys, h * J.nameCY, w * J.nameW);
+    nameCapMM = polysBounds(p).height;
+    placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+  }
+  if (numPolys) {
+    const p = placeTextPolys(numPolys, h * J.numCY, w * J.numW);
+    numCapMM = polysBounds(p).height;
+    placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+  }
+
+  // ---- placa: silueta + argolla fundida arriba, agujero al final
+  let bodyPaths = roundPolys([jerseySilhouette(w, h)], Math.min(w, h) * J.round).map(ptsToClipper);
+  bodyPaths = ClipperLib.Clipper.PolyTreeToPaths(
+    clipperBoolean(bodyPaths, null, ClipperLib.ClipType.ctUnion));
+
+  const holeR = Math.max(0.6, opts.loopHoleDiameterMM / 2);
+  const ringR = holeR + Math.max(1.6, opts.loopRingThicknessMM);
+  const mmBody = bodyPaths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
+  // Se sondea el relleno real en x=0 en vez de usar el techo de la caja: el
+  // cuello sube por encima de la línea de hombro y anclar a la caja dejaba la
+  // argolla flotando sobre el aire de los hombros.
+  const topY = topFilledY(mmBody, 0, h / 2 + 1, -h / 2);
+  const ringCy = (topY === null ? h / 2 : topY) + ringR * 0.35;
+  const platePaths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+    bodyPaths, [circleClipperPath(0, ringCy, ringR, 56, false)], ClipperLib.ClipType.ctUnion));
+  const plateTree = clipperBoolean(
+    platePaths, [circleClipperPath(0, ringCy, holeR, 40, false)], ClipperLib.ClipType.ctDifference);
+  const {shapes: baseShapes, islands} = polyTreeToShapes(plateTree);
+
+  // ---- contorno y relleno del dorsal, recortados contra la camiseta
+  const outlinePaths = [];
+  const fillPolys = [];
+  placed.forEach(t => {
+    outlinePaths.push(...ClipperLib.Clipper.PolyTreeToPaths(
+      offsetPolygonsOutward(t.polys, t.outline)));
+    fillPolys.push(...t.polys);
+  });
+  const clipTo = paths => clipperBoolean(
+    ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(paths, null, ClipperLib.ClipType.ctUnion)),
+    bodyPaths, ClipperLib.ClipType.ctIntersection);
+  const {shapes: outlineShapes} = polyTreeToShapes(clipTo(outlinePaths));
+  const {shapes: fillShapes} = polyTreeToShapes(clipTo(polysToClipperPaths(fillPolys)));
+
+  const bb = shapesBounds(baseShapes);
+  const dx = -bb.minX, dy = -bb.minY;
+  const tBase = opts.baseThicknessMM;
+  // El relieve total sigue siendo `textRaisedHeightMM`: se reparte en dos
+  // escalones, contorno abajo y letras encima, para que el dorsal se lea con
+  // sombra propia sin engordar la pieza.
+  const tBand = Math.max(0.4, opts.textRaisedHeightMM * 0.5);
+  const tText = Math.max(0.4, opts.textRaisedHeightMM - tBand);
+
+  const baseGeo = new THREE.ExtrudeGeometry(
+    baseShapes.map(s => translateShape(s, dx, dy)),
+    {depth: tBase, bevelEnabled: false, curveSegments});
+  const pieces = [{geometry: baseGeo, part: 'base'}];
+  if (outlineShapes.length) {
+    const g = new THREE.ExtrudeGeometry(
+      outlineShapes.map(s => translateShape(s, dx, dy)),
+      {depth: tBand, bevelEnabled: false, curveSegments});
+    g.translate(0, 0, tBase);
+    pieces.push({geometry: g, part: 'borde'});
+  }
+  if (fillShapes.length) {
+    const g = new THREE.ExtrudeGeometry(
+      fillShapes.map(s => translateShape(s, dx, dy)),
+      {depth: tText, bevelEnabled: false, curveSegments});
+    g.translate(0, 0, tBase + tBand);
+    pieces.push({geometry: g, part: 'text'});
+  }
+
+  return {
+    pieces,
+    width: bb.maxX - bb.minX,
+    height: bb.maxY - bb.minY,
+    islands,
+    missingChars: missing,
+    nameCapMM,
+    numberCapMM: numCapMM,
+    jerseyWidthMM: w,
+    // Alturas donde cambia el color, para que el aviso de "pausa y cambio de
+    // rollo" no prometa un solo cambio en una pieza que lleva tres colores.
+    colourStepsZ: [tBase, tBase + tBand],
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * Camiseta a partir de una plantilla trazada (assets/plantillas).
+ * ------------------------------------------------------------------ */
+
+/** Pared mínima entre el agujero de la argolla y el borde de la pieza. Por
+ *  debajo de esto el aro se rompe al colgarlo del llavero. */
+const JERSEY_MIN_RING_WALL = 1.1;
+
+/** Anillos normalizados de la plantilla -> polígonos en mm. */
+function templateToPolys(partes, scale) {
+  const out = [];
+  for (const poly of partes) {
+    for (const ring of poly) {
+      out.push(ring.map(([x, y]) => [x * scale, y * scale]));
+    }
+  }
+  return out;
+}
+
+/**
+ * Camiseta con el dibujo real de una plantilla: la placa queda teselada en
+ * varias tintas planas y el dorsal se levanta encima, en dos escalones.
+ *
+ * Las piezas salen etiquetadas 'tinta0'…'tintaN' —incluido el dorsal, que
+ * reutiliza dos tintas de la propia camiseta— para que la pieza entera siga
+ * cabiendo en los cuatro huecos del AMS Lite.
+ */
+function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
+  const curveSegments = opts.curveSegments || 10;
+  const missing = [];
+  const addMissing = list => (list || []).forEach(ch => {
+    if (missing.indexOf(ch) === -1) missing.push(ch);
+  });
+
+  const h = Math.max(12, opts.letterHeightMM / tpl.numeroCaja.h);
+  const w = h * tpl.anchoRel;
+
+  // ---- agujero de la argolla, recortado al tamaño real de la pieza
+  const ringWall = tpl.aro.r * h;
+  const holeMax = Math.max(0.6, ringWall - JERSEY_MIN_RING_WALL);
+  const holeR = Math.min(Math.max(0.6, opts.loopHoleDiameterMM / 2), holeMax);
+  const holePath = [circleClipperPath(tpl.aro.x * h, tpl.aro.y * h, holeR, 44, false)];
+
+  const siluetaPaths = polysToClipperPaths(templateToPolys(tpl.silueta, h));
+  const siluetaTree = clipperBoolean(siluetaPaths, null, ClipperLib.ClipType.ctUnion);
+  const siluetaSinAgujero = ClipperLib.Clipper.PolyTreeToPaths(siluetaTree);
+  const {shapes: siluetaShapes, islands} = polyTreeToShapes(
+    clipperBoolean(siluetaSinAgujero, holePath, ClipperLib.ClipType.ctDifference));
+  const bb = shapesBounds(siluetaShapes);
+  const dx = -bb.minX, dy = -bb.minY;
+
+  // ---- dorsal: nombre y número en sus franjas, con contorno
+  const render = (text, capMM) => {
+    if (!text) return null;
+    const polys = boldenPolygons(
+      linesToPolygons(font, emojiFont, [{text}], capMM, curveSegments), opts.textBoldMM);
+    addMissing(polys.missing);
+    return polys.length ? polys : null;
+  };
+  const J = JERSEY;
+  const placed = [];
+  let nameCapMM = 0, numCapMM = 0;
+  const nm = render(name, h * tpl.nombreCaja.h);
+  if (nm) {
+    const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
+    nameCapMM = polysBounds(p).height;
+    placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+  }
+  const nu = render(number, h * tpl.numeroCaja.h);
+  if (nu) {
+    const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
+    numCapMM = polysBounds(p).height;
+    placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+  }
+
+  const clipToShirt = paths => clipperBoolean(
+    ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(paths, null, ClipperLib.ClipType.ctUnion)),
+    siluetaSinAgujero, ClipperLib.ClipType.ctIntersection);
+  const outlinePaths = [];
+  const fillPolys = [];
+  placed.forEach(t => {
+    outlinePaths.push(...ClipperLib.Clipper.PolyTreeToPaths(
+      offsetPolygonsOutward(t.polys, t.outline)));
+    fillPolys.push(...t.polys);
+  });
+
+  const tBase = opts.baseThicknessMM;
+  const tBand = Math.max(0.4, opts.textRaisedHeightMM * 0.5);
+  const tText = Math.max(0.4, opts.textRaisedHeightMM - tBand);
+  const pieces = [];
+  const extrude = (shapes, z0, z1, part) => {
+    if (!shapes.length) return;
+    const g = new THREE.ExtrudeGeometry(
+      shapes.map(s => translateShape(s, dx, dy)),
+      {depth: z1 - z0, bevelEnabled: false, curveSegments});
+    if (z0) g.translate(0, 0, z0);
+    pieces.push({geometry: g, part});
+  };
+
+  // La placa: cada tinta a la misma altura, recortada contra el agujero. El
+  // dibujo original ya tesela la silueta sin solapes, así que no hace falta
+  // ninguna booleana entre tintas aquí.
+  tpl.tintas.forEach(t => {
+    const paths = polysToClipperPaths(templateToPolys(t.p, h));
+    const tree = clipperBoolean(
+      ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(paths, null, ClipperLib.ClipType.ctUnion)),
+      holePath, ClipperLib.ClipType.ctDifference);
+    extrude(polyTreeToShapes(tree).shapes, 0, tBase, 'tinta' + t.i);
+  });
+
+  if (outlinePaths.length) {
+    extrude(polyTreeToShapes(clipToShirt(outlinePaths)).shapes,
+      tBase, tBase + tBand, 'tinta' + tpl.dorsal.contorno);
+    extrude(polyTreeToShapes(clipToShirt(polysToClipperPaths(fillPolys))).shapes,
+      tBase + tBand, tBase + tBand + tText, 'tinta' + tpl.dorsal.relleno);
+  }
+
+  return {
+    pieces,
+    width: bb.maxX - bb.minX,
+    height: bb.maxY - bb.minY,
+    islands,
+    missingChars: missing,
+    nameCapMM,
+    numberCapMM: numCapMM,
+    jerseyWidthMM: w,
+    holeDiameterMM: holeR * 2,
+    // Una plantilla lleva todas sus tintas en la MISMA capa, así que no hay
+    // ninguna altura donde pausar: quien avise de la pausa debe callarse.
+    colourStepsZ: null,
+    flatInks: tpl.tintas.length,
+  };
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     pathToPolygons, signedArea, pointInPolygon, polygonsToShapes, textToShapes,
@@ -1860,5 +2211,7 @@ if (typeof module !== 'undefined' && module.exports) {
     teardropProfile, roundProfile, pencilBodyTopZ, normalizePencilCapEnd, normalizePencilTunnelStyle,
     pencilCapPlacement, capCoverageLimitX, pencilVoidHalfWidth, pencilBestAxisY,
     teardropAreaMM2, circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
+    JERSEY, jerseySilhouette, roundPolys, placeTextPolys, buildJerseyTile,
+    buildJerseyTemplateTile, templateToPolys, JERSEY_MIN_RING_WALL,
   };
 }

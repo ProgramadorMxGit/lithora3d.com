@@ -32,10 +32,10 @@
 <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/fonts/inter.css">
-<link rel="stylesheet" href="assets/app/estilos.css?v=afe0e2c9">
-<link rel="stylesheet" href="assets/app/pagina.css?v=afe0e2c9">
-<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=afe0e2c9" crossorigin="anonymous">
-<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=afe0e2c9" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/app/estilos.css?v=fb525b66">
+<link rel="stylesheet" href="assets/app/pagina.css?v=fb525b66">
+<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=fb525b66" crossorigin="anonymous">
+<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=fb525b66" crossorigin="anonymous">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -301,6 +301,10 @@
             <span class="product-emoji" aria-hidden="true">✏️</span>
             <span><b>Nombre para lápiz</b><small>Agujero longitudinal, sin argolla</small></span>
           </button>
+          <button type="button" class="product-opt" data-product="jersey" aria-pressed="false">
+            <span class="product-emoji" aria-hidden="true">👕</span>
+            <span><b>Camiseta con dorsal</b><small>Nombre y número en relieve</small></span>
+          </button>
         </div>
         <div id="pencil-settings" hidden>
           <p class="pencil-group-label">¿Qué lápiz es?</p>
@@ -341,6 +345,21 @@
         </div>
       </section>
 
+      <section class="card" id="jersey-tpl-card" hidden>
+        <h2>👕 ¿Qué camiseta?</h2>
+        <div class="pencil-fit-list" id="jersey-tpl-list" role="group" aria-label="Diseño de la camiseta">
+          <button type="button" data-tpl="lisa" aria-pressed="true"><b>Lisa</b><small>Un color · el nombre y el número mandan</small></button>
+          <button type="button" data-tpl="america-dorsal" aria-pressed="false"><b>América · dorsal</b><small>Cuatro tintas · necesita AMS</small></button>
+        </div>
+        <div class="info-box">
+          La camiseta lisa sale de un color y el dorsal encima, en dos escalones de relieve.
+          <small>El diseño a cuatro tintas lleva todos sus colores en la <b>misma capa</b>: hace falta
+          <b>multicolor (AMS)</b> para que salga como se ve. Los cuatro colores se cambian abajo, en
+          <b>Colores</b>, y el nombre y el número reutilizan dos de ellos para que la pieza siga
+          cabiendo en cuatro filamentos.</small>
+        </div>
+      </section>
+
       <section class="card">
         <h2>✏️ Nombres</h2>
         <div id="name-rows"></div>
@@ -354,10 +373,19 @@
         <div class="info-box warn" id="case-font-warn" role="alert" hidden></div>
         <div class="info-box" id="name-cap" role="status" hidden></div>
         <div class="info-box warn" id="text-warn" role="alert" hidden></div>
+        <div class="info-box warn" id="jersey-warn" role="alert" hidden></div>
       </section>
 
       <section class="card" id="style-card">
         <h2>✨ Estilo</h2>
+        <div class="info-box" id="jersey-style-note" hidden>
+          La camiseta trae su propia composición: <b>nombre</b> bajo el cuello y <b>número</b>
+          grande al centro, cada uno con su contorno de un segundo color en dos escalones de relieve.
+          <small>El <b>tamaño de las letras</b> manda sobre el <b>número</b> y la camiseta crece con él;
+          el nombre se ajusta solo a su franja. El grosor del contorno se calcula por proporción,
+          porque un valor fijo en milímetros que iba bien con el número tapaba las letras del nombre.
+          Deja el número vacío si quieres solo el nombre.</small>
+        </div>
         <div class="info-box" id="pencil-style-note" hidden>
           Se usa un contorno reforzado para mantener unido cualquier nombre alrededor del túnel.
           Las <b>MAYÚSCULAS</b> son lo más resistente aquí: no tienen rabitos que bajen (g, p, y)
@@ -387,7 +415,9 @@
       <section class="card">
         <h2>🎨 Colores</h2>
         <div class="preset-grid" id="color-presets"></div>
-        <div class="color-pickers">
+        <!-- Un selector por tinta del dibujo; se rellena desde la plantilla. -->
+        <div class="color-pickers" id="tinta-pickers" hidden></div>
+        <div class="color-pickers" id="color-pickers">
           <label class="color-pick">
             <span>Fondo</span>
             <input type="color" id="in-baseColor" aria-label="Color del fondo">
@@ -716,17 +746,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=afe0e2c9"></script>
-<script src="assets/vendor/opentype.js?v=afe0e2c9"></script>
-<script src="assets/vendor/fflate.js?v=afe0e2c9"></script>
-<script src="assets/vendor/clipper.js?v=afe0e2c9"></script>
-<script src="assets/app/geometria.js?v=afe0e2c9"></script>
-<script src="assets/app/exportadores.js?v=afe0e2c9"></script>
+<script src="assets/vendor/three.js?v=fb525b66"></script>
+<script src="assets/vendor/opentype.js?v=fb525b66"></script>
+<script src="assets/vendor/fflate.js?v=fb525b66"></script>
+<script src="assets/vendor/clipper.js?v=fb525b66"></script>
+<script src="assets/app/geometria.js?v=fb525b66"></script>
+<script src="assets/app/exportadores.js?v=fb525b66"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=afe0e2c9').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=fb525b66').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=afe0e2c9" defer></script>
+<script src="assets/app/creador.js?v=fb525b66" defer></script>
 </body>
 </html>

@@ -74,7 +74,7 @@ test('el ?v del generador coincide con el hash real de los recursos de la app', 
   for (const rec of ['assets/app/estilos.css', 'assets/app/pagina.css',
     'assets/app/geometria.js', 'assets/app/exportadores.js',
     'assets/app/creador.js', 'assets/app/perfil-bambu.json',
-    'assets/fuentes/fuentes.json']) {
+    'assets/fuentes/fuentes.json', 'assets/plantillas/camisetas.json']) {
     hash.update(fs.readFileSync(path.join(base, rec)).toString('binary').replaceAll('\r\n', '\n'), 'binary');
   }
   const esperado = hash.digest('hex').slice(0, 8);
