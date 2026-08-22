@@ -399,13 +399,14 @@ for marca, valor in (
 #
 # fuentes.json entra en el hash: enumera las tipografias incluidas y la app la
 # pide en tiempo de ejecucion, asi que al anadir una fuente el ?v= debe cambiar
-# para que un navegador con cache vieja no se quede sin ella.
+# para que un navegador con cache vieja no se quede sin ella. camisetas.json
+# entra por lo mismo: la app la pide bajo demanda al elegir el producto.
 import hashlib
 _hash = hashlib.md5()
 for _rec in ('assets/app/estilos.css', 'assets/app/pagina.css',
              'assets/app/geometria.js', 'assets/app/exportadores.js',
              'assets/app/creador.js', 'assets/app/perfil-bambu.json',
-             'assets/fuentes/fuentes.json'):
+             'assets/fuentes/fuentes.json', 'assets/plantillas/camisetas.json'):
     _datos = open(os.path.join(AQUI, _rec.replace('/', os.sep)), 'rb').read()
     _hash.update(_datos.replace(b'\r\n', b'\n'))
 VER = _hash.hexdigest()[:8]
