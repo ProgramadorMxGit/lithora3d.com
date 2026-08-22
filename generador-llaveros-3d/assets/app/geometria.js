@@ -2100,7 +2100,10 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
     if (missing.indexOf(ch) === -1) missing.push(ch);
   });
 
-  const h = Math.max(12, opts.letterHeightMM / tpl.numeroCaja.h);
+  /* `altoRef` es el alto del número de referencia dentro de la plantilla, así
+     que el mismo control deja las dos caras del llavero a la misma escala
+     aunque el frente no lleve dorsal ninguno. */
+  const h = Math.max(12, opts.letterHeightMM / tpl.altoRef);
   const w = h * tpl.anchoRel;
 
   // ---- agujero de la argolla, recortado al tamaño real de la pieza
@@ -2128,17 +2131,21 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
   const J = JERSEY;
   const placed = [];
   let nameCapMM = 0, numCapMM = 0;
-  const nm = render(name, h * tpl.nombreCaja.h);
-  if (nm) {
-    const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
-    nameCapMM = polysBounds(p).height;
-    placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
-  }
-  const nu = render(number, h * tpl.numeroCaja.h);
-  if (nu) {
-    const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
-    numCapMM = polysBounds(p).height;
-    placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+  // El frente lleva el escudo en mitad del pecho: no hay dónde poner un nombre
+  // sin taparlo, así que esa plantilla declara que no admite dorsal.
+  if (tpl.admiteDorsal) {
+    const nm = render(name, h * tpl.nombreCaja.h);
+    if (nm) {
+      const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
+      nameCapMM = polysBounds(p).height;
+      placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+    }
+    const nu = render(number, h * tpl.numeroCaja.h);
+    if (nu) {
+      const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
+      numCapMM = polysBounds(p).height;
+      placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+    }
   }
 
   const clipToShirt = paths => clipperBoolean(
@@ -2193,6 +2200,7 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
     numberCapMM: numCapMM,
     jerseyWidthMM: w,
     holeDiameterMM: holeR * 2,
+    admiteDorsal: !!tpl.admiteDorsal,
     // Una plantilla lleva todas sus tintas en la MISMA capa, así que no hay
     // ninguna altura donde pausar: quien avise de la pausa debe callarse.
     colourStepsZ: null,

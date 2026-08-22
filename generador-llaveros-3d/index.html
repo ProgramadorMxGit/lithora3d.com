@@ -32,10 +32,10 @@
 <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/fonts/inter.css">
-<link rel="stylesheet" href="assets/app/estilos.css?v=fb525b66">
-<link rel="stylesheet" href="assets/app/pagina.css?v=fb525b66">
-<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=fb525b66" crossorigin="anonymous">
-<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=fb525b66" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/app/estilos.css?v=737b6a2d">
+<link rel="stylesheet" href="assets/app/pagina.css?v=737b6a2d">
+<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=737b6a2d" crossorigin="anonymous">
+<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=737b6a2d" crossorigin="anonymous">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -349,14 +349,16 @@
         <h2>👕 ¿Qué camiseta?</h2>
         <div class="pencil-fit-list" id="jersey-tpl-list" role="group" aria-label="Diseño de la camiseta">
           <button type="button" data-tpl="lisa" aria-pressed="true"><b>Lisa</b><small>Un color · el nombre y el número mandan</small></button>
-          <button type="button" data-tpl="america-dorsal" aria-pressed="false"><b>América · dorsal</b><small>Cuatro tintas · necesita AMS</small></button>
+          <button type="button" data-tpl="america-dorsal" aria-pressed="false"><b>América · dorsal</b><small>Cuatro tintas · lleva nombre y número</small></button>
+          <button type="button" data-tpl="america-frente" aria-pressed="false"><b>América · frente</b><small>Cuatro tintas · con el escudo, sin dorsal</small></button>
         </div>
         <div class="info-box">
           La camiseta lisa sale de un color y el dorsal encima, en dos escalones de relieve.
-          <small>El diseño a cuatro tintas lleva todos sus colores en la <b>misma capa</b>: hace falta
-          <b>multicolor (AMS)</b> para que salga como se ve. Los cuatro colores se cambian abajo, en
+          <small>Los diseños a cuatro tintas llevan todos sus colores en la <b>misma capa</b>: hace falta
+          <b>multicolor (AMS)</b> para que salgan como se ven. Los cuatro colores se cambian abajo, en
           <b>Colores</b>, y el nombre y el número reutilizan dos de ellos para que la pieza siga
-          cabiendo en cuatro filamentos.</small>
+          cabiendo en cuatro filamentos. El <b>frente</b> lleva el escudo en mitad del pecho, así que
+          no admite dorsal: se imprime aparte y se pega contra el reverso si lo quieres a dos caras.</small>
         </div>
       </section>
 
@@ -374,6 +376,11 @@
         <div class="info-box" id="name-cap" role="status" hidden></div>
         <div class="info-box warn" id="text-warn" role="alert" hidden></div>
         <div class="info-box warn" id="jersey-warn" role="alert" hidden></div>
+        <div class="info-box" id="jersey-nodorsal-note" hidden>
+          El <b>frente</b> lleva el escudo en mitad del pecho, así que no admite nombre ni número.
+          <small>Lo que escribas aquí solo sirve para nombrar el archivo y para tener una camiseta
+          por fila. Si quieres el dorsal, elige <b>América · dorsal</b> arriba.</small>
+        </div>
       </section>
 
       <section class="card" id="style-card">
@@ -746,17 +753,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=fb525b66"></script>
-<script src="assets/vendor/opentype.js?v=fb525b66"></script>
-<script src="assets/vendor/fflate.js?v=fb525b66"></script>
-<script src="assets/vendor/clipper.js?v=fb525b66"></script>
-<script src="assets/app/geometria.js?v=fb525b66"></script>
-<script src="assets/app/exportadores.js?v=fb525b66"></script>
+<script src="assets/vendor/three.js?v=737b6a2d"></script>
+<script src="assets/vendor/opentype.js?v=737b6a2d"></script>
+<script src="assets/vendor/fflate.js?v=737b6a2d"></script>
+<script src="assets/vendor/clipper.js?v=737b6a2d"></script>
+<script src="assets/app/geometria.js?v=737b6a2d"></script>
+<script src="assets/app/exportadores.js?v=737b6a2d"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=fb525b66').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=737b6a2d').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=fb525b66" defer></script>
+<script src="assets/app/creador.js?v=737b6a2d" defer></script>
 </body>
 </html>

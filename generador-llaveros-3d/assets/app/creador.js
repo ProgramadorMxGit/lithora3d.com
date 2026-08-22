@@ -232,6 +232,14 @@
     });
     return plantillasCargadas;
   }
+  /** ¿La camiseta en uso lleva nombre y número? El frente del América no: el
+   *  escudo ocupa el centro del pecho. Mientras la plantilla se está bajando se
+   *  asume que sí y se vuelve a pintar la lista al terminar. */
+  const dorsalDisponible = () => {
+    if (state.productType !== 'jersey') return false;
+    const t = plantillaActiva();
+    return !t || t.admiteDorsal !== false;
+  };
   const plantillaActiva = () =>
     (state.productType === 'jersey' && state.jerseyTemplate !== 'lisa')
       ? plantillas[state.jerseyTemplate] || null : null;
@@ -398,7 +406,7 @@
       /* El dorsal es un campo aparte y no "Felix 27" dentro del nombre: van a
          franjas distintas de la camiseta y con tamaños muy distintos, así que
          separarlos aquí evita tener que adivinar dónde termina uno. */
-      if (state.productType === 'jersey') {
+      if (dorsalDisponible()) {
         const numEl = document.createElement('input');
         numEl.type = 'text';
         numEl.className = 'name-num';
@@ -647,6 +655,9 @@
       });
     }
     renderInkPickers();
+    const nota = $('jersey-nodorsal-note');
+    if (nota) nota.hidden = !(state.productType === 'jersey' && !dorsalDisponible());
+    renderNameRows();
   }
 
   /** Un selector de color por tinta del dibujo. Se rehace al cambiar de
@@ -1453,6 +1464,7 @@
       await cargarPlantillas();
       if (cancelled()) return;
       renderInkPickers();
+      renderNameRows();   // el frente no lleva dorsal: sobra el campo de número
     }
     const tpl = plantillaActiva();
 

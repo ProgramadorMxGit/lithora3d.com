@@ -103,11 +103,18 @@ test('la plantilla declara todo lo que la app necesita para construirla', () => 
   assert.equal(plantillas.version, 1);
   assert.ok(plantillas.plantillas.length >= 1);
   for (const t of plantillas.plantillas) {
-    for (const k of ['id', 'nombre', 'anchoRel', 'colores', 'aro', 'silueta', 'tintas',
-      'nombreCaja', 'numeroCaja', 'dorsal']) {
+    for (const k of ['id', 'nombre', 'anchoRel', 'altoRef', 'colores', 'aro', 'silueta',
+      'tintas', 'admiteDorsal']) {
       assert.ok(t[k] !== undefined, `${t.id} no trae ${k}`);
     }
-    assert.ok(t.aro.r > 0 && t.numeroCaja.h > 0, `${t.id}: aro o caja del número sin medida`);
+    assert.ok(t.aro.r > 0 && t.altoRef > 0, `${t.id}: aro o alto de referencia sin medida`);
+    // Solo las que llevan dorsal declaran franjas: el frente del América no
+    // tiene dónde ponerlo sin tapar el escudo.
+    if (t.admiteDorsal) {
+      for (const k of ['nombreCaja', 'numeroCaja', 'dorsal']) {
+        assert.ok(t[k] !== undefined, `${t.id} admite dorsal pero no trae ${k}`);
+      }
+    }
     // La silueta se guarda SIN el agujero: el diámetro lo pone el usuario y la
     // pieza se escala, así que un agujero fijo saldría minúsculo o rompería el aro.
     for (const poly of t.silueta) {
@@ -121,13 +128,14 @@ test('el dorsal reutiliza tintas de la propia camiseta, no colores nuevos', () =
   // AMS Lite del A1 solo tiene 4.
   for (const t of plantillas.plantillas) {
     const n = t.colores.length;
+    for (const tinta of t.tintas) {
+      assert.ok(tinta.i >= 0 && tinta.i < n, `${t.id}: tinta ${tinta.i} sin color`);
+    }
+    if (!t.admiteDorsal) continue;
     assert.ok(t.dorsal.relleno >= 0 && t.dorsal.relleno < n, `${t.id}: relleno fuera de rango`);
     assert.ok(t.dorsal.contorno >= 0 && t.dorsal.contorno < n, `${t.id}: contorno fuera de rango`);
     assert.notEqual(t.dorsal.relleno, t.dorsal.contorno, `${t.id}: relleno y contorno iguales`);
     assert.ok(t.tintas.length <= n);
-    for (const tinta of t.tintas) {
-      assert.ok(tinta.i >= 0 && tinta.i < n, `${t.id}: tinta ${tinta.i} sin color`);
-    }
   }
 });
 
@@ -146,6 +154,7 @@ test('las tintas teselan la silueta: ni huecos ni colores pisándose', () => {
 
 test('las franjas del dorsal caben dentro de la camiseta de la plantilla', () => {
   for (const t of plantillas.plantillas) {
+    if (!t.admiteDorsal) continue;
     const anillos = t.silueta.map(p => p[0]);
     const anchoEn = y => Math.max(0, ...anillos.map(r => halfWidthAt(r, y)));
     for (const [que, caja] of [['nombre', t.nombreCaja], ['número', t.numeroCaja]]) {
@@ -155,6 +164,19 @@ test('las franjas del dorsal caben dentro de la camiseta de la plantilla', () =>
       }
     }
   }
+});
+
+test('las dos caras del mismo llavero salen a la misma escala', () => {
+  // El frente no lleva número, así que su tamaño no puede salir de una caja de
+  // dorsal: las dos plantillas guardan el mismo alto de número de referencia
+  // para que impresas en pareja midan lo mismo.
+  const caras = plantillas.plantillas.filter(t => t.id.startsWith('america-'));
+  assert.ok(caras.length >= 2, 'faltan las dos caras');
+  const alto = 12;
+  const alturas = caras.map(t => alto / t.altoRef);
+  const anchos = caras.map((t, i) => alturas[i] * t.anchoRel);
+  assert.ok(Math.max(...anchos) - Math.min(...anchos) < 0.5,
+    `los anchos se separan: ${anchos.map(v => v.toFixed(1))}`);
 });
 
 test('la caja del número manda sobre el tamaño de la camiseta', () => {
