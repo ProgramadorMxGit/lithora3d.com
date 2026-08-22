@@ -4,6 +4,11 @@
   // ---------- constants ----------
   const NAME_COLORS = ['#e63946', '#2a9d8f', '#e9a200', '#7b2cbf', '#0077b6', '#d81e5b', '#3a9d23', '#e05d00'];
 
+  /* Caja del texto. 'asis' es el valor de fábrica porque lo que el usuario teclea
+     es la única intención que conocemos de verdad: "Dafne" debe salir "Dafne".
+     Las otras dos existen para no tener que reescribir 24 filas a mano. */
+  const TEXT_CASES = ['asis', 'upper', 'lower'];
+
   const COLOR_PRESETS = [
     {n: 'Clásico', b: '#f5f5f5', t: '#2b2b2b'},
     {n: 'Fuego', b: '#2b2b2b', t: '#ff6b35'},
@@ -21,6 +26,7 @@
     fontKey: null,
     letterHeight: 12,
     textBold: 0,         // negrita sintética en mm por lado; engorda trazos de fuentes script
+    textCase: 'asis',    // 'asis' respeta lo tecleado | 'upper' MAYÚSCULAS | 'lower' minúsculas
     fixedHeight: false,  // force every keychain to a target Y height (mm)
     targetHeight: 25,    // the general target Y height when fixedHeight is on
     nameHeights: [],     // per-name Y override (mm), parallel to names; blank = use general
@@ -234,6 +240,9 @@
       return;
     }
     state.fontKey = key;
+    // El aviso de "esta letra no tiene minúsculas de verdad" depende de la
+    // tipografía, así que se revisa en cada cambio y no solo al arrancar.
+    updateCaseFontWarning();
     scheduleRebuild();
   }
 
@@ -803,6 +812,73 @@
   addResetIcon($('in-bordeColor').closest('label'), ['bordeColor']);
   addResetIcon($('btn-col-minus').parentElement.previousElementSibling, ['columns']);
 
+  // ---------- caja del texto (mayúsculas / minúsculas) ----------
+  const caseListEl = $('case-list');
+  caseListEl.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.textCase = btn.dataset.case;
+      syncCaseUI();
+      syncResetIcons();
+      scheduleRebuild();
+    });
+  });
+  addResetIcon(caseListEl.previousElementSibling, ['textCase']);
+
+  /** Traduce lo tecleado a la caja elegida. Se usan las variantes con configuración
+   *  regional: sin ella la "ñ" y las vocales acentuadas viajan bien, pero se pierde
+   *  el criterio del español en casos como la I. */
+  function applyTextCase(str) {
+    if (state.textCase === 'upper') return str.toLocaleUpperCase('es-MX');
+    if (state.textCase === 'lower') return str.toLocaleLowerCase('es-MX');
+    return str;
+  }
+
+  /* Bangers y Luckiest Guy dibujan las minúsculas con forma de capital: con ellas
+     el nombre sale en mayúsculas pidas lo que pidas, y el usuario acaba creyendo
+     que la app le ignora. Se detecta midiendo el glifo de la "a" contra el de la
+     "A" en la fuente ya parseada, no con una lista fija de nombres: así también
+     cubre las tipografías que suba el propio usuario. */
+  function fontDrawsLowercaseAsCaps(otFont) {
+    if (!otFont) return false;
+    try {
+      const alto = ch => {
+        const g = otFont.charToGlyph(ch);
+        if (!g || !g.index) return 0;
+        const bb = g.getBoundingBox();
+        return bb ? bb.y2 : 0;
+      };
+      const a = alto('a');
+      const A = alto('A');
+      if (!(a > 0) || !(A > 0)) return false;
+      return a / A > 0.92;
+    } catch (e) {
+      return false;   // fuente rara: mejor no avisar que avisar en falso
+    }
+  }
+
+  function updateCaseFontWarning() {
+    const box = $('case-font-warn');
+    if (!box) return;
+    const f = state.fontKey ? fonts[state.fontKey] : null;
+    const aplica = state.textCase !== 'upper' && f && fontDrawsLowercaseAsCaps(f.otFont);
+    box.hidden = !aplica;
+    if (!aplica) return;
+    box.innerHTML =
+      '⚠️ La tipografía <b>' + escapeHtml(f.label) + '</b> dibuja las minúsculas ' +
+      '<b>con forma de mayúscula</b>: la pieza saldrá en capitales aunque escribas en minúsculas.' +
+      '<br><small>Es cosa del diseño de la letra, no del programa. Si quieres minúsculas de verdad, ' +
+      'elige otra tipografía (Poppins Bold, Quicksand, Montserrat, Baloo 2…).</small>';
+  }
+
+  function syncCaseUI() {
+    caseListEl.querySelectorAll('button').forEach(btn => {
+      const on = btn.dataset.case === state.textCase;
+      btn.classList.toggle('selected', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    updateCaseFontWarning();
+  }
+
   // ---------- sliders ----------
   function bindSlider(inputId, valId, key, fmt, after) {
     const input = $(inputId);
@@ -1163,7 +1239,7 @@
 
       for (let i = 0; i < validEntries.length; i++) {
         const e = validEntries[i];
-        const lines = [{text: state.productType === 'pencil' ? e.name.toLocaleUpperCase('es-MX') : e.name}];
+        const lines = [{text: applyTextCase(e.name)}];
         let tile;
         try {
           if (state.productType === 'pencil') tile = buildPencilNameTile(font, emojiFont, lines, currentOpts());
@@ -1452,7 +1528,7 @@
      de que hay que abrirlos otra vez. */
   const SAVE_KEY = 'lithora.llaveros.v1';
   const SAVED_KEYS = [
-    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'fixedHeight',
+    'productType', 'names', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
     'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
@@ -1517,6 +1593,13 @@
     if (snap.state.pencilCapEnd === undefined && typeof snap.state.pencilClosedEnd === 'boolean') {
       snap.state.pencilCapEnd = snap.state.pencilClosedEnd ? 'end' : 'open';
     }
+    /* Antes de que existiera el selector de caja, el modo lápiz forzaba
+       MAYÚSCULAS sin preguntar. Un guardado de esa época tiene que volver igual
+       que se dejó, así que se le pone 'upper' explícito. Los llaveros nunca se
+       transformaban, de modo que para ellos el nuevo 'asis' ya es lo que había. */
+    if (snap.state.textCase === undefined && snap.state.productType === 'pencil') {
+      snap.state.textCase = 'upper';
+    }
     const safe = sanitizeSnapshotState(snap.state);
     SAVED_KEYS.forEach(k => {
       if (safe[k] === undefined) return;
@@ -1530,6 +1613,7 @@
     if (!['keychain', 'pencil'].includes(state.productType)) state.productType = DEFAULT_STATE.productType;
     if (!['open', 'start', 'end'].includes(state.pencilCapEnd)) state.pencilCapEnd = DEFAULT_STATE.pencilCapEnd;
     if (!['round', 'teardrop'].includes(state.pencilTunnelStyle)) state.pencilTunnelStyle = DEFAULT_STATE.pencilTunnelStyle;
+    if (!TEXT_CASES.includes(state.textCase)) state.textCase = DEFAULT_STATE.textCase;
 
     refreshAllControls();
   }
@@ -1558,6 +1642,7 @@
     syncProductUI();
     syncStyleUI();
     syncModeUI();
+    syncCaseUI();
     updateNameCapHint();
     syncResetIcons();
   }

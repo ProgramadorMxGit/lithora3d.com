@@ -503,8 +503,8 @@ button.big:active { transform: translateY(0) scale(.985); }
 .product-opt b { font-size: var(--fs-label); font-weight: 700; }
 .product-opt small { color: var(--ink-small); font-size: var(--fs-micro); line-height: 1.35; }
 #pencil-settings { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
-.pencil-fit-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 15px; }
-.pencil-fit-list button {
+.pencil-fit-list, .case-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 15px; }
+.pencil-fit-list button, .case-list button {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -516,12 +516,12 @@ button.big:active { transform: translateY(0) scale(.985); }
   font: inherit;
   cursor: pointer;
 }
-.pencil-fit-list button:hover { border-color: var(--accent-sky); }
-.pencil-fit-list button.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-.pencil-fit-list b { font-size: 12px; }
-.pencil-fit-list small { font-size: 10px; color: var(--ink-small); }
+.pencil-fit-list button:hover, .case-list button:hover { border-color: var(--accent-sky); }
+.pencil-fit-list button.selected, .case-list button.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.pencil-fit-list b, .case-list b { font-size: 12px; }
+.pencil-fit-list small, .case-list small { font-size: 10px; color: var(--ink-small); }
 .pencil-spec { margin-bottom: 0; }
-.pencil-group-label { margin: 0 0 7px; font-size: 12px; font-weight: 700; color: var(--ink-muted); }
+.pencil-group-label, .group-label { margin: 0 0 7px; font-size: 12px; font-weight: 700; color: var(--ink-muted); }
 /* Flechita "volver al valor original", estilo Bambu: solo aparece cuando el
    control está fuera de su valor de fábrica. */
 .reset-def {
@@ -540,7 +540,7 @@ button.big:active { transform: translateY(0) scale(.985); }
 .reset-def:hover { background: var(--accent-soft); }
 .slider-row label .reset-def { margin-left: auto; margin-right: 6px; }
 .slider-row label .val { margin-left: 0; }
-.pencil-group-label .reset-def, .check-row .reset-def { margin-left: 4px; }
+.pencil-group-label .reset-def, .group-label .reset-def, .check-row .reset-def { margin-left: 4px; }
 .fit-test-btn {
   width: 100%;
   margin-bottom: 15px;
