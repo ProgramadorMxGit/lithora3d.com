@@ -157,6 +157,23 @@ test('el dorsal reutiliza tintas de la propia camiseta, no colores nuevos', () =
   }
 });
 
+test('una plantilla puede gastar menos tintas de las que declara su paleta', () => {
+  /* El dibujo del Santos solo usa dos (verde y blanco) mientras que su dorsal
+     tira de una tercera. Cuando el dorsal se fundía con las tintas del dibujo,
+     esa tercera no existía en la cara, el hueco ya se había restado del resto y
+     la pieza salía AGUJEREADA. El caso tiene que seguir existiendo aquí para
+     que nadie lo "simplifique" igualando las dos listas. */
+  const conMenos = plantillas.plantillas.filter(
+    t => t.admiteDorsal && gruposDe(t).length < t.colores.length);
+  assert.ok(conMenos.length >= 1,
+    'ninguna plantilla ejercita ya el caso de dorsal con una tinta que el dibujo no usa');
+  for (const t of conMenos) {
+    const usadas = new Set(gruposDe(t).map(x => x.i));
+    assert.ok(!usadas.has(t.dorsal.contorno) || !usadas.has(t.dorsal.relleno),
+      `${t.id}: el dorsal ya no aporta ninguna tinta nueva`);
+  }
+});
+
 test('las tintas teselan la silueta: ni huecos ni colores pisándose', () => {
   // Simplificar cada región por su cuenta las dejaba solapadas unas décimas de
   // micra, y dos colores en la misma capa y el mismo sitio son ambiguos para el
