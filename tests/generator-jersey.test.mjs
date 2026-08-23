@@ -217,12 +217,18 @@ test('la de dos caras reparte el relieve del frente en varios niveles', () => {
 test('sin número, el nombre baja al pecho y crece', () => {
   // Antes el número era obligatorio de facto: sin él el nombre se quedaba en su
   // franja de arriba, diminuto, y media camiseta salía vacía.
+  const nom = {cy: 0.1896, h: 0.1072, w: 0.3957};
   const num = {cy: 0.0035, h: 0.2408, w: 0.3462};
-  const solo = cajaNombreSolo(num);
-  assert.ok(solo.h > JERSEY.nameH * 1.3, 'el nombre solo tiene que crecer');
+  const solo = cajaNombreSolo(nom, num);
+  assert.ok(solo.h > nom.h * 1.3, 'el nombre solo tiene que crecer');
   assert.ok(solo.w > num.w, 'y disponer de más ancho que el número');
-  assert.ok(solo.cy < num.cy + num.h / 2 && solo.cy > num.cy - num.h / 2,
-    'y quedar dentro de la franja que dejó libre el número');
+  /* Crece hacia ABAJO, manteniendo su línea superior. Bajarlo al centro lo
+     dejaba sobre la transición de los chevrones; crecerlo centrado lo subía al
+     cuello, donde la camiseta se estrecha y el contorno se corta contra el
+     hombro. El hueco que hay que llenar está debajo. */
+  assert.ok(Math.abs((solo.cy + solo.h / 2) - (nom.cy + nom.h / 2)) < 1e-9,
+    'el nombre solo conserva su línea superior');
+  assert.ok(solo.cy > num.cy, 'y sigue por encima de donde iría el número');
 });
 
 test('el ancho útil de una franja es el MÍNIMO, no el máximo', () => {
