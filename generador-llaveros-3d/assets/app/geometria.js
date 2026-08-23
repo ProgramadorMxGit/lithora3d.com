@@ -1973,18 +1973,25 @@ function buildJerseyTile(font, emojiFont, name, number, opts) {
     return polys.length ? polys : null;
   };
 
+  // El número se resuelve primero: si no lo hay, el nombre usa su sitio.
   const numPolys = render(number, h * J.numH);
-  const namePolys = render(name, h * J.nameH);
+  const cajaN = numPolys
+    ? {cy: J.nameCY, h: J.nameH, w: J.nameW}
+    : cajaNombreSolo({cy: J.numCY, h: J.numH, w: J.numW});
+  const namePolys = render(name, h * cajaN.h);
   if (!numPolys && !namePolys) {
     const err = new Error('sin texto');
     err.missingChars = missing;
     throw err;
   }
 
+  const cuerpoRings = roundPolys([jerseySilhouette(w, h)], Math.min(w, h) * J.round);
   const placed = [];
   let nameCapMM = 0, numCapMM = 0;
   if (namePolys) {
-    const p = placeTextPolys(namePolys, h * J.nameCY, w * J.nameW);
+    const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
+    const p = placeTextPolys(namePolys, h * cajaN.cy,
+      anchoCajaTexto(cuerpoRings, h, cajaN, w * cajaN.w, grosor));
     nameCapMM = polysBounds(p).height;
     placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
   }
@@ -2138,17 +2145,21 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
   // El frente lleva el escudo en mitad del pecho: no hay dónde poner un nombre
   // sin taparlo, así que esa plantilla declara que no admite dorsal.
   if (tpl.admiteDorsal) {
-    const nm = render(name, h * tpl.nombreCaja.h);
-    if (nm) {
-      const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
-      nameCapMM = polysBounds(p).height;
-      placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
-    }
+    // Primero el número: sin él, el nombre hereda su sitio y crece.
     const nu = render(number, h * tpl.numeroCaja.h);
     if (nu) {
       const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
       numCapMM = polysBounds(p).height;
       placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+    }
+    const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.numeroCaja);
+    const nm = render(name, h * cajaN.h);
+    if (nm) {
+      const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
+      const p = placeTextPolys(nm, h * cajaN.cy,
+        anchoCajaTexto(templateToPolys(tpl.silueta, h), h, cajaN, h * cajaN.w, grosor));
+      nameCapMM = polysBounds(p).height;
+      placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
     }
   }
 
@@ -2212,6 +2223,51 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
   };
 }
 
+/** Cuando la camiseta va sin número, el nombre se queda solo arriba y la pieza
+ *  parece a medio hacer. Con estos factores —relativos a la caja del número—
+ *  baja al pecho y crece hasta ocupar el sitio que dejó libre. */
+const JERSEY_SOLO_NOMBRE = {cy: -0.06, h: 0.58, w: 1.65};
+
+/** Ancho aprovechable de la silueta en la franja [y0, y1]: se toma el MÍNIMO,
+ *  porque el texto tiene que caber a todas las alturas que ocupa. Midiendo solo
+ *  el ancho máximo, un nombre sin número se salía del cuerpo por abajo, donde
+ *  ya no hay mangas (25.7 mm de torso contra 29.7 de texto), y las letras de
+ *  los extremos salían cortadas contra el borde. */
+function anchoUtil(rings, y0, y1, muestras) {
+  const n = muestras || 9;
+  let min = Infinity;
+  for (let k = 0; k < n; k++) {
+    const y = y0 + (y1 - y0) * (k / (n - 1));
+    let lo = Infinity, hi = -Infinity;
+    for (const ring of rings) {
+      for (let i = 0; i < ring.length; i++) {
+        const a = ring[i], b = ring[(i + 1) % ring.length];
+        if ((a[1] - y) * (b[1] - y) > 0 || a[1] === b[1]) continue;
+        const x = a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]);
+        if (x < lo) lo = x;
+        if (x > hi) hi = x;
+      }
+    }
+    if (hi > lo && hi - lo < min) min = hi - lo;
+  }
+  return isFinite(min) ? min : 0;
+}
+
+/** Ancho que puede ocupar una caja de texto sin que el contorno se salga. */
+function anchoCajaTexto(rings, h, caja, anchoPedido, grosorContorno) {
+  const y0 = h * (caja.cy - caja.h / 2), y1 = h * (caja.cy + caja.h / 2);
+  const util = anchoUtil(rings, y0, y1) - 2 * (grosorContorno + 0.3);
+  return util > 1 ? Math.min(anchoPedido, util) : anchoPedido;
+}
+
+function cajaNombreSolo(cajaNumero) {
+  return {
+    cy: cajaNumero.cy + cajaNumero.h * JERSEY_SOLO_NOMBRE.cy,
+    h: cajaNumero.h * JERSEY_SOLO_NOMBRE.h,
+    w: cajaNumero.w * JERSEY_SOLO_NOMBRE.w,
+  };
+}
+
 /** Espesor de la capa de color que va contra la placa. Es una piel: más fina
  *  deja translucir el núcleo y se ve sucia. */
 const JERSEY_SKIN_MM = 0.6;
@@ -2265,17 +2321,20 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
   const espejo = polys => polys.map(p => p.map(([x, y]) => [-x, y]));
   const placed = [];
   let nameCapMM = 0, numCapMM = 0;
-  const nm = render(name, h * tpl.nombreCaja.h);
-  if (nm) {
-    const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
-    nameCapMM = polysBounds(p).height;
-    placed.push({polys: espejo(p), outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
-  }
   const nu = render(number, h * tpl.numeroCaja.h);
   if (nu) {
     const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
     numCapMM = polysBounds(p).height;
     placed.push({polys: espejo(p), outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+  }
+  const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.numeroCaja);
+  const nm = render(name, h * cajaN.h);
+  if (nm) {
+    const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
+    const p = placeTextPolys(nm, h * cajaN.cy,
+      anchoCajaTexto(templateToPolys(tpl.silueta, h), h, cajaN, h * cajaN.w, grosor));
+    nameCapMM = polysBounds(p).height;
+    placed.push({polys: espejo(p), outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
   }
 
   let ringPaths = null, fillPaths = null;
@@ -2375,5 +2434,6 @@ if (typeof module !== 'undefined' && module.exports) {
     JERSEY, jerseySilhouette, roundPolys, placeTextPolys, buildJerseyTile,
     buildJerseyTemplateTile, templateToPolys, JERSEY_MIN_RING_WALL,
     buildJerseyDoubleTile, JERSEY_SKIN_MM, JERSEY_LEVEL_RATIO,
+    JERSEY_SOLO_NOMBRE, cajaNombreSolo, anchoUtil, anchoCajaTexto,
   };
 }

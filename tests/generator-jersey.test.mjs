@@ -12,7 +12,8 @@ const source = fs.readFileSync(
 );
 const sandbox = {module: {exports: {}}, exports: {}};
 vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
-const {JERSEY, jerseySilhouette, placeTextPolys, polysBounds} = sandbox.module.exports;
+const {JERSEY, jerseySilhouette, placeTextPolys, polysBounds,
+       cajaNombreSolo, anchoUtil} = sandbox.module.exports;
 
 /** Medio ancho de la silueta a la altura `y`, cruzando sus aristas. */
 function halfWidthAt(pts, y) {
@@ -211,6 +212,29 @@ test('la de dos caras reparte el relieve del frente en varios niveles', () => {
     assert.ok(niveles.size >= 3, `${t.id}: solo ${niveles.size} nivel(es) de relieve`);
     assert.ok(niveles.has(0), `${t.id}: falta el nivel de fondo`);
   }
+});
+
+test('sin número, el nombre baja al pecho y crece', () => {
+  // Antes el número era obligatorio de facto: sin él el nombre se quedaba en su
+  // franja de arriba, diminuto, y media camiseta salía vacía.
+  const num = {cy: 0.0035, h: 0.2408, w: 0.3462};
+  const solo = cajaNombreSolo(num);
+  assert.ok(solo.h > JERSEY.nameH * 1.3, 'el nombre solo tiene que crecer');
+  assert.ok(solo.w > num.w, 'y disponer de más ancho que el número');
+  assert.ok(solo.cy < num.cy + num.h / 2 && solo.cy > num.cy - num.h / 2,
+    'y quedar dentro de la franja que dejó libre el número');
+});
+
+test('el ancho útil de una franja es el MÍNIMO, no el máximo', () => {
+  /* Una camiseta es ancha arriba (mangas) y estrecha abajo (cuerpo). Midiendo
+     el máximo, un nombre sin número se salía del cuerpo por abajo y las letras
+     de los extremos salían cortadas contra el borde. */
+  const camiseta = [[[-20, 10], [20, 10], [20, 0], [6, 0], [6, -20], [-6, -20], [-6, 0], [-20, 0]]];
+  assert.ok(Math.abs(anchoUtil(camiseta, 2, 8) - 40) < 0.5, 'arriba mide 40');
+  assert.ok(Math.abs(anchoUtil(camiseta, -18, -2) - 12) < 0.5, 'abajo mide 12');
+  // Una franja que cruza el escalón se queda con el estrecho, no con el ancho.
+  assert.ok(Math.abs(anchoUtil(camiseta, -6, 6) - 12) < 0.5,
+    'a caballo del escalón debe ganar el ancho menor');
 });
 
 test('el dorsal guarda las proporciones de una playera de verdad', () => {
