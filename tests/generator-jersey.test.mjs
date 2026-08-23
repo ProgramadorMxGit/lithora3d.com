@@ -13,7 +13,7 @@ const source = fs.readFileSync(
 const sandbox = {module: {exports: {}}, exports: {}};
 vm.runInNewContext(source, sandbox, {filename: 'geometria.js'});
 const {JERSEY, jerseySilhouette, placeTextPolys, polysBounds,
-       cajaNombreSolo, anchoUtil} = sandbox.module.exports;
+       cajaNombreSolo, escalarCajaNombre, anchoUtil} = sandbox.module.exports;
 
 /** Medio ancho de la silueta a la altura `y`, cruzando sus aristas. */
 function halfWidthAt(pts, y) {
@@ -229,6 +229,20 @@ test('sin número, el nombre baja al pecho y crece', () => {
   assert.ok(Math.abs((solo.cy + solo.h / 2) - (nom.cy + nom.h / 2)) < 1e-9,
     'el nombre solo conserva su línea superior');
   assert.ok(solo.cy > num.cy, 'y sigue por encima de donde iría el número');
+});
+
+test('el tamaño del nombre escala su caja a lo alto Y a lo ancho', () => {
+  const caja = {cy: 0.19, h: 0.107, w: 0.396};
+  assert.equal(escalarCajaNombre(caja, 1), caja, 'al 100 % no debe tocar nada');
+  const grande = escalarCajaNombre(caja, 1.5);
+  assert.ok(Math.abs(grande.h - caja.h * 1.5) < 1e-9);
+  /* El ancho escala también: si solo creciera el alto, un nombre largo —que ya
+     toca el ancho del pecho— no se movería ni un milímetro por mucho que se
+     subiera el deslizador, y parecería roto. */
+  assert.ok(Math.abs(grande.w - caja.w * 1.5) < 1e-9, 'el ancho tiene que acompañar');
+  assert.equal(grande.cy, caja.cy, 'la franja no se mueve de sitio');
+  // Un guardado manipulado no debe reventar la pieza.
+  assert.equal(escalarCajaNombre(caja, 0), caja);
 });
 
 test('el ancho útil de una franja es el MÍNIMO, no el máximo', () => {
