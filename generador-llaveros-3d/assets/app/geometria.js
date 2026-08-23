@@ -1977,7 +1977,8 @@ function buildJerseyTile(font, emojiFont, name, number, opts) {
   const numPolys = render(number, h * J.numH);
   const cajaN = numPolys
     ? {cy: J.nameCY, h: J.nameH, w: J.nameW}
-    : cajaNombreSolo({cy: J.numCY, h: J.numH, w: J.numW});
+    : cajaNombreSolo({cy: J.nameCY, h: J.nameH, w: J.nameW},
+      {cy: J.numCY, h: J.numH, w: J.numW});
   const namePolys = render(name, h * cajaN.h);
   if (!numPolys && !namePolys) {
     const err = new Error('sin texto');
@@ -2152,7 +2153,7 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
       numCapMM = polysBounds(p).height;
       placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
     }
-    const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.numeroCaja);
+    const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja);
     const nm = render(name, h * cajaN.h);
     if (nm) {
       const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
@@ -2226,7 +2227,7 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
 /** Cuando la camiseta va sin número, el nombre se queda solo arriba y la pieza
  *  parece a medio hacer. Con estos factores —relativos a la caja del número—
  *  baja al pecho y crece hasta ocupar el sitio que dejó libre. */
-const JERSEY_SOLO_NOMBRE = {cy: -0.06, h: 0.58, w: 1.65};
+const JERSEY_SOLO_NOMBRE = {h: 0.58, w: 1.65};
 
 /** Ancho aprovechable de la silueta en la franja [y0, y1]: se toma el MÍNIMO,
  *  porque el texto tiene que caber a todas las alturas que ocupa. Midiendo solo
@@ -2255,15 +2256,27 @@ function anchoUtil(rings, y0, y1, muestras) {
 
 /** Ancho que puede ocupar una caja de texto sin que el contorno se salga. */
 function anchoCajaTexto(rings, h, caja, anchoPedido, grosorContorno) {
-  const y0 = h * (caja.cy - caja.h / 2), y1 = h * (caja.cy + caja.h / 2);
+  // La franja se mide CON el contorno incluido, arriba y abajo: midiendo solo
+  // la caja del texto, el contorno asomaba por encima, se metía en el cuello
+  // —donde la camiseta ya se estrecha— y salía cortado contra el hombro.
+  const y0 = h * (caja.cy - caja.h / 2) - grosorContorno;
+  const y1 = h * (caja.cy + caja.h / 2) + grosorContorno;
   const util = anchoUtil(rings, y0, y1) - 2 * (grosorContorno + 0.3);
   return util > 1 ? Math.min(anchoPedido, util) : anchoPedido;
 }
 
-function cajaNombreSolo(cajaNumero) {
+/** Sin número, el nombre crece hasta ocupar el hueco que aquel dejó, pero NO se
+ *  mueve de su altura: se queda en la franja alta, sobre el pecho liso. Bajarlo
+ *  al centro lo dejaba justo en la transición de los chevrones y el dibujo de
+ *  debajo se lo comía. */
+function cajaNombreSolo(cajaNombre, cajaNumero) {
+  const h = cajaNumero.h * JERSEY_SOLO_NOMBRE.h;
   return {
-    cy: cajaNumero.cy + cajaNumero.h * JERSEY_SOLO_NOMBRE.cy,
-    h: cajaNumero.h * JERSEY_SOLO_NOMBRE.h,
+    // Crece hacia ABAJO, manteniendo su línea superior: creciendo centrado se
+    // subía al cuello, donde la camiseta se estrecha, y el contorno se cortaba
+    // contra el hombro. El hueco que hay que llenar está debajo, no arriba.
+    cy: cajaNombre.cy + cajaNombre.h / 2 - h / 2,
+    h: h,
     w: cajaNumero.w * JERSEY_SOLO_NOMBRE.w,
   };
 }
@@ -2327,7 +2340,7 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
     numCapMM = polysBounds(p).height;
     placed.push({polys: espejo(p), outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
   }
-  const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.numeroCaja);
+  const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja);
   const nm = render(name, h * cajaN.h);
   if (nm) {
     const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
