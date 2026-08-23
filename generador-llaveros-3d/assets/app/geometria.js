@@ -1975,10 +1975,10 @@ function buildJerseyTile(font, emojiFont, name, number, opts) {
 
   // El número se resuelve primero: si no lo hay, el nombre usa su sitio.
   const numPolys = render(number, h * J.numH);
-  const cajaN = numPolys
+  const cajaN = escalarCajaNombre(numPolys
     ? {cy: J.nameCY, h: J.nameH, w: J.nameW}
     : cajaNombreSolo({cy: J.nameCY, h: J.nameH, w: J.nameW},
-      {cy: J.numCY, h: J.numH, w: J.numW});
+      {cy: J.numCY, h: J.numH, w: J.numW}), opts.jerseyNameScale);
   const namePolys = render(name, h * cajaN.h);
   if (!numPolys && !namePolys) {
     const err = new Error('sin texto');
@@ -1990,11 +1990,10 @@ function buildJerseyTile(font, emojiFont, name, number, opts) {
   const placed = [];
   let nameCapMM = 0, numCapMM = 0;
   if (namePolys) {
-    const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
-    const p = placeTextPolys(namePolys, h * cajaN.cy,
-      anchoCajaTexto(cuerpoRings, h, cajaN, w * cajaN.w, grosor));
-    nameCapMM = polysBounds(p).height;
-    placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+    const r = colocarTextoEnCaja(cuerpoRings, h, cajaN, namePolys, w * cajaN.w,
+      J.nameOutline, J.minOutline);
+    nameCapMM = polysBounds(r.polys).height;
+    placed.push({polys: r.polys, outline: r.grosor});
   }
   if (numPolys) {
     const p = placeTextPolys(numPolys, h * J.numCY, w * J.numW);
@@ -2153,14 +2152,15 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
       numCapMM = polysBounds(p).height;
       placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
     }
-    const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja);
+    const cajaN = escalarCajaNombre(
+      nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja),
+      opts.jerseyNameScale);
     const nm = render(name, h * cajaN.h);
     if (nm) {
-      const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
-      const p = placeTextPolys(nm, h * cajaN.cy,
-        anchoCajaTexto(templateToPolys(tpl.silueta, h), h, cajaN, h * cajaN.w, grosor));
-      nameCapMM = polysBounds(p).height;
-      placed.push({polys: p, outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+      const r = colocarTextoEnCaja(templateToPolys(tpl.silueta, h), h, cajaN, nm,
+        h * cajaN.w, J.nameOutline, J.minOutline);
+      nameCapMM = polysBounds(r.polys).height;
+      placed.push({polys: r.polys, outline: r.grosor});
     }
   }
 
@@ -2269,6 +2269,38 @@ function anchoCajaTexto(rings, h, caja, anchoPedido, grosorContorno) {
  *  mueve de su altura: se queda en la franja alta, sobre el pecho liso. Bajarlo
  *  al centro lo dejaba justo en la transición de los chevrones y el dibujo de
  *  debajo se lo comía. */
+/** Aplica el factor de "tamaño del nombre" a su franja. Escala alto Y ancho: si
+ *  solo creciera el alto, un nombre largo —que ya toca el ancho del pecho— no
+ *  se movería ni un milímetro y el deslizador parecería roto. El recorte contra
+ *  la silueta sigue mandando, así que subirlo nunca saca el texto de la pieza. */
+function escalarCajaNombre(caja, escala) {
+  const s = escala > 0 ? escala : 1;
+  if (s === 1) return caja;
+  return {cy: caja.cy, h: caja.h * s, w: caja.w * s};
+}
+
+/** Coloca un texto en su franja ajustando el ancho al hueco REAL que ocupa.
+ *
+ *  Dos pasadas: la primera mide con el alto nominal de la caja; la segunda, con
+ *  el alto que el texto acabó teniendo de verdad, que al encogerse por ancho es
+ *  menor y por tanto deja más hueco. Sin la segunda, subir el "tamaño del
+ *  nombre" podía devolver un nombre MÁS pequeño —la caja crecía, se metía en el
+ *  cuello donde la camiseta se estrecha, y el recorte se comía más de lo que se
+ *  había ganado—, así que el deslizador se volvía en contra a partir del 120 %.
+ */
+function colocarTextoEnCaja(rings, h, caja, polys, anchoPedido, factorContorno, minContorno) {
+  let colocado = null;
+  let grosor = Math.max(minContorno, h * caja.h * factorContorno);
+  for (let i = 0; i < 2; i++) {
+    const altoReal = colocado ? polysBounds(colocado).height / h : caja.h;
+    const ancho = anchoCajaTexto(rings, h, {cy: caja.cy, h: altoReal, w: caja.w},
+      anchoPedido, grosor);
+    colocado = placeTextPolys(polys, h * caja.cy, ancho);
+    grosor = Math.max(minContorno, polysBounds(colocado).height * factorContorno);
+  }
+  return {polys: colocado, grosor: grosor};
+}
+
 function cajaNombreSolo(cajaNombre, cajaNumero) {
   const h = cajaNumero.h * JERSEY_SOLO_NOMBRE.h;
   return {
@@ -2340,14 +2372,15 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
     numCapMM = polysBounds(p).height;
     placed.push({polys: espejo(p), outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
   }
-  const cajaN = nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja);
+  const cajaN = escalarCajaNombre(
+    nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja),
+    opts.jerseyNameScale);
   const nm = render(name, h * cajaN.h);
   if (nm) {
-    const grosor = Math.max(J.minOutline, h * cajaN.h * J.nameOutline);
-    const p = placeTextPolys(nm, h * cajaN.cy,
-      anchoCajaTexto(templateToPolys(tpl.silueta, h), h, cajaN, h * cajaN.w, grosor));
-    nameCapMM = polysBounds(p).height;
-    placed.push({polys: espejo(p), outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+    const r = colocarTextoEnCaja(templateToPolys(tpl.silueta, h), h, cajaN, nm,
+      h * cajaN.w, J.nameOutline, J.minOutline);
+    nameCapMM = polysBounds(r.polys).height;
+    placed.push({polys: espejo(r.polys), outline: r.grosor});
   }
 
   let ringPaths = null, fillPaths = null;
@@ -2447,6 +2480,7 @@ if (typeof module !== 'undefined' && module.exports) {
     JERSEY, jerseySilhouette, roundPolys, placeTextPolys, buildJerseyTile,
     buildJerseyTemplateTile, templateToPolys, JERSEY_MIN_RING_WALL,
     buildJerseyDoubleTile, JERSEY_SKIN_MM, JERSEY_LEVEL_RATIO,
-    JERSEY_SOLO_NOMBRE, cajaNombreSolo, anchoUtil, anchoCajaTexto,
+    JERSEY_SOLO_NOMBRE, cajaNombreSolo, escalarCajaNombre, anchoUtil, anchoCajaTexto,
+    colocarTextoEnCaja,
   };
 }

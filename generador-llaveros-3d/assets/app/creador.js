@@ -26,6 +26,7 @@
     numbers: ['10', '7'],  // dorsal de cada fila, solo en camiseta; paralelo a names
     jerseyTemplate: 'lisa',  // 'lisa' = camiseta de un color | id de assets/plantillas
     jerseyInks: [],          // color de cada tinta de la plantilla, en orden
+    jerseyNameScale: 1,      // factor sobre el tamaño de fábrica del nombre
     fontKey: null,
     letterHeight: 12,
     textBold: 0,         // negrita sintética en mm por lado; engorda trazos de fuentes script
@@ -715,6 +716,8 @@
        proporción en buildJerseyTile. */
     const needsOutline = !jersey && (pencil || state.style === 'outline' || state.style === 'double');
     $('outline-width-row').style.display = needsOutline ? 'block' : 'none';
+    const escala = $('name-scale-row');
+    if (escala) escala.hidden = !jersey;
     if (!needsOutline) $('islands-warn').hidden = true;
     $('borde-pick').hidden = pencil || (!jersey && state.style !== 'double');
   }
@@ -1123,6 +1126,8 @@
   }
   bindSlider('in-gap', 'val-gap', 'gap', v => v.toFixed(0) + ' mm');
   bindSlider('in-outlineWidth', 'val-outlineWidth', 'outlineWidth', v => v.toFixed(1) + ' mm');
+  bindSlider('in-jerseyNameScale', 'val-jerseyNameScale', 'jerseyNameScale',
+    v => Math.round(v * 100) + ' %');
 
   // ---------- fixed keychain height (Y) ----------
   const fixedHeightChk = $('in-fixedHeight');
@@ -1410,6 +1415,7 @@
       pencilTunnelStyle: state.pencilTunnelStyle,
       curveSegments: state.curveSegments,
       outlineWidthMM: state.outlineWidth,
+      jerseyNameScale: state.jerseyNameScale,
     };
   }
 
@@ -1825,7 +1831,8 @@
      de que hay que abrirlos otra vez. */
   const SAVE_KEY = 'lithora.llaveros.v1';
   const SAVED_KEYS = [
-    'productType', 'names', 'numbers', 'jerseyTemplate', 'jerseyInks', 'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
+    'productType', 'names', 'numbers', 'jerseyTemplate', 'jerseyInks', 'jerseyNameScale',
+    'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
     'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
@@ -1918,6 +1925,9 @@
     if (!['open', 'start', 'end'].includes(state.pencilCapEnd)) state.pencilCapEnd = DEFAULT_STATE.pencilCapEnd;
     if (!['round', 'teardrop'].includes(state.pencilTunnelStyle)) state.pencilTunnelStyle = DEFAULT_STATE.pencilTunnelStyle;
     if (!TEXT_CASES.includes(state.textCase)) state.textCase = DEFAULT_STATE.textCase;
+    if (!(state.jerseyNameScale >= 0.6 && state.jerseyNameScale <= 1.6)) {
+      state.jerseyNameScale = DEFAULT_STATE.jerseyNameScale;
+    }
 
     refreshAllControls();
   }
@@ -1933,6 +1943,9 @@
       const val = $('val-' + key.replace(/^in-/, ''));
       if (val) val.textContent = state[key].toFixed(dec) + ' mm';
     });
+    // No lleva 'mm': es un porcentaje, no una medida.
+    $('in-jerseyNameScale').value = state.jerseyNameScale;
+    $('val-jerseyNameScale').textContent = Math.round(state.jerseyNameScale * 100) + ' %';
     $('val-columns').textContent = state.columns;
     $('in-rainbow').checked = state.rainbow;
     syncPencilCapUI();
