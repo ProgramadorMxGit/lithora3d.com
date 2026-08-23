@@ -213,6 +213,32 @@ test('la de dos caras reparte el relieve del frente en varios niveles', () => {
   }
 });
 
+test('el dorsal guarda las proporciones de una playera de verdad', () => {
+  /* Medido sobre una foto de dorsal real (A. Cervantes 13, Club América 25/26):
+     el número ocupa el 27 % del alto de la camiseta y su centro cae al 43.5 %
+     desde el hombro, o sea en la mitad de ARRIBA. La primera versión lo hacía
+     un tercio más grande y por debajo del centro, y la pieza parecía un cartel.
+     Los márgenes son anchos a propósito: fijan la intención, no un valor. */
+  assert.ok(JERSEY.numH > 0.24 && JERSEY.numH < 0.30,
+    `el número ocupa ${(JERSEY.numH * 100).toFixed(0)} % del alto; en la real es 27 %`);
+  assert.ok(JERSEY.numCY > 0,
+    'el número va en la mitad de arriba de la camiseta, como en la real');
+  assert.ok(JERSEY.numH > JERSEY.nameH * 2,
+    'el número tiene que dominar sobre el nombre');
+  assert.ok(JERSEY.nameCY > JERSEY.numCY, 'el nombre va por encima del número');
+
+  for (const t of plantillas.plantillas.filter(x => x.admiteDorsal)) {
+    // Sobre la plantilla se mide contra su alto total, que incluye la argolla
+    // (~12 % del alto), así que el 27 % de la camiseta cae cerca del 24 % aquí.
+    assert.ok(t.numeroCaja.h > 0.21 && t.numeroCaja.h < 0.27,
+      `${t.id}: el número ocupa ${(t.numeroCaja.h * 100).toFixed(0)} % del alto de la plantilla`);
+    assert.ok(t.numeroCaja.cy > t.numeroCaja.h * -0.5,
+      `${t.id}: el número cuelga demasiado bajo`);
+    assert.ok(t.nombreCaja.cy - t.nombreCaja.h / 2 >= t.numeroCaja.cy + t.numeroCaja.h / 2,
+      `${t.id}: el nombre y el número se pisan`);
+  }
+});
+
 test('la caja del número manda sobre el tamaño de la camiseta', () => {
   // El alto de letra que pide la interfaz es el del número: si esta relación se
   // rompe, la camiseta deja de crecer con el control y el aviso de nombre
