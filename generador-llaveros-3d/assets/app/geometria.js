@@ -1876,10 +1876,14 @@ const JERSEY = {
   hipX: 0.310,            // el cuerpo abre solo un poco hacia el bajo
   hemDip: 0.022,          // el bajo cae al centro, como una camiseta de verdad
   round: 0.022,           // radio de suavizado, en fracción del lado menor
-  /* Los anchos de franja dejan sitio al contorno: con 0.56 y 0.52 el borde del
-     número llegaba justo a la sisa y se recortaba contra la manga. */
-  nameCY: 0.293, nameH: 0.105, nameW: 0.52,   // franja del nombre
-  numCY: -0.075, numH: 0.300, numW: 0.480,    // franja del número
+  /* Franjas medidas sobre una foto de dorsal real (A. Cervantes 13, Club
+     América 25/26): el número ocupa el 27 % del alto de la camiseta y va
+     centrado al 43.5 % desde el hombro. La primera versión lo hacía un tercio
+     más grande y más bajo, y la pieza parecía un cartel en vez de una playera.
+     El nombre es la única concesión: en la foto mide un 5 % del alto, que a
+     esta escala no imprimiría limpio, así que se deja al 10 %. */
+  nameCY: 0.300, nameH: 0.100, nameW: 0.48,   // franja del nombre
+  numCY: 0.065, numH: 0.270, numW: 0.400,     // franja del número
   nameOutline: 0.14,      // grosor del contorno, en fracción del alto de su texto
   numOutline: 0.085,
   minOutline: 0.6,        // 1.5 anchos de extrusión a boquilla 0.4: menos no sale
