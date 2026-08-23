@@ -2420,19 +2420,22 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
       paths = ClipperLib.Clipper.PolyTreeToPaths(
         clipperBoolean(paths, ringPaths, ClipperLib.ClipType.ctDifference));
     }
-    if (t.i === tpl.dorsal.contorno && ringPaths) {
-      paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
-        paths.concat(ClipperLib.Clipper.PolyTreeToPaths(
-          clipperBoolean(ringPaths, fillPaths, ClipperLib.ClipType.ctDifference))),
-        null, ClipperLib.ClipType.ctUnion));
-    }
-    if (t.i === tpl.dorsal.relleno && fillPaths) {
-      paths = ClipperLib.Clipper.PolyTreeToPaths(
-        clipperBoolean(paths.concat(fillPaths), null, ClipperLib.ClipType.ctUnion));
-    }
     inksAbajo.add(t.i);
     extrude(polyTreeToShapes(conAgujero(paths)).shapes, 0, zSkin, 'tinta' + t.i);
   });
+  /* El dorsal se emite como piezas propias en vez de fundirlo con las tintas
+     del dibujo: fundiéndolo, una plantilla que no usara esa tinta en su arte
+     plano —el Santos solo gasta dos— se quedaba SIN contorno, y como el hueco
+     ya se había restado del resto, la pieza salía agujereada. */
+  if (ringPaths) {
+    extrude(polyTreeToShapes(conAgujero(ClipperLib.Clipper.PolyTreeToPaths(
+      clipperBoolean(ringPaths, fillPaths, ClipperLib.ClipType.ctDifference)))).shapes,
+      0, zSkin, 'tinta' + tpl.dorsal.contorno);
+    inksAbajo.add(tpl.dorsal.contorno);
+    extrude(polyTreeToShapes(conAgujero(fillPaths)).shapes, 0, zSkin,
+      'tinta' + tpl.dorsal.relleno);
+    inksAbajo.add(tpl.dorsal.relleno);
+  }
 
   extrude(polyTreeToShapes(conAgujero(siluetaPaths)).shapes, zSkin, zCore, 'tinta' + tpl.nucleo);
 
