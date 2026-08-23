@@ -98,14 +98,28 @@ const areaAnillo = ring => Math.abs(ring.reduce((s, [x, y], i) => {
 }, 0)) / 2;
 const areaPoly = poly => areaAnillo(poly[0]) - poly.slice(1).reduce((s, h) => s + areaAnillo(h), 0);
 const areaPartes = partes => partes.reduce((s, p) => s + areaPoly(p), 0);
+/** Grupos de tinta de una plantilla, sea de una cara o de dos. */
+const gruposDe = t => t.tintas || t.caraB;
 
 test('la plantilla declara todo lo que la app necesita para construirla', () => {
   assert.equal(plantillas.version, 1);
   assert.ok(plantillas.plantillas.length >= 1);
   for (const t of plantillas.plantillas) {
     for (const k of ['id', 'nombre', 'anchoRel', 'altoRef', 'colores', 'aro', 'silueta',
-      'tintas', 'admiteDorsal']) {
+      'admiteDorsal']) {
       assert.ok(t[k] !== undefined, `${t.id} no trae ${k}`);
+    }
+    if (t.dosCaras) {
+      for (const k of ['caraA', 'caraB', 'nucleo']) {
+        assert.ok(t[k] !== undefined, `${t.id} es de dos caras pero no trae ${k}`);
+      }
+      // Cada grupo del frente declara su nivel de relieve; sin él subiría todo
+      // a la misma altura y la pieza volvería a ser una calcomanía plana.
+      for (const g of t.caraA) {
+        assert.ok(Number.isInteger(g.n) && g.n >= 0 && g.n <= 3, `${t.id}: nivel raro ${g.n}`);
+      }
+    } else {
+      assert.ok(t.tintas !== undefined, `${t.id} no trae tintas`);
     }
     assert.ok(t.aro.r > 0 && t.altoRef > 0, `${t.id}: aro o alto de referencia sin medida`);
     // Solo las que llevan dorsal declaran franjas: el frente del América no
@@ -128,14 +142,17 @@ test('el dorsal reutiliza tintas de la propia camiseta, no colores nuevos', () =
   // AMS Lite del A1 solo tiene 4.
   for (const t of plantillas.plantillas) {
     const n = t.colores.length;
-    for (const tinta of t.tintas) {
+    for (const tinta of gruposDe(t).concat(t.caraA || [])) {
       assert.ok(tinta.i >= 0 && tinta.i < n, `${t.id}: tinta ${tinta.i} sin color`);
+    }
+    if (t.dosCaras) {
+      assert.ok(t.nucleo >= 0 && t.nucleo < n, `${t.id}: núcleo sin color`);
     }
     if (!t.admiteDorsal) continue;
     assert.ok(t.dorsal.relleno >= 0 && t.dorsal.relleno < n, `${t.id}: relleno fuera de rango`);
     assert.ok(t.dorsal.contorno >= 0 && t.dorsal.contorno < n, `${t.id}: contorno fuera de rango`);
     assert.notEqual(t.dorsal.relleno, t.dorsal.contorno, `${t.id}: relleno y contorno iguales`);
-    assert.ok(t.tintas.length <= n);
+    assert.ok(gruposDe(t).length <= n);
   }
 });
 
@@ -145,10 +162,15 @@ test('las tintas teselan la silueta: ni huecos ni colores pisándose', () => {
   // laminador.
   for (const t of plantillas.plantillas) {
     const total = areaPartes(t.silueta);
-    const tintas = t.tintas.reduce((s, x) => s + areaPartes(x.p), 0);
-    const desvio = Math.abs(tintas - total) / total;
-    assert.ok(desvio < 0.002,
-      `${t.id}: las tintas suman ${(tintas / total * 100).toFixed(2)} % de la silueta`);
+    // En la de dos caras se comprueban las DOS: cada una tesela por su lado, y
+    // un hueco en cualquiera es un agujero en la pieza impresa.
+    const caras = t.dosCaras ? [t.caraA, t.caraB] : [t.tintas];
+    for (const cara of caras) {
+      const suma = cara.reduce((s, x) => s + areaPartes(x.p), 0);
+      const desvio = Math.abs(suma - total) / total;
+      assert.ok(desvio < 0.002,
+        `${t.id}: una cara suma ${(suma / total * 100).toFixed(2)} % de la silueta`);
+    }
   }
 });
 
@@ -177,6 +199,18 @@ test('las dos caras del mismo llavero salen a la misma escala', () => {
   const anchos = caras.map((t, i) => alturas[i] * t.anchoRel);
   assert.ok(Math.max(...anchos) - Math.min(...anchos) < 0.5,
     `los anchos se separan: ${anchos.map(v => v.toFixed(1))}`);
+});
+
+test('la de dos caras reparte el relieve del frente en varios niveles', () => {
+  // Si todos los grupos acabaran en el mismo nivel la cara de arriba sería una
+  // calcomanía plana, que es justo lo que la plantilla viene a evitar.
+  const dc = plantillas.plantillas.filter(t => t.dosCaras);
+  assert.ok(dc.length >= 1, 'falta la plantilla de dos caras');
+  for (const t of dc) {
+    const niveles = new Set(t.caraA.map(g => g.n));
+    assert.ok(niveles.size >= 3, `${t.id}: solo ${niveles.size} nivel(es) de relieve`);
+    assert.ok(niveles.has(0), `${t.id}: falta el nivel de fondo`);
+  }
 });
 
 test('la caja del número manda sobre el tamaño de la camiseta', () => {

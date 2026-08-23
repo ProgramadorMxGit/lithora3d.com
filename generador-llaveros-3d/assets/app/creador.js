@@ -90,6 +90,8 @@
   // Diámetro real del agujero de la argolla: en una plantilla puede salir menor
   // que el pedido, porque el aro viene dibujado y la pieza se escala.
   let lastHoleMM = 0;
+  // Espesor total de la pieza cuando no es obvio (camiseta de dos caras).
+  let lastThicknessMM = 0;
   let lastValidNames = [];
   // tileIndex -> index into state.names/state.nameColors (skips empty rows)
   let lastValidOrig = [];
@@ -1445,6 +1447,7 @@
     lastColourSteps = null;
     lastFlatInks = 0;
     lastHoleMM = 0;
+    lastThicknessMM = 0;
     let pencilLayout = null; // {tiles, offsets} solo en modo lápiz, para fantasma y gramos
 
     /* En camiseta una fila con solo el número es válida: hay dorsales sin
@@ -1488,11 +1491,14 @@
         const lines = [{text: applyTextCase(e.name)}];
         let tile;
         try {
-          if (jerseyMode) tile = tpl
-            ? buildJerseyTemplateTile(font, emojiFont,
-              applyTextCase(e.name), applyTextCase(e.number), tpl, currentOpts())
-            : buildJerseyTile(font, emojiFont,
-              applyTextCase(e.name), applyTextCase(e.number), currentOpts());
+          if (jerseyMode) tile = !tpl
+            ? buildJerseyTile(font, emojiFont,
+              applyTextCase(e.name), applyTextCase(e.number), currentOpts())
+            : tpl.dosCaras
+              ? buildJerseyDoubleTile(font, emojiFont,
+                applyTextCase(e.name), applyTextCase(e.number), tpl, currentOpts())
+              : buildJerseyTemplateTile(font, emojiFont,
+                applyTextCase(e.name), applyTextCase(e.number), tpl, currentOpts());
           else if (state.productType === 'pencil') tile = buildPencilNameTile(font, emojiFont, lines, currentOpts());
           else if (state.style === 'outline') tile = buildOutlineTile(font, emojiFont, lines, currentOpts());
           else if (state.style === 'double') tile = buildDoubleOutlineTile(font, emojiFont, lines, currentOpts());
@@ -1541,6 +1547,7 @@
       lastColourSteps = tiles[0].colourStepsZ || null;
       lastFlatInks = tiles[0].flatInks || 0;
       lastHoleMM = tiles[0].holeDiameterMM || 0;
+      lastThicknessMM = tiles[0].thicknessMM || 0;
 
       updateIslandsWarning(Math.max(1, ...tiles.map(t => t.islands || 1)));
       updateJerseyWarning(tiles);
@@ -1600,6 +1607,9 @@
 
     let hudText = plateLabel +
       ' · ' + size.x.toFixed(0) + '×' + size.y.toFixed(0) + ' mm';
+    // En la camiseta de dos caras el grueso no se adivina mirando la placa, y
+    // es justo lo que decide si cabe en un llavero de bolsillo.
+    if (lastThicknessMM) hudText += ' · ' + lastThicknessMM.toFixed(1) + ' mm de grueso';
     if (pencilLayout) {
       // Densidad del perfil real si ya cargó; PLA genérico si no.
       const dens = parseFloat(((window.__BAMBU_PROJECT__ || {}).filament_density || [])[0]) || 1.24;

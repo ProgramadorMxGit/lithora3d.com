@@ -2208,6 +2208,155 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
   };
 }
 
+/** Espesor de la capa de color que va contra la placa. Es una piel: más fina
+ *  deja translucir el núcleo y se ve sucia. */
+const JERSEY_SKIN_MM = 0.6;
+
+/** Reparto del relieve frontal entre los cuatro niveles, en fracciones de
+ *  `textRaisedHeightMM`. Con el valor de fábrica (1.4) sale 0.6 / 1.2 / 1.6 /
+ *  1.8 mm, que es el escalonado del llavero de referencia. */
+const JERSEY_LEVEL_RATIO = [0.43, 0.86, 1.14, 1.29];
+
+/**
+ * Camiseta de DOS CARAS: el reverso plano contra la placa, un núcleo macizo en
+ * medio y el frente en relieve escalonado arriba. Sale de una sola impresión,
+ * sin pegar nada.
+ *
+ * La cara de abajo va plana a la fuerza: un relieve mirando a la placa sería un
+ * voladizo. Por eso el nombre y el número, que viven en esa cara, se resuelven
+ * a color dentro del propio teselado en vez de levantarse.
+ */
+function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
+  const curveSegments = opts.curveSegments || 10;
+  const J = JERSEY;
+  const missing = [];
+  const addMissing = list => (list || []).forEach(ch => {
+    if (missing.indexOf(ch) === -1) missing.push(ch);
+  });
+
+  const h = Math.max(12, opts.letterHeightMM / tpl.altoRef);
+  const w = h * tpl.anchoRel;
+
+  const ringWall = tpl.aro.r * h;
+  const holeR = Math.min(Math.max(0.6, opts.loopHoleDiameterMM / 2),
+    Math.max(0.6, ringWall - JERSEY_MIN_RING_WALL));
+  const holePath = [circleClipperPath(tpl.aro.x * h, tpl.aro.y * h, holeR, 44, false)];
+
+  const siluetaPaths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+    polysToClipperPaths(templateToPolys(tpl.silueta, h)), null, ClipperLib.ClipType.ctUnion));
+  const conAgujero = paths => clipperBoolean(paths, holePath, ClipperLib.ClipType.ctDifference);
+  const {shapes: siluetaShapes, islands} = polyTreeToShapes(conAgujero(siluetaPaths));
+  const bb = shapesBounds(siluetaShapes);
+  const dx = -bb.minX, dy = -bb.minY;
+
+  // ---- dorsal, en la cara de abajo: se dibuja espejado porque esa cara se
+  // mira desde el otro lado de la pieza.
+  const render = (text, capMM) => {
+    if (!text) return null;
+    const polys = boldenPolygons(
+      linesToPolygons(font, emojiFont, [{text}], capMM, curveSegments), opts.textBoldMM);
+    addMissing(polys.missing);
+    return polys.length ? polys : null;
+  };
+  const espejo = polys => polys.map(p => p.map(([x, y]) => [-x, y]));
+  const placed = [];
+  let nameCapMM = 0, numCapMM = 0;
+  const nm = render(name, h * tpl.nombreCaja.h);
+  if (nm) {
+    const p = placeTextPolys(nm, h * tpl.nombreCaja.cy, h * tpl.nombreCaja.w);
+    nameCapMM = polysBounds(p).height;
+    placed.push({polys: espejo(p), outline: Math.max(J.minOutline, nameCapMM * J.nameOutline)});
+  }
+  const nu = render(number, h * tpl.numeroCaja.h);
+  if (nu) {
+    const p = placeTextPolys(nu, h * tpl.numeroCaja.cy, h * tpl.numeroCaja.w);
+    numCapMM = polysBounds(p).height;
+    placed.push({polys: espejo(p), outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
+  }
+
+  let ringPaths = null, fillPaths = null;
+  if (placed.length) {
+    const recorta = paths => ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+      ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(paths, null, ClipperLib.ClipType.ctUnion)),
+      siluetaPaths, ClipperLib.ClipType.ctIntersection));
+    const anillos = [];
+    const rellenos = [];
+    placed.forEach(t => {
+      anillos.push(...ClipperLib.Clipper.PolyTreeToPaths(offsetPolygonsOutward(t.polys, t.outline)));
+      rellenos.push(...polysToClipperPaths(t.polys));
+    });
+    ringPaths = recorta(anillos);
+    fillPaths = recorta(rellenos);
+  }
+
+  const zSkin = JERSEY_SKIN_MM;
+  const zCore = Math.max(zSkin + 0.4, opts.baseThicknessMM);
+  const pieces = [];
+  const extrude = (shapes, z0, z1, part) => {
+    if (!shapes.length) return;
+    const g = new THREE.ExtrudeGeometry(
+      shapes.map(s => translateShape(s, dx, dy)),
+      {depth: z1 - z0, bevelEnabled: false, curveSegments});
+    if (z0) g.translate(0, 0, z0);
+    pieces.push({geometry: g, part});
+  };
+
+  // ---- cara de abajo: teselado plano, con el dorsal restado de lo que hay
+  // debajo y añadido como dos tintas más.
+  const inksAbajo = new Set();
+  tpl.caraB.forEach(t => {
+    let paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+      polysToClipperPaths(templateToPolys(t.p, h)), null, ClipperLib.ClipType.ctUnion));
+    if (ringPaths) {
+      paths = ClipperLib.Clipper.PolyTreeToPaths(
+        clipperBoolean(paths, ringPaths, ClipperLib.ClipType.ctDifference));
+    }
+    if (t.i === tpl.dorsal.contorno && ringPaths) {
+      paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+        paths.concat(ClipperLib.Clipper.PolyTreeToPaths(
+          clipperBoolean(ringPaths, fillPaths, ClipperLib.ClipType.ctDifference))),
+        null, ClipperLib.ClipType.ctUnion));
+    }
+    if (t.i === tpl.dorsal.relleno && fillPaths) {
+      paths = ClipperLib.Clipper.PolyTreeToPaths(
+        clipperBoolean(paths.concat(fillPaths), null, ClipperLib.ClipType.ctUnion));
+    }
+    inksAbajo.add(t.i);
+    extrude(polyTreeToShapes(conAgujero(paths)).shapes, 0, zSkin, 'tinta' + t.i);
+  });
+
+  extrude(polyTreeToShapes(conAgujero(siluetaPaths)).shapes, zSkin, zCore, 'tinta' + tpl.nucleo);
+
+  // ---- cara de arriba: cada grupo sube hasta la altura de su nivel
+  tpl.caraA.forEach(t => {
+    const alto = opts.textRaisedHeightMM *
+      (JERSEY_LEVEL_RATIO[Math.min(t.n, JERSEY_LEVEL_RATIO.length - 1)]);
+    const paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
+      polysToClipperPaths(templateToPolys(t.p, h)), null, ClipperLib.ClipType.ctUnion));
+    extrude(polyTreeToShapes(conAgujero(paths)).shapes, zCore, zCore + Math.max(0.2, alto),
+      'tinta' + t.i);
+  });
+
+  const alturaMax = zCore + Math.max(0.2, opts.textRaisedHeightMM *
+    JERSEY_LEVEL_RATIO[JERSEY_LEVEL_RATIO.length - 1]);
+  return {
+    pieces,
+    width: bb.maxX - bb.minX,
+    height: bb.maxY - bb.minY,
+    islands,
+    missingChars: missing,
+    nameCapMM,
+    numberCapMM: numCapMM,
+    jerseyWidthMM: w,
+    holeDiameterMM: holeR * 2,
+    admiteDorsal: true,
+    colourStepsZ: null,
+    flatInks: inksAbajo.size,
+    thicknessMM: alturaMax,
+    rimMM: zCore + Math.max(0.2, opts.textRaisedHeightMM * JERSEY_LEVEL_RATIO[0]),
+  };
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     pathToPolygons, signedArea, pointInPolygon, polygonsToShapes, textToShapes,
@@ -2221,5 +2370,6 @@ if (typeof module !== 'undefined' && module.exports) {
     teardropAreaMM2, circularSegmentAreaMM2, estimatePencilVolumeMM3, buildPencilFitTestTile,
     JERSEY, jerseySilhouette, roundPolys, placeTextPolys, buildJerseyTile,
     buildJerseyTemplateTile, templateToPolys, JERSEY_MIN_RING_WALL,
+    buildJerseyDoubleTile, JERSEY_SKIN_MM, JERSEY_LEVEL_RATIO,
   };
 }

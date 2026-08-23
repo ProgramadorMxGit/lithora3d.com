@@ -32,10 +32,10 @@
 <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/fonts/inter-latin-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/fonts/inter.css">
-<link rel="stylesheet" href="assets/app/estilos.css?v=737b6a2d">
-<link rel="stylesheet" href="assets/app/pagina.css?v=737b6a2d">
-<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=737b6a2d" crossorigin="anonymous">
-<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=737b6a2d" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/app/estilos.css?v=a6b5c18b">
+<link rel="stylesheet" href="assets/app/pagina.css?v=a6b5c18b">
+<link rel="preload" as="fetch" href="assets/fuentes/fuentes.json?v=a6b5c18b" crossorigin="anonymous">
+<link rel="preload" as="fetch" href="assets/fuentes/poppins-bold.ttf?v=a6b5c18b" crossorigin="anonymous">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -351,6 +351,7 @@
           <button type="button" data-tpl="lisa" aria-pressed="true"><b>Lisa</b><small>Un color · el nombre y el número mandan</small></button>
           <button type="button" data-tpl="america-dorsal" aria-pressed="false"><b>América · dorsal</b><small>Cuatro tintas · lleva nombre y número</small></button>
           <button type="button" data-tpl="america-frente" aria-pressed="false"><b>América · frente</b><small>Cuatro tintas · con el escudo, sin dorsal</small></button>
+          <button type="button" data-tpl="america-dos-caras" aria-pressed="false"><b>América · dos caras</b><small>Escudo delante y dorsal detrás, en una pieza</small></button>
         </div>
         <div class="info-box">
           La camiseta lisa sale de un color y el dorsal encima, en dos escalones de relieve.
@@ -358,7 +359,11 @@
           <b>multicolor (AMS)</b> para que salgan como se ven. Los cuatro colores se cambian abajo, en
           <b>Colores</b>, y el nombre y el número reutilizan dos de ellos para que la pieza siga
           cabiendo en cuatro filamentos. El <b>frente</b> lleva el escudo en mitad del pecho, así que
-          no admite dorsal: se imprime aparte y se pega contra el reverso si lo quieres a dos caras.</small>
+          no admite dorsal.
+          <br><b>Dos caras</b> lo resuelve en una sola pieza: el dorsal plano contra la placa, un núcleo
+          en medio y el escudo arriba en relieve. Sale más gruesa (el HUD te dice cuánto) y con muchos
+          más cambios de filamento, porque lleva los cuatro colores abajo y otra vez arriba. Baja el
+          <b>grosor de la base</b> si la quieres más delgada.</small>
         </div>
       </section>
 
@@ -753,17 +758,17 @@
   </p>
 </footer>
 
-<script src="assets/vendor/three.js?v=737b6a2d"></script>
-<script src="assets/vendor/opentype.js?v=737b6a2d"></script>
-<script src="assets/vendor/fflate.js?v=737b6a2d"></script>
-<script src="assets/vendor/clipper.js?v=737b6a2d"></script>
-<script src="assets/app/geometria.js?v=737b6a2d"></script>
-<script src="assets/app/exportadores.js?v=737b6a2d"></script>
+<script src="assets/vendor/three.js?v=a6b5c18b"></script>
+<script src="assets/vendor/opentype.js?v=a6b5c18b"></script>
+<script src="assets/vendor/fflate.js?v=a6b5c18b"></script>
+<script src="assets/vendor/clipper.js?v=a6b5c18b"></script>
+<script src="assets/app/geometria.js?v=a6b5c18b"></script>
+<script src="assets/app/exportadores.js?v=a6b5c18b"></script>
 <script>
 /* El perfil de Bambu se carga aparte para no bloquear el primer pintado. */
 window.__BAMBU_PROJECT__ = null;
-fetch('assets/app/perfil-bambu.json?v=737b6a2d').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
+fetch('assets/app/perfil-bambu.json?v=a6b5c18b').then(r => r.json()).then(p => { window.__BAMBU_PROJECT__ = p; });
 </script>
-<script src="assets/app/creador.js?v=737b6a2d" defer></script>
+<script src="assets/app/creador.js?v=a6b5c18b" defer></script>
 </body>
 </html>
