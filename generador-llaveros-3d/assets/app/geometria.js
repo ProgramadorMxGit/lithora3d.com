@@ -2153,7 +2153,7 @@ function buildJerseyTemplateTile(font, emojiFont, name, number, tpl, opts) {
       placed.push({polys: p, outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
     }
     const cajaN = escalarCajaNombre(
-      nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja),
+      nu ? tpl.nombreCaja : (tpl.nombreSoloCaja || cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja)),
       opts.jerseyNameScale);
     const nm = render(name, h * cajaN.h);
     if (nm) {
@@ -2301,6 +2301,11 @@ function colocarTextoEnCaja(rings, h, caja, polys, anchoPedido, factorContorno, 
   return {polys: colocado, grosor: grosor};
 }
 
+/** Caja del nombre cuando NO hay numero. La regla se dedujo de la silueta del
+ *  America y ahi funciona, pero no es universal: en una camiseta mas alta y con
+ *  las mangas mas bajas -la del Chivas- la caja derivada cae justo en la sisa y
+ *  el nombre se monta sobre las mangas. Por eso una plantilla puede traer su
+ *  propia `nombreSoloCaja` y esta funcion queda como respaldo. */
 function cajaNombreSolo(cajaNombre, cajaNumero) {
   const h = cajaNumero.h * JERSEY_SOLO_NOMBRE.h;
   return {
@@ -2373,7 +2378,7 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
     placed.push({polys: espejo(p), outline: Math.max(J.minOutline, numCapMM * J.numOutline)});
   }
   const cajaN = escalarCajaNombre(
-    nu ? tpl.nombreCaja : cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja),
+    nu ? tpl.nombreCaja : (tpl.nombreSoloCaja || cajaNombreSolo(tpl.nombreCaja, tpl.numeroCaja)),
     opts.jerseyNameScale);
   const nm = render(name, h * cajaN.h);
   if (nm) {

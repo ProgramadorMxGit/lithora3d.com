@@ -248,6 +248,28 @@ test('sin número, el nombre baja al pecho y crece', () => {
   assert.ok(solo.cy > num.cy, 'y sigue por encima de donde iría el número');
 });
 
+test('la franja del nombre sin número también cabe, la deduzca la app o no', () => {
+  /* La regla de cajaNombreSolo se dedujo de la silueta del América. En una
+     camiseta más alta y con las mangas más bajas —la del Chivas— la franja
+     deducida cae justo en la sisa y el nombre se monta sobre las dos mangas,
+     así que esa plantilla trae su propia `nombreSoloCaja`. Venga de donde
+     venga, tiene que caber y tiene que CRECER: si no crece, quitar el número
+     deja media camiseta vacía y un nombre diminuto. */
+  const anchoEn = (anillos, y) => Math.max(0, ...anillos.map(r => halfWidthAt(r, y)));
+  for (const t of plantillas.plantillas) {
+    if (!t.admiteDorsal) continue;
+    const solo = t.nombreSoloCaja || cajaNombreSolo(t.nombreCaja, t.numeroCaja);
+    assert.ok(solo.h > t.nombreCaja.h, `${t.id}: el nombre solo no crece a lo alto`);
+    assert.ok(solo.cy > t.numeroCaja.cy,
+      `${t.id}: el nombre solo se ha bajado por debajo de donde iría el número`);
+    const anillos = t.silueta.map(p => p[0]);
+    for (const y of [solo.cy - solo.h / 2, solo.cy, solo.cy + solo.h / 2]) {
+      assert.ok(anchoEn(anillos, y) > 0,
+        `${t.id}: la franja del nombre solo se sale de la pieza a y=${y}`);
+    }
+  }
+});
+
 test('el tamaño del nombre escala su caja a lo alto Y a lo ancho', () => {
   const caja = {cy: 0.19, h: 0.107, w: 0.396};
   assert.equal(escalarCajaNombre(caja, 1), caja, 'al 100 % no debe tocar nada');
