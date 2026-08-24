@@ -177,6 +177,59 @@ test('una plantilla puede gastar menos tintas de las que declara su paleta', () 
   }), 'ninguna plantilla ejercita ya el caso de dorsal con una tinta que el dibujo no usa');
 });
 
+/** ¿Cae el punto dentro del anillo? Ray casting, el de toda la vida. */
+function dentroDeAnillo(ring, x, y) {
+  let dentro = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) dentro = !dentro;
+  }
+  return dentro;
+}
+const dentroDePoly = (poly, x, y) =>
+  dentroDeAnillo(poly[0], x, y) && !poly.slice(1).some(h => dentroDeAnillo(h, x, y));
+/** ¿Es este color un negro de verdad? No vale la luminancia media: el verde
+    oscuro del Santos (#0C5B3F) promedia 55 y colaría por debajo de cualquier
+    umbral razonable. Un negro tiene los TRES canales bajos y además apenas
+    separados entre sí; ese verde tiene el canal verde en 91. */
+const esNegro = hex => {
+  const v = hex.replace('#', '');
+  const c = [0, 2, 4].map(i => parseInt(v.slice(i, i + 2), 16));
+  return Math.max(...c) < 60 && Math.max(...c) - Math.min(...c) < 25;
+};
+
+test('el filo de todas las camisetas va de negro', () => {
+  /* El contorno negro es lo que hace que la pieza se lea como una camiseta y no
+     como una mancha de colores. El Santos trazado se publicó una vez con el filo
+     en verde oscuro porque su uniforme no traía negro y meterlo pedía un quinto
+     filamento; la salida buena es gastar un hueco del AMS en negro, no ahorrárselo. */
+  const DENTRO = 0.008;          // ~0.4 mm hacia dentro, en alto de pieza
+  for (const t of plantillas.plantillas) {
+    const grupos = t.tintas || t.caraA;
+    const ring = t.silueta[0][0];
+    let vistos = 0;
+    for (let i = 0; i < ring.length; i += Math.max(1, Math.floor(ring.length / 40))) {
+      const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+      const dx = x2 - x1, dy = y2 - y1;
+      const n = Math.hypot(dx, dy);
+      if (n < 1e-9) continue;
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      // normal hacia dentro: se prueban los dos sentidos y se coge el que cae dentro
+      let px = mx - dy / n * DENTRO, py = my + dx / n * DENTRO;
+      if (!dentroDePoly(t.silueta[0], px, py)) {
+        px = mx + dy / n * DENTRO; py = my - dx / n * DENTRO;
+        if (!dentroDePoly(t.silueta[0], px, py)) continue;
+      }
+      const g = grupos.find(gr => gr.p.some(poly => dentroDePoly(poly, px, py)));
+      if (!g) continue;           // justo en una frontera; no cuenta
+      vistos++;
+      assert.ok(esNegro(t.colores[g.i]),
+        `${t.id}: el filo lleva ${t.colores[g.i]} en (${px.toFixed(3)}, ${py.toFixed(3)})`);
+    }
+    assert.ok(vistos >= 10, `${t.id}: solo se pudieron medir ${vistos} puntos del filo`);
+  }
+});
+
 test('las tintas teselan la silueta: ni huecos ni colores pisándose', () => {
   // Simplificar cada región por su cuenta las dejaba solapadas unas décimas de
   // micra, y dos colores en la misma capa y el mismo sitio son ambiguos para el
