@@ -198,6 +198,22 @@ const esNegro = hex => {
   return Math.max(...c) < 60 && Math.max(...c) - Math.min(...c) < 25;
 };
 
+test('cada grupo del relieve declara su ancho, para poder topar la altura', () => {
+  /* Un relieve más alto que 1.6 veces su propio ancho es una cuchilla: se apoya
+     solo en su huella y se despega de pasarle la mano por encima. El dibujo
+     trazado trae detalles de cuatro décimas que al nivel 3 subían 1.8 mm, o sea
+     4.5 veces su ancho, y así se publicó. geometria.js topa ahora la altura con
+     este número; sin él el tope no se aplica y vuelven las cuchillas. */
+  for (const t of plantillas.plantillas) {
+    if (!t.caraA) continue;
+    for (const g of t.caraA) {
+      assert.ok(typeof g.w === 'number' && g.w > 0,
+        `${t.id}: un grupo del relieve (tinta ${g.i}, nivel ${g.n}) no declara w`);
+      assert.ok(g.w < 12 / t.altoRef, `${t.id}: w=${g.w} no es un ancho plausible`);
+    }
+  }
+});
+
 test('cada camiseta declara el ancho de su detalle más fino', () => {
   /* El deslizador del tamaño deja encoger la pieza hasta 6 mm de letra y el
      dibujo encoge con ella: una franja de 0.45 mm a tamaño de fábrica queda en
