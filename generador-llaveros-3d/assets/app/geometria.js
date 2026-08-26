@@ -2326,6 +2326,12 @@ const JERSEY_SKIN_MM = 0.6;
  *  `textRaisedHeightMM`. Con el valor de fábrica (1.4) sale 0.6 / 1.2 / 1.6 /
  *  1.8 mm, que es el escalonado del llavero de referencia. */
 const JERSEY_LEVEL_RATIO = [0.43, 0.86, 1.14, 1.29];
+/** Un relieve más alto que esto por su propio ancho es una cuchilla: se apoya
+ *  solo en su huella y se despega de pasarle la mano por encima. El dibujo
+ *  trazado trae detalles de cuatro décimas, que al nivel 3 subían 1.8 mm.
+ *  La plantilla ya viene con los niveles bajados, pero el deslizador de altura
+ *  llega a 3 mm y volvería a levantarlos, así que el tope se aplica aquí. */
+const JERSEY_ESBELTEZ = 1.6;
 
 /**
  * Camiseta de DOS CARAS: el reverso plano contra la placa, un núcleo macizo en
@@ -2446,8 +2452,11 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
 
   // ---- cara de arriba: cada grupo sube hasta la altura de su nivel
   tpl.caraA.forEach(t => {
-    const alto = opts.textRaisedHeightMM *
+    const nominal = opts.textRaisedHeightMM *
       (JERSEY_LEVEL_RATIO[Math.min(t.n, JERSEY_LEVEL_RATIO.length - 1)]);
+    // t.w es el ancho más fino del grupo a tamaño de fábrica; escala con la pieza.
+    const ancho = t.w ? t.w * h * tpl.altoRef / 12 : Infinity;
+    const alto = Math.min(nominal, JERSEY_ESBELTEZ * ancho);
     const paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
       polysToClipperPaths(templateToPolys(t.p, h)), null, ClipperLib.ClipType.ctUnion));
     extrude(polyTreeToShapes(conAgujero(paths)).shapes, zCore, zCore + Math.max(0.2, alto),
