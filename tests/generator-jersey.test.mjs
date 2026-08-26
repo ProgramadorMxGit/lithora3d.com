@@ -198,6 +198,21 @@ const esNegro = hex => {
   return Math.max(...c) < 60 && Math.max(...c) - Math.min(...c) < 25;
 };
 
+test('cada camiseta declara el ancho de su detalle más fino', () => {
+  /* El deslizador del tamaño deja encoger la pieza hasta 6 mm de letra y el
+     dibujo encoge con ella: una franja de 0.45 mm a tamaño de fábrica queda en
+     0.22 a la mitad, y eso ya no sale de una boquilla de 0.4. Sin este número
+     la app no puede avisar, y la camiseta se imprime con hilos sueltos donde
+     debería haber dibujo. Lo mide medir-detalle.py sobre la geometría real. */
+  for (const t of plantillas.plantillas) {
+    assert.ok(typeof t.detalleMin === 'number' && t.detalleMin > 0,
+      `${t.id}: no declara detalleMin`);
+    // cota barata: nada puede ser más ancho que la propia camiseta
+    assert.ok(t.detalleMin < 12 / t.altoRef,
+      `${t.id}: detalleMin ${t.detalleMin} no es un ancho plausible`);
+  }
+});
+
 test('el filo de todas las camisetas va de negro', () => {
   /* El contorno negro es lo que hace que la pieza se lea como una camiseta y no
      como una mancha de colores. El Santos trazado se publicó una vez con el filo
