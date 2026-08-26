@@ -247,6 +247,11 @@
     (state.productType === 'jersey' && state.jerseyTemplate !== 'lisa')
       ? plantillas[state.jerseyTemplate] || null : null;
 
+  /** Ancho mínimo que sale limpio de una boquilla de 0.4. Por debajo, el
+      laminador rellena con hilos sueltos y eso es lo que se ve como mal
+      acabado en la pieza. */
+  const BOQUILLA_MM = 0.4;
+
   /** Color de la tinta `i`: el elegido por el usuario o el del propio dibujo. */
   function inkColor(i) {
     if (state.jerseyInks[i]) return state.jerseyInks[i];
@@ -766,6 +771,23 @@
       avisos.push('⚠️ La argolla de esta camiseta solo da para un agujero de <b>' +
         lastHoleMM.toFixed(1) + ' mm</b>, no los ' + state.holeD.toFixed(1) + ' mm que pediste.' +
         '<br><small>Sube el <b>tamaño del número</b> para agrandar la pieza entera si necesitas un aro más grueso.</small>');
+    }
+    /* El deslizador del tamaño deja encoger la camiseta hasta 6 mm de letra, y
+       el dibujo encoge con ella. Cada plantilla trae en `detalleMin` el ancho de
+       su pieza más fina a tamaño de fábrica; si al encoger cae por debajo de la
+       boquilla, ese detalle no sale y hay que decirlo antes de imprimir. */
+    const tpl = plantillaActiva();
+    if (tpl && tpl.detalleMin) {
+      const h = Math.max(12, state.letterHeight / tpl.altoRef);
+      const fino = tpl.detalleMin * h * tpl.altoRef / 12;
+      if (fino < BOQUILLA_MM) {
+        const minimo = 12 * BOQUILLA_MM / tpl.detalleMin;
+        avisos.push('⚠️ A este tamaño el detalle más fino de la camiseta queda en <b>' +
+          fino.toFixed(2) + ' mm</b>, por debajo de la boquilla de 0.4.' +
+          '<br><small>Ese detalle no va a salir: la boquilla no lo resuelve y el laminador' +
+          ' lo rellena con hilos sueltos. Sube el <b>tamaño del número</b> a <b>' +
+          minimo.toFixed(0) + ' mm</b> o más para que salga entero.</small>');
+      }
     }
     if (!avisos.length) { box.hidden = true; return; }
     box.hidden = false;
