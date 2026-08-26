@@ -218,7 +218,7 @@ function buildKeychainTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 6;
 
   const polys = boldenPolygons(
-    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments, opts.lineGapRatio),
     opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
@@ -436,7 +436,7 @@ function shapesBounds(shapes) {
 function buildOutlineTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
   const polys = boldenPolygons(
-    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments, opts.lineGapRatio),
     opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin contornos');
@@ -812,7 +812,7 @@ function estimatePencilVolumeMM3(m) {
 function buildPencilNameTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
   const polys = boldenPolygons(
-    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments, opts.lineGapRatio),
     opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin contornos para lápiz');
@@ -1246,7 +1246,11 @@ function translatePolys(polys, dx, dy) {
  * Lay out one or two lines of text (second line smaller, centred underneath),
  * returning polygons centred on the origin.
  */
-function linesToPolygons(font, emojiFont, lines, letterHeightMM, curveSegments) {
+/** `gapRatio` es la separacion entre lineas en proporcion al alto de letra.
+ *  El 0.25 de siempre deja hueco de sobra para leer, pero en un llavero de
+ *  contorno las dos lineas tienen que TOCARSE para salir de una pieza, y con
+ *  fuentes de letra separada -Baloo 2- no llegaban ni con 2 mm de borde. */
+function linesToPolygons(font, emojiFont, lines, letterHeightMM, curveSegments, gapRatio) {
   const capHeight = getCapHeight(font);
   const all = [];
   const rendered = [];
@@ -1259,7 +1263,7 @@ function linesToPolygons(font, emojiFont, lines, letterHeightMM, curveSegments) 
     if (polys.length) rendered.push({polys, bounds: polysBounds(polys)});
   });
   if (!rendered.length) { const empty = []; empty.missing = missing; return empty; }
-  const gap = letterHeightMM * 0.25;
+  const gap = letterHeightMM * (gapRatio === undefined ? 0.25 : gapRatio);
   const totalH = rendered.reduce((s, r) => s + r.bounds.height, 0) + gap * (rendered.length - 1);
   let yTop = totalH / 2;
   rendered.forEach(r => {
@@ -1476,7 +1480,7 @@ const SHAPE_CONTENT = {
 function buildShapeTile(font, emojiFont, lines, shapeKey, opts) {
   const curveSegments = opts.curveSegments || 10;
   const polys = boldenPolygons(
-    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments, opts.lineGapRatio),
     opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
@@ -1541,7 +1545,7 @@ function buildShapeTile(font, emojiFont, lines, shapeKey, opts) {
 function buildDoubleOutlineTile(font, emojiFont, lines, opts) {
   const curveSegments = opts.curveSegments || 10;
   const polys = boldenPolygons(
-    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments),
+    linesToPolygons(font, emojiFont, lines, opts.letterHeightMM, curveSegments, opts.lineGapRatio),
     opts.textBoldMM);
   if (!polys.length) {
     const err = new Error('sin texto');
