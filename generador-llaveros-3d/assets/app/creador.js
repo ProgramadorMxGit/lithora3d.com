@@ -31,6 +31,9 @@
     letterHeight: 12,
     textBold: 0,         // negrita sintética en mm por lado; engorda trazos de fuentes script
     textCase: 'asis',    // 'asis' respeta lo tecleado | 'upper' MAYÚSCULAS | 'lower' minúsculas
+    // Parte el nombre en una linea por palabra. 'Eduardo Alonso' en una sola
+    // linea son 17 cm de tira; en dos, una pieza que cabe en la mano.
+    multilinea: false,
     fixedHeight: false,  // force every keychain to a target Y height (mm)
     targetHeight: 25,    // the general target Y height when fixedHeight is on
     nameHeights: [],     // per-name Y override (mm), parallel to names; blank = use general
@@ -723,6 +726,12 @@
     $('outline-width-row').style.display = needsOutline ? 'block' : 'none';
     const escala = $('name-scale-row');
     if (escala) escala.hidden = !jersey;
+    // Partir en lineas es cosa del llavero: el lapiz va por el tunel y la
+    // camiseta tiene su propia composicion de nombre y numero.
+    const multi = $('multilinea-row');
+    if (multi) multi.hidden = pencil || jersey;
+    const notaMulti = $('multilinea-note');
+    if (notaMulti) notaMulti.hidden = pencil || jersey || !state.multilinea;
     if (!needsOutline) $('islands-warn').hidden = true;
     $('borde-pick').hidden = pencil || (!jersey && state.style !== 'double');
   }
@@ -1152,6 +1161,15 @@
     v => Math.round(v * 100) + ' %');
 
   // ---------- fixed keychain height (Y) ----------
+  const multiChk = $('in-multilinea');
+  if (multiChk) {
+    multiChk.addEventListener('change', () => {
+      state.multilinea = multiChk.checked;
+      syncProductUI();
+      scheduleRebuild();
+    });
+  }
+
   const fixedHeightChk = $('in-fixedHeight');
   const targetHeightInput = $('in-targetHeight');
   function syncFixedHeightUI() {
@@ -1516,7 +1534,14 @@
 
       for (let i = 0; i < validEntries.length; i++) {
         const e = validEntries[i];
-        const lines = [{text: applyTextCase(e.name)}];
+        const texto = applyTextCase(e.name);
+        const palabras = texto.trim().split(/\s+/).filter(Boolean);
+        // linesToPolygons ya apila y centra varias lineas con su separacion;
+        // que acaben pegadas o sueltas depende del borde, y de eso avisa
+        // updateIslandsWarning.
+        const lines = (state.multilinea && palabras.length > 1)
+          ? palabras.map(t => ({text: t}))
+          : [{text: texto}];
         let tile;
         try {
           if (jerseyMode) tile = !tpl
@@ -1855,6 +1880,7 @@
   const SAVED_KEYS = [
     'productType', 'names', 'numbers', 'jerseyTemplate', 'jerseyInks', 'jerseyNameScale',
     'nameHeights', 'nameColors', 'fontKey', 'letterHeight', 'textBold', 'textCase', 'fixedHeight',
+    'multilinea',
     'targetHeight', 'baseThickness', 'raisedHeight', 'padding', 'corner', 'holeD',
     'pencilHoleD', 'pencilWall', 'pencilCapEnd', 'pencilTunnelStyle', 'showPencilGhost',
     'columns', 'gap', 'style', 'outlineWidth', 'bordeColor', 'baseColor',
@@ -1970,6 +1996,7 @@
     $('val-jerseyNameScale').textContent = Math.round(state.jerseyNameScale * 100) + ' %';
     $('val-columns').textContent = state.columns;
     $('in-rainbow').checked = state.rainbow;
+    if ($('in-multilinea')) $('in-multilinea').checked = state.multilinea;
     syncPencilCapUI();
     $('in-layerHeight').value = String(state.layerHeight);
     $('in-bordeColor').value = state.bordeColor;
