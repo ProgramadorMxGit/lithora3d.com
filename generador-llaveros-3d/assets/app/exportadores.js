@@ -408,6 +408,36 @@ function patchProjectSettings(template, groups, options = {}) {
   }
   groups.forEach((g, i) => { cfg.filament_colour[i] = toHex6(g.color); });
 
+  /* La matriz de purga se RECALCULA de los colores de verdad, no se extiende.
+     El bucle de arriba solo estira los arrays de longitud origN, y esta tiene
+     origN x origN: con 4 tintas se quedaba en 9 entradas cuando Bambu espera
+     16, y con los valores de los colores de la plantilla, no de los de la
+     pieza. Sin una matriz valida el laminador purga de menos y el color claro
+     arranca tenido del anterior: eso es lo que saco el blanco sucio sobre el
+     negro en la primera camiseta impresa.
+
+     Subir de luminancia es lo caro -tapar negro con blanco cuesta mucho mas
+     que al reves-, asi que ese termino pesa el doble que el de contraste. */
+  const rgbDe = hex => {
+    const h = toHex6(hex).slice(1);
+    return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
+  };
+  const tintas = groups.map(g => rgbDe(g.color));
+  const media = c => (c[0] + c[1] + c[2]) / 3;
+  const matriz = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) { matriz.push('0'); continue; }
+      const subida = Math.max(0, (media(tintas[j]) - media(tintas[i])) / 255);
+      const contraste = Math.max(...[0, 1, 2].map(k => Math.abs(tintas[j][k] - tintas[i][k]))) / 255;
+      matriz.push(String(Math.round((140 + 260 * contraste + 500 * subida) / 10) * 10));
+    }
+  }
+  cfg.flush_volumes_matrix = matriz;
+  if (Array.isArray(cfg.flush_volumes_vector)) {
+    cfg.flush_volumes_vector = new Array(n * 2).fill('140');
+  }
+
   const pencilMode = options.productType === 'pencil';
   const overrides = pencilMode
     ? {...QUALITY_OVERRIDES, ...PENCIL_QUALITY_OVERRIDES}

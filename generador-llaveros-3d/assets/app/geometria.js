@@ -2460,7 +2460,18 @@ function buildJerseyDoubleTile(font, emojiFont, name, number, tpl, opts) {
       (JERSEY_LEVEL_RATIO[Math.min(t.n, JERSEY_LEVEL_RATIO.length - 1)]);
     // t.w es el ancho más fino del grupo a tamaño de fábrica; escala con la pieza.
     const ancho = t.w ? t.w * h * tpl.altoRef / 12 : Infinity;
-    const alto = Math.min(nominal, JERSEY_ESBELTEZ * ancho);
+    /* El tope NUNCA baja del plano del fondo (el nivel 0). Si baja, el detalle
+       queda en un POZO y el fondo le imprime su capa de arriba encima: en la
+       primera pieza salieron el Caliente y el escudo en negro, con solo un filo
+       de color asomando por las paredes. A ras se ve el color; hundido, no. */
+    const piso = opts.textRaisedHeightMM * JERSEY_LEVEL_RATIO[0];
+    let alto = Math.max(piso, Math.min(nominal, JERSEY_ESBELTEZ * ancho));
+    /* Y se ajusta a un numero ENTERO de capas, hacia abajo. Con alturas a media
+       capa el laminador redondea el solo: la cara de arriba se queda en una
+       rebanada partida y cada altura distinta multiplica los cambios de
+       filamento, que es donde se ensucia el color. */
+    const capa = opts.layerHeightMM || 0.2;
+    alto = Math.max(Math.floor(piso / capa), Math.floor(alto / capa + 1e-9)) * capa;
     const paths = ClipperLib.Clipper.PolyTreeToPaths(clipperBoolean(
       polysToClipperPaths(templateToPolys(t.p, h)), null, ClipperLib.ClipType.ctUnion));
     extrude(polyTreeToShapes(conAgujero(paths)).shapes, zCore, zCore + Math.max(0.2, alto),
