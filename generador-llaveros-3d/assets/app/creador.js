@@ -1446,6 +1446,8 @@
       // a tocarse con fuentes de letra suelta -Baloo 2 pedia 2.4 mm de borde-.
       // A 0.18 fusionan con el borde de fabrica y nunca sale peor que antes.
       lineGapRatio: state.multilinea ? 0.18 : undefined,
+      // Para que el relieve caiga en capas enteras y no a media rebanada.
+      layerHeightMM: state.layerHeight,
       textBoldMM: state.textBold,
       baseThicknessMM: state.baseThickness,
       textRaisedHeightMM: state.raisedHeight,
