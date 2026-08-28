@@ -234,11 +234,23 @@ function buildKeychainTile(font, emojiFont, lines, opts) {
   const plateHeight = text2.height + padding * 2;
   const plateWidth = text2.width + padding * 2;
 
-  const loopOuterR = plateHeight / 2;
+  /* La argolla se dimensiona por UNA linea, no por la placa entera. Con dos
+     lineas la placa mide el doble y el aro salia igual de grande, centrado a
+     media altura: un circulo enorme metido entre los dos renglones. En un
+     llavero de verdad cuelga de la esquina de arriba y es del tamano de un
+     renglon. */
+  const lb = polys.lineBounds;
+  const altoRenglon = (lb && lb.length > 1)
+    ? (lb[0].maxY - lb[0].minY) + padding * 2
+    : plateHeight;
+  const loopOuterR = Math.min(plateHeight, altoRenglon) / 2;
   const loopInnerR = Math.max(0.6, loopHoleD / 2);
   const loopOverlap = Math.min(cornerRadius + 1.5, loopOuterR * 0.6);
   const loopCenterX = loopOuterR;
-  const loopCenterY = plateHeight / 2;
+  // Arriba del todo cuando hay varias lineas; centrada cuando solo hay una.
+  const loopCenterY = (lb && lb.length > 1)
+    ? plateHeight - loopOuterR
+    : plateHeight / 2;
 
   const plateX = loopOuterR * 2 - loopOverlap;
   const plateShape = roundedRectShape(plateX, 0, plateWidth, plateHeight, cornerRadius);
@@ -454,7 +466,12 @@ function buildOutlineTile(font, emojiFont, lines, opts) {
   // 2. fuse an eyelet on the left, overlapping the first letter so it holds
   const holeR = Math.max(0.6, opts.loopHoleDiameterMM / 2);
   const ringR = holeR + Math.max(opts.loopRingThicknessMM, opts.outlineWidthMM);
-  const preferredRingY = (tb.minY + tb.maxY) / 2;
+  // Con varias lineas la argolla va colgada de la PRIMERA, arriba, como en un
+  // llavero de verdad; centrada en el bloque caia en el hueco entre lineas.
+  const lb = polys.lineBounds;
+  const preferredRingY = (lb && lb.length > 1)
+    ? (lb[0].minY + lb[0].maxY) / 2
+    : (tb.minY + tb.maxY) / 2;
   const outlinedPolys = basePaths.map(path =>
     path.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const anchor = leftFilledAnchor(outlinedPolys, preferredRingY);
@@ -593,6 +610,7 @@ function boldenPolygons(polys, boldMM) {
   const paths = ClipperLib.Clipper.PolyTreeToPaths(tree);
   const out = paths.map(p => p.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   out.missing = polys.missing || [];
+  out.lineBounds = polys.lineBounds;
   return out;
 }
 
@@ -1266,16 +1284,26 @@ function linesToPolygons(font, emojiFont, lines, letterHeightMM, curveSegments, 
   const gap = letterHeightMM * (gapRatio === undefined ? 0.25 : gapRatio);
   const totalH = rendered.reduce((s, r) => s + r.bounds.height, 0) + gap * (rendered.length - 1);
   let yTop = totalH / 2;
+  /* Se apunta donde acaba cada linea. La argolla la necesita: con varias
+     lineas hay que colgarla de la PRIMERA, no del centro del bloque, que cae
+     en el hueco entre las dos y se monta sobre las letras de abajo. */
+  const lineBounds = [];
   rendered.forEach(r => {
     const dx = -(r.bounds.minX + r.bounds.maxX) / 2;
     const dy = yTop - r.bounds.maxY;
     all.push(...translatePolys(r.polys, dx, dy));
+    lineBounds.push({maxY: yTop, minY: yTop - r.bounds.height});
     yTop -= r.bounds.height + gap;
   });
+  all.lineBounds = lineBounds;
   // Emoji glyphs often contain touching/overlapping contours; a clipper
   // union normalises them so the extrusion has no duplicated edges.
   const out = typeof ClipperLib !== 'undefined' ? clipperNormalizePolys(all) : all;
   out.missing = missing;
+  // clipperNormalizePolys devuelve un array NUEVO: sin esta linea el dato de
+  // donde queda cada renglon se perdia aqui mismo y la argolla seguia yendose
+  // al centro del bloque.
+  out.lineBounds = lineBounds;
   return out;
 }
 
@@ -1563,7 +1591,12 @@ function buildDoubleOutlineTile(font, emojiFont, lines, opts) {
   // eyelet on the outer plate, left side
   const holeR = Math.max(0.6, opts.loopHoleDiameterMM / 2);
   const ringR = holeR + Math.max(opts.loopRingThicknessMM, w2);
-  const preferredRingY = (tb.minY + tb.maxY) / 2;
+  // Con varias lineas la argolla va colgada de la PRIMERA, arriba, como en un
+  // llavero de verdad; centrada en el bloque caia en el hueco entre lineas.
+  const lb = polys.lineBounds;
+  const preferredRingY = (lb && lb.length > 1)
+    ? (lb[0].minY + lb[0].maxY) / 2
+    : (tb.minY + tb.maxY) / 2;
   const outlinedPolys = outerPaths.map(path =>
     path.map(pt => [pt.X / CLIPPER_SCALE, pt.Y / CLIPPER_SCALE]));
   const anchor = leftFilledAnchor(outlinedPolys, preferredRingY);
