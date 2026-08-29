@@ -422,11 +422,19 @@ function patchProjectSettings(template, groups, options = {}) {
     const h = toHex6(hex).slice(1);
     return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16));
   };
-  const tintas = groups.map(g => rgbDe(g.color));
+  /* Se dimensiona por los huecos que DECLARA el archivo, no por los grupos de
+     la pieza. Con menos grupos que la plantilla (2 tintas sobre una plantilla
+     de 3) filament_colour sigue teniendo 3 entradas, y una matriz de 2x2 para
+     3 filamentos deja el project_settings INCONSISTENTE: Bambu lo rechaza
+     entero y se pierden de golpe TODOS los ajustes de calidad -planchado,
+     paredes arachne, contorno lento-, que es justo lo que dejó los llaveros de
+     nombre con la cara de arriba rugosa. */
+  const huecos = cfg.filament_colour.length;
+  const tintas = cfg.filament_colour.map(c => rgbDe(c));
   const media = c => (c[0] + c[1] + c[2]) / 3;
   const matriz = [];
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
+  for (let i = 0; i < huecos; i++) {
+    for (let j = 0; j < huecos; j++) {
       if (i === j) { matriz.push('0'); continue; }
       const subida = Math.max(0, (media(tintas[j]) - media(tintas[i])) / 255);
       const contraste = Math.max(...[0, 1, 2].map(k => Math.abs(tintas[j][k] - tintas[i][k]))) / 255;
@@ -435,7 +443,7 @@ function patchProjectSettings(template, groups, options = {}) {
   }
   cfg.flush_volumes_matrix = matriz;
   if (Array.isArray(cfg.flush_volumes_vector)) {
-    cfg.flush_volumes_vector = new Array(n * 2).fill('140');
+    cfg.flush_volumes_vector = new Array(huecos * 2).fill('140');
   }
 
   const pencilMode = options.productType === 'pencil';
