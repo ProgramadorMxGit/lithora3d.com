@@ -251,11 +251,34 @@ function toHex6(hex) {
  * Enum tokens are the serialized values BambuStudio expects, NOT UI labels.
  */
 const QUALITY_OVERRIDES = {
-  // ---- Ironing: the single biggest win for the flat top (base was "no ironing") ----
-  ironing_type: 'top',          // iron every top face: base plane AND letter tops (enum: no ironing|top|topmost|solid)
-  ironing_flow: '20%',          // was 15% — los cráteres residuales piden más material en la pasada de plancha
-  ironing_spacing: '0.1',       // was 0.15 — passes overlap below nozzle width, re-ironing the same area = glossier
-  ironing_speed: '20',          // was 30 — más lento = más calor por punto: la plancha refunde y rellena micro-picaduras
+  /* ---- Planchado: la mayor ganancia en la cara plana (de fábrica viene apagado) ----
+     El material que la plancha deposita por milímetro cuadrado es `flow /
+     spacing`. Bambu diseña su plancha en 10%/0.15 = 66.7. Las rondas anteriores
+     subieron el caudal a 20% y cerraron el paso a 0.1 persiguiendo picaduras:
+     eso son 200, TRES VECES el material por área sobre una superficie que la
+     pasada de arriba ya dejó llena. Lo sobrante no cabe, así que se amontona en
+     lomos y se arrastra.
+
+     Medido laminando "Debanhy" (92 mm, letra cursiva) con el CLI de Bambu:
+     con 20%/0.1 la plancha de la cara blanca daba 1912 pasadas de 2.8 mm de
+     media, el 40% de ellas por debajo de 1 mm. Una pasada de menos de 1 mm no
+     plancha: con 6000 mm/s² la boquilla acelera, frena y suelta un grumo. Eran
+     +23.7% de material sobre la cara vista y 9.5 min de boquilla a 220 °C
+     raspando unas letras de 1.4 mm de alto. De ahí salieron los llaveros
+     ondulados y con grumos del pedido de Naim.
+
+     El paso va a 0.18 y no a los 0.15 de Bambu porque nuestras líneas de cara
+     superior son de 0.5 mm y las suyas de 0.42: 0.15 x 0.5/0.42 = 0.18 conserva
+     el MISMO traslape que ellos calcularon. Resultado medido: 862 pasadas
+     (-55%), +11.5% de material (la mitad) y 3.4 min de plancha (un tercio).
+
+     Las picaduras que motivaron aquella subida se atacan donde nacen -capas de
+     cierre, ancho de línea, traslape pared-relleno, velocidad de cara- y todo
+     eso sigue abajo intacto. La plancha pule un techo ya cerrado; no lo cierra. */
+  ironing_type: 'top',          // plancha toda cara superior: meseta del fondo Y techo de las letras (enum: no ironing|top|topmost|solid)
+  ironing_flow: '10%',          // el de Bambu; 20% amontonaba material que no cabía
+  ironing_spacing: '0.18',      // el traslape de Bambu ajustado a nuestra línea de 0.5 mm
+  ironing_speed: '30',          // el de Bambu; a 20 sólo se alargaba el horneado de la pieza
 
   // ---- Top surface: cleaner, no infill telegraphing through the show face ----
   top_surface_pattern: 'monotonic',  // was monotonicline — propagates monotonic order to sub-layers (BambuStudio #1953)
