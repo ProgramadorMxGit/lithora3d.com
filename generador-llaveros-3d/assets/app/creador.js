@@ -164,10 +164,9 @@
     card.dataset.key = key;
     card.setAttribute('role', 'radio');
     card.setAttribute('aria-checked', 'false');
-    card.setAttribute('aria-label', f.label);
     card.tabIndex = -1;
     card.style.fontFamily = '"' + f.cssName + '", sans-serif';
-    card.innerHTML = '<span aria-hidden="true">Abc</span><small>' + escapeHtml(f.label) + '</small>' + (f.isCustom ? '<span class="badge">TUYA</span>' : '');
+    card.innerHTML = '<span>Abc</span><small>' + escapeHtml(f.label) + '</small>' + (f.isCustom ? '<span class="badge">TUYA</span>' : '');
     card.addEventListener('click', () => selectFont(key));
     card.addEventListener('keydown', ev => {
       if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); selectFont(key); return; }

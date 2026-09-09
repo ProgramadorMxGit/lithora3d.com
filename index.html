@@ -52,12 +52,33 @@
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "Organization",
+          "@type": "LocalBusiness",
           "@id": "https://lithora3d.com/#organization",
           "name": "Lithora 3D",
           "url": "https://lithora3d.com/",
           "logo": "https://lithora3d.com/assets/logo.png",
+          "image": "https://lithora3d.com/assets/og-card.jpg",
           "description": "Servicio de impresion 3D profesional para prototipos, piezas personalizadas y produccion bajo demanda.",
+          "telephone": "+52-833-108-0178",
+          "priceRange": "$$",
+          "currenciesAccepted": "MXN",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Tampico",
+            "addressRegion": "Tamaulipas",
+            "addressCountry": "MX"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 22.2553,
+            "longitude": -97.8686
+          },
+          "areaServed": [
+            { "@type": "City", "name": "Tampico" },
+            { "@type": "City", "name": "Ciudad Madero" },
+            { "@type": "City", "name": "Altamira" },
+            { "@type": "Country", "name": "Mexico" }
+          ],
           "sameAs": [
             "https://www.facebook.com/Lithora3D/",
             "https://www.instagram.com/lithora3d/"
@@ -195,6 +216,7 @@
               <li role="none"><a href="/prototipado-rapido/" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Prototipado rápido</a></li>
               <li role="none"><a href="/materiales-impresion-3d/" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Materiales de impresión 3D</a></li>
               <li role="none"><a href="/ecosistema-soluciones/" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Soluciones por nicho</a></li>
+              <li role="none"><a href="/recuerdos-personalizados-3d/" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Recuerdos para eventos</a></li>
               <li role="none"><a href="#piezas-personalizadas" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Piezas personalizadas</a></li>
               <li role="none"><a href="#produccion" class="dropdown-item block px-4 py-2 text-sm text-[#334155] hover:bg-[#F1F5F9]" role="menuitem">Producción bajo demanda</a></li>
             </ul>
@@ -223,6 +245,7 @@
       <a href="/prototipado-rapido/" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Prototipado rápido</a>
       <a href="/materiales-impresion-3d/" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Materiales</a>
       <a href="/ecosistema-soluciones/" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Soluciones por nicho</a>
+      <a href="/recuerdos-personalizados-3d/" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Recuerdos para eventos</a>
       <a href="/precios-impresion-3d/" class="nav-link text-sm text-[#334155] px-3 py-2 rounded-lg block">Precios</a>
       <a href="/generador-llaveros-3d/" class="nav-link text-sm font-semibold text-[#0369A1] px-3 py-2 rounded-lg block">Generador de llaveros gratis</a>
       <a href="/cotizar/" class="cta-sheen header-cta mt-2 inline-flex items-center justify-center gap-1.5 bg-[#0F172A] text-white text-sm font-semibold px-5 py-2.5 rounded-full w-full">Cotizar →</a>
@@ -445,6 +468,47 @@
             <a class="idea-showcase__secondary" href="/ecosistema-soluciones/">Ver ideas por nicho</a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         RECUERDOS PARA EVENTOS
+    ============================================================ -->
+    <section id="recuerdos" class="section-pad bg-[#F8FAFC]" aria-labelledby="recuerdos-title">
+      <div class="max-w-[1280px] mx-auto px-6">
+        <p data-animate="fade-up" class="section-eyebrow text-center text-[#0369A1] text-xs font-semibold uppercase tracking-widest mb-3">RECUERDOS PARA EVENTOS</p>
+        <h2 id="recuerdos-title" data-animate="fade-up" data-delay="80" class="text-3xl lg:text-4xl font-bold text-[#0F172A] text-center mb-4">
+          Recuerdos personalizados en lote, cada pieza con su nombre
+        </h2>
+        <p data-animate="fade-up" data-delay="120" class="text-[#334155] leading-relaxed text-center max-w-3xl mx-auto mb-12">Lotes de 50 a 100 piezas para bautizo, boda, baby shower y primera comunión, impresos en 3D sin molde ni mínimo de fábrica. Entrega en Tampico, Ciudad Madero y Altamira.</p>
+
+        <div data-animate="stagger" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Bautizo</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">El lote más pedido: cruces, angelitos y llaveros con el nombre del bebé y la fecha.</p>
+            <a href="/recuerdos-para-bautizo/" class="text-[#0369A1] text-sm font-semibold hover:underline">Recuerdos para bautizo →</a>
+          </article>
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Boda</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Iniciales de los novios, marcadores de mesa con el nombre de cada invitado y piezas en la paleta de la boda.</p>
+            <a href="/recuerdos-para-boda/" class="text-[#0369A1] text-sm font-semibold hover:underline">Recuerdos para boda →</a>
+          </article>
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Baby shower</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Biberones, ositos y nubes con el nombre del bebé, que también sirven de premio en los juegos.</p>
+            <a href="/recuerdos-para-baby-shower/" class="text-[#0369A1] text-sm font-semibold hover:underline">Recuerdos para baby shower →</a>
+          </article>
+          <article class="feature-card bg-white rounded-xl border border-[#E2E8F0] p-8 shadow-md">
+            <h3 class="text-xl font-semibold text-[#0F172A] mb-2">Primera comunión</h3>
+            <p class="text-sm text-[#334155] leading-relaxed mb-4">Cálices, biblias y espigas con el nombre del niño o la niña, listos para la fecha.</p>
+            <a href="/recuerdos-primera-comunion/" class="text-[#0369A1] text-sm font-semibold hover:underline">Recuerdos de primera comunión →</a>
+          </article>
+        </div>
+
+        <p data-animate="fade-up" class="text-center text-sm text-[#334155]">
+          <a href="/recuerdos-personalizados-3d/" class="text-[#0369A1] font-semibold hover:underline">Ver todos los recuerdos personalizados en 3D →</a>
+          &nbsp;·&nbsp; ¿Tienes impresora? <a href="/generador-llaveros-3d/" class="text-[#0369A1] font-semibold hover:underline">Genera los llaveros gratis</a>
+        </p>
       </div>
     </section>
 
@@ -1168,6 +1232,7 @@
         <a href="#servicios"   class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Servicios</a>
         <a href="/materiales-impresion-3d/" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Materiales</a>
         <a href="#ideas-impresas" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Ideas</a>
+        <a href="/recuerdos-personalizados-3d/" class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Recuerdos</a>
         <a href="#nosotros"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Nosotros</a>
         <a href="#recursos"    class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Recursos</a>
         <a href="/cotizar/"     class="text-sm text-[#94A3B8] hover:text-white transition-colors duration-200">Contacto</a>

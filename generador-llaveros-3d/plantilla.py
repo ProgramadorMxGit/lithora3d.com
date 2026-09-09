@@ -222,8 +222,8 @@ PAGINA = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF | Lithora 3D</title>
-<meta name="description" content="Crea llaveros 3D con nombre y nombres para l&aacute;piz, y desc&aacute;rgalos gratis en STL o 3MF multicolor para Bambu Studio. Sin registro y sin l&iacute;mite de descargas. Funciona con &ntilde; y tildes.">
+<title>Generador de llaveros y nombres para l&aacute;piz 3D gratis | Lithora 3D</title>
+<meta name="description" content="Crea llaveros con nombre y nombres para l&aacute;piz en 3D y desc&aacute;rgalos gratis en STL o 3MF multicolor para Bambu Studio. Sin registro, con &ntilde; y tildes.">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta name="theme-color" content="#0F172A">
 <link rel="canonical" href="{url}">
@@ -236,7 +236,7 @@ PAGINA = '''<!DOCTYPE html>
 <meta property="og:locale" content="es_MX">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Lithora 3D">
-<meta property="og:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
+<meta property="og:title" content="Generador de llaveros y nombres para l&aacute;piz 3D gratis">
 <meta property="og:description" content="Escribe los nombres, elige llavero o nombre para l&aacute;piz y desc&aacute;rgalo listo para imprimir. Gratis, sin registro y sin l&iacute;mite de descargas.">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="https://lithora3d.com/assets/og-card.jpg">
@@ -245,7 +245,7 @@ PAGINA = '''<!DOCTYPE html>
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Generador de llaveros 3D de Lithora 3D">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Generador de llaveros 3D y nombres para l&aacute;piz: gratis en STL y 3MF">
+<meta name="twitter:title" content="Generador de llaveros y nombres para l&aacute;piz 3D gratis">
 <meta name="twitter:description" content="Crea llaveros con nombre y desc&aacute;rgalos en STL o 3MF multicolor. Sin registro.">
 <meta name="twitter:image" content="https://lithora3d.com/assets/og-card.jpg">
 <link rel="preload" href="/assets/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -339,6 +339,9 @@ PAGINA = '''<!DOCTYPE html>
     <p>Lithora 3D es un servicio real de impresi&oacute;n 3D. Genera aqu&iacute; tu archivo y nos lo mandas, o
     cu&eacute;ntanos qu&eacute; necesitas y lo resolvemos nosotros: atendemos entregas en Tampico, Ciudad Madero y
     Altamira, y enviamos proyectos al resto de M&eacute;xico.</p>
+    <p>Si lo que buscas es un lote de recuerdos con nombre para bautizo, boda, baby shower o primera
+    comuni&oacute;n, mira <a href="/recuerdos-personalizados-3d/">recuerdos personalizados impresos en 3D</a>:
+    te cotizamos las piezas ya impresas, cada una con su nombre.</p>
     <p class="acciones-servicio">
       <a class="boton-primario" href="/cotizar/">Pedir una cotizaci&oacute;n</a>
       <a class="boton-secundario" href="/servicio-impresion-3d/">Ver el servicio completo</a>
@@ -354,6 +357,7 @@ PAGINA = '''<!DOCTYPE html>
     <a href="/prototipado-rapido/">Prototipado</a>
     <a href="/precios-impresion-3d/">Precios</a>
     <a href="/materiales-impresion-3d/">Materiales</a>
+    <a href="/recuerdos-personalizados-3d/">Recuerdos</a>
     <a href="/cotizar/">Cotizar</a>
   </p>
 </footer>
