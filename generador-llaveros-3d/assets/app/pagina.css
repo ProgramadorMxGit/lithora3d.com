@@ -122,6 +122,7 @@ header h1 {
 }
 .bloque-servicio h2 { color: white; }
 .bloque-servicio p { color: #CBD5E1; }
+.bloque-servicio p a:not(.boton-primario):not(.boton-secundario) { color: #7DD3FC; text-decoration: underline; text-underline-offset: 2px; }
 .acciones-servicio { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .boton-primario, .boton-secundario {
   display: inline-block;
